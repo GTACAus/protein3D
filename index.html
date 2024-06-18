@@ -475,7 +475,7 @@
 
         function copyText() {
             const sequenceContainer = document.getElementById('sequence-container');
-            const sequenceText = sequenceContainer.textContent;
+            const sequenceText = sequenceContainer.textContent.split('\n').slice(1).join('').trim();
             navigator.clipboard.writeText(sequenceText).then(() => {
                 alert('Text copied to clipboard');
             });
@@ -525,7 +525,7 @@
                 document.getElementById('substrateOrDrug').textContent = substrateOrDrug;
 
                 originalText = geneSeq;
-                document.getElementById('sequence-container').textContent = `>${geneName}\n${geneSeq}`;
+                document.getElementById('sequence-container').textContent = geneSeq;
 
                 initializeViewers(); // Initialize viewers with new data
             };
