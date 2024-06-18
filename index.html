@@ -473,6 +473,14 @@
             document.getElementById(outputId).innerHTML = proteinSequence;
         }
 
+        function copyText() {
+            const sequenceContainer = document.getElementById('sequence-container');
+            const sequenceText = sequenceContainer.textContent;
+            navigator.clipboard.writeText(sequenceText).then(() => {
+                alert('Text copied to clipboard');
+            });
+        }
+
         function copyMutantText() {
             const proteinSequenceDiv = document.getElementById('proteinSequence2');
             const highlightedText = proteinSequenceDiv.querySelector('.highlight').innerText;
