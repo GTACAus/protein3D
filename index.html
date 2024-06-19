@@ -109,14 +109,6 @@
             box-sizing: border-box;
             overflow-y: auto;
         }
-        .highlight {
-            color: green;
-        }
-        /* New style for active site text */
-        #activeSiteText {
-            word-wrap: break-word; /* Ensure long words or sequences wrap */
-            white-space: pre-wrap; /* Preserve whitespace and wrap text */
-        }
         .highlight-faint-purple {
             background-color: #E6E6FA;
         }
@@ -214,10 +206,6 @@
                     <div id="originalSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
                 </div>
                 <div>
-                    <h3>Mutant Sequence</h3>
-                    <div id="mutantSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
-                </div>
-                <div>
                     <h3>Key</h3>
                     <p><span class="highlight-blue">Light Blue</span>: Every second codon</p>
                     <p><span class="highlight-faint-purple">Faint Purple</span>: Silent mutation</p>
@@ -226,6 +214,10 @@
                     <p><span class="highlight-red">Red</span>: Premature stop codon</p>
                     <p><span style="text-decoration: underline;">Underline</span>: Nucleotide insertion or deletion</p>
                     <p><span style="text-decoration: line-through;">Strikethrough</span>: Deleted codon</p>
+                </div>
+                <div>
+                    <h3>Mutant Sequence</h3>
+                    <div id="mutantSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
                 </div>
             </div>
         </div>
@@ -302,7 +294,7 @@
                         const neutral = new Set(['SER', 'THR', 'CYS', 'TYR', 'HIS']);
                         if (hydrophobic.has(atom.resn)) return 'yellow';
                         else if (hydrophilic.has(atom.resn)) return 'white';
-                        else if (neutral.has(atom.resn)) return 'gray';
+                        else if (neutral has(atom.resn)) return 'gray';
                         return 'green';  // fallback color
                     }
                 }
@@ -643,17 +635,19 @@
                     }
 
                     // Frameshift mutation (highlight all subsequent codons in orange)
-                    if (codon.length !== 3 || frameshiftOccurred) {
+                    if (!frameshiftOccurred && (codon.length !== 3 || codon.includes('_'))) {
                         frameshiftOccurred = true;
-                        if (i % 2 === 0) {
-                            mutantHTML = mutantHTML.replace(codon, `<span class="highlight-orange">${codon}</span>`);
-                        }
+                        // Highlight subsequent codons in orange
                     }
+                }
 
-                    // Premature stop codon (highlight the first stop codon in red)
-                    if (codonTable[codon] === '*' && !foundStopCodon) {
-                        foundStopCodon = true;
+                // Highlight frameshifted codons in orange
+                if (frameshiftOccurred) {
+                    if (codonTable[codon] === '*') {
                         mutantHTML = mutantHTML.replace(codon, `<span class="highlight-red">${codon}</span>`);
+                        frameshiftOccurred = false;  // Stop highlighting after first stop codon
+                    } else {
+                        mutantHTML = mutantHTML.replace(codon, `<span class="highlight-orange">${codon}</span>`);
                     }
                 }
 
