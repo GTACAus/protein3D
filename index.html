@@ -605,50 +605,50 @@
             const mutantCodons = getCodons(mutantSeq);
             let originalHTML = '';
             let mutantHTML = '';
-            let mutationDetected = false;
-            let foundStopCodon = false;
             let frameshiftOccurred = false;
+            let foundStopCodon = false;
+
+            function applyHighlight(codon, highlightClass) {
+                return `<span class="${highlightClass}">${codon}</span>`;
+            }
+
+            function compareAndHighlightCodons(originalCodon, mutantCodon, index) {
+                if (originalCodon === mutantCodon) {
+                    return mutantCodon;
+                }
+
+                // Detect and highlight mutations
+                if (codonTable[originalCodon] === codonTable[mutantCodon]) {
+                    return applyHighlight(mutantCodon, 'highlight-faint-purple'); // Silent mutation
+                } else if (codonTable[originalCodon] !== codonTable[mutantCodon] && codonTable[mutantCodon] !== '*') {
+                    return applyHighlight(mutantCodon, 'highlight-yellow'); // Amino acid substitution
+                } else if (mutantCodon.length !== 3 || mutantCodon.includes('_')) {
+                    frameshiftOccurred = true;
+                    return applyHighlight(mutantCodon, 'highlight-orange'); // Frameshift mutation
+                }
+
+                return mutantCodon;
+            }
 
             for (let i = 0; i < mutantCodons.length; i++) {
                 const codon = mutantCodons[i];
                 const originalCodon = originalCodons[i];
 
-                // Highlight every second codon in light blue
-                if (i % 2 === 0) {
-                    mutantHTML += `<span class="highlight-blue">${codon}</span>`;
+                // Apply mutations first
+                if (!frameshiftOccurred) {
+                    mutantHTML += compareAndHighlightCodons(originalCodon, codon, i);
                 } else {
-                    mutantHTML += codon;
-                }
-
-                // Detect and highlight mutations
-                if (codon !== originalCodon) {
-                    mutationDetected = true;
-
-                    // Silent mutation (only highlight if codon translates to the same amino acid)
-                    if (codonTable[codon] === codonTable[originalCodon]) {
-                        mutantHTML = mutantHTML.replace(codon, `<span class="highlight-faint-purple">${codon}</span>`);
-                    }
-
-                    // Amino acid substitution
-                    if (codonTable[codon] !== codonTable[originalCodon] && codonTable[codon] !== '*') {
-                        mutantHTML = mutantHTML.replace(codon, `<span class="highlight-yellow">${codon}</span>`);
-                    }
-
-                    // Frameshift mutation (highlight all subsequent codons in orange)
-                    if (!frameshiftOccurred && (codon.length !== 3 || codon.includes('_'))) {
-                        frameshiftOccurred = true;
-                        // Highlight subsequent codons in orange
-                    }
-                }
-
-                // Highlight frameshifted codons in orange
-                if (frameshiftOccurred) {
                     if (codonTable[codon] === '*') {
-                        mutantHTML = mutantHTML.replace(codon, `<span class="highlight-red">${codon}</span>`);
-                        frameshiftOccurred = false;  // Stop highlighting after first stop codon
+                        mutantHTML += applyHighlight(codon, 'highlight-red'); // Premature stop codon
+                        frameshiftOccurred = false; // Stop highlighting after first stop codon
                     } else {
-                        mutantHTML = mutantHTML.replace(codon, `<span class="highlight-orange">${codon}</span>`);
+                        mutantHTML += applyHighlight(codon, 'highlight-orange'); // Frameshifted codons
                     }
+                }
+
+                // Highlight every second codon in light blue
+                if (!frameshiftOccurred && i % 2 === 0) {
+                    mutantHTML = mutantHTML.replace(codon, applyHighlight(codon, 'highlight-blue'));
                 }
 
                 // Add newline every 10 codons for readability
