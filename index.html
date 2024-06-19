@@ -190,6 +190,21 @@
             </div>
         </div>
 
+        <!-- Compare Original and Mutant Sequences -->
+        <div class="container card">
+            <div class="card-content">
+                <h2>Compare Original and Mutant Sequences</h2>
+                <div>
+                    <h3>Original Sequence</h3>
+                    <div id="originalSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
+                </div>
+                <div>
+                    <h3>Mutant Sequence</h3>
+                    <div id="mutantSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
+                </div>
+            </div>
+        </div>
+
         <!-- Use AI to Fold Protein -->
         <div class="container card">
             <div class="card-content">
@@ -540,6 +555,95 @@
         }
 
         document.getElementById('fileInput').addEventListener('change', loadXMLFile);
+
+        function highlightMutantSequence(originalSeq, mutantSeq) {
+            const codonTable = {
+                'TTT': 'F', 'TTC': 'F', 'TTA': 'L', 'TTG': 'L',
+                'CTT': 'L', 'CTC': 'L', 'CTA': 'L', 'CTG': 'L',
+                'ATT': 'I', 'ATC': 'I', 'ATA': 'I', 'ATG': 'M',
+                'GTT': 'V', 'GTC': 'V', 'GTA': 'V', 'GTG': 'V',
+                'TCT': 'S', 'TCC': 'S', 'TCA': 'S', 'TCG': 'S',
+                'CCT': 'P', 'CCC': 'P', 'CCA': 'P', 'CCG': 'P',
+                'ACT': 'T', 'ACC': 'T', 'ACA': 'T', 'ACG': 'T',
+                'GCT': 'A', 'GCC': 'A', 'GCA': 'A', 'GCG': 'A',
+                'TAT': 'Y', 'TAC': 'Y', 'TAA': '*', 'TAG': '*',
+                'CAT': 'H', 'CAC': 'H', 'CAA': 'Q', 'CAG': 'Q',
+                'AAT': 'N', 'AAC': 'N', 'AAA': 'K', 'AAG': 'K',
+                'GAT': 'D', 'GAC': 'D', 'GAA': 'E', 'GAG': 'E',
+                'TGT': 'C', 'TGC': 'C', 'TGA': '*', 'TGG': 'W',
+                'CGT': 'R', 'CGC': 'R', 'CGA': 'R', 'CGG': 'R',
+                'AGT': 'S', 'AGC': 'S', 'AGA': 'R', 'AGG': 'R',
+                'GGT': 'G', 'GGC': 'G', 'GGA': 'G', 'GGG': 'G'
+            };
+
+            function getCodons(dnaSequence) {
+                const codons = [];
+                for (let i = 0; i < dnaSequence.length; i += 3) {
+                    codons.push(dnaSequence.substr(i, 3));
+                }
+                return codons;
+            }
+
+            const originalCodons = getCodons(originalSeq);
+            const mutantCodons = getCodons(mutantSeq);
+            let originalHTML = '';
+            let mutantHTML = '';
+            let mutationDetected = false;
+            let foundStopCodon = false;
+
+            for (let i = 0; i < mutantCodons.length; i++) {
+                const codon = mutantCodons[i];
+                const originalCodon = originalCodons[i];
+
+                // Highlight every second codon
+                if (i % 2 === 0) {
+                    mutantHTML += `<span style="background-color: lightblue;">${codon}</span>`;
+                } else {
+                    mutantHTML += codon;
+                }
+
+                // Check for silent mutation
+                if (codonTable[codon] === codonTable[originalCodon]) {
+                    mutantHTML += `<span style="background-color: purple;">${codon}</span>`;
+                }
+
+                // Check for frameshift mutation
+                if (mutationDetected && (i % 2 === 0)) {
+                    mutantHTML += `<span style="background-color: orange;">${codon}</span>`;
+                }
+
+                // Check for premature stop codon
+                if (codonTable[codon] === '*' && !foundStopCodon) {
+                    foundStopCodon = true;
+                    mutantHTML += `<span style="text-decoration: line-through;">${codon}</span>`;
+                }
+
+                // Check for amino acid substitution
+                if (codonTable[codon] !== codonTable[originalCodon]) {
+                    mutantHTML += `<span style="background-color: yellow;">${codon}</span>`;
+                }
+
+                // Check for nucleotide insertions and deletions
+                if (codon.length !== 3) {
+                    mutantHTML += `<span style="text-decoration: underline;">${codon}</span>`;
+                }
+
+                originalHTML += originalCodon;
+                if ((i + 1) % 10 === 0) {
+                    originalHTML += '\n';
+                    mutantHTML += '\n';
+                }
+            }
+
+            document.getElementById('originalSequence').innerHTML = originalHTML;
+            document.getElementById('mutantSequence').innerHTML = mutantHTML;
+        }
+
+        // Example usage:
+        const originalSeq = "ATGCGATACGCTTGA";
+        const mutantSeq = "ATGCGTACGCTTGA";
+        highlightMutantSequence(originalSeq, mutantSeq);
+
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
