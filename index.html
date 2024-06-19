@@ -294,7 +294,7 @@
                         const neutral = new Set(['SER', 'THR', 'CYS', 'TYR', 'HIS']);
                         if (hydrophobic.has(atom.resn)) return 'yellow';
                         else if (hydrophilic.has(atom.resn)) return 'white';
-                        else if (neutral has(atom.resn)) return 'gray';
+                        else if (neutral.has(atom.resn)) return 'gray';
                         return 'green';  // fallback color
                     }
                 }
