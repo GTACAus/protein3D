@@ -109,21 +109,6 @@
             box-sizing: border-box;
             overflow-y: auto;
         }
-        .highlight-faint-purple {
-            background-color: #E6E6FA;
-        }
-        .highlight-yellow {
-            background-color: yellow;
-        }
-        .highlight-orange {
-            background-color: orange;
-        }
-        .highlight-red {
-            color: red;
-        }
-        .highlight-blue {
-            background-color: lightblue;
-        }
     </style>
 </head>
 <body>
@@ -204,16 +189,6 @@
                 <div>
                     <h3>Original Sequence</h3>
                     <div id="originalSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
-                </div>
-                <div>
-                    <h3>Key</h3>
-                    <p><span class="highlight-blue">Light Blue</span>: Every second codon</p>
-                    <p><span class="highlight-faint-purple">Faint Purple</span>: Silent mutation</p>
-                    <p><span class="highlight-yellow">Yellow</span>: Amino acid substitution</p>
-                    <p><span class="highlight-orange">Orange</span>: Frameshift mutation</p>
-                    <p><span class="highlight-red">Red</span>: Premature stop codon</p>
-                    <p><span style="text-decoration: underline;">Underline</span>: Nucleotide insertion or deletion</p>
-                    <p><span style="text-decoration: line-through;">Strikethrough</span>: Deleted codon</p>
                 </div>
                 <div>
                     <h3>Mutant Sequence</h3>
@@ -574,25 +549,6 @@
         document.getElementById('fileInput').addEventListener('change', loadXMLFile);
 
         function highlightMutantSequence(originalSeq, mutantSeq) {
-            const codonTable = {
-                'TTT': 'F', 'TTC': 'F', 'TTA': 'L', 'TTG': 'L',
-                'CTT': 'L', 'CTC': 'L', 'CTA': 'L', 'CTG': 'L',
-                'ATT': 'I', 'ATC': 'I', 'ATA': 'I', 'ATG': 'M',
-                'GTT': 'V', 'GTC': 'V', 'GTA': 'V', 'GTG': 'V',
-                'TCT': 'S', 'TCC': 'S', 'TCA': 'S', 'TCG': 'S',
-                'CCT': 'P', 'CCC': 'P', 'CCA': 'P', 'CCG': 'P',
-                'ACT': 'T', 'ACC': 'T', 'ACA': 'T', 'ACG': 'T',
-                'GCT': 'A', 'GCC': 'A', 'GCA': 'A', 'GCG': 'A',
-                'TAT': 'Y', 'TAC': 'Y', 'TAA': '*', 'TAG': '*',
-                'CAT': 'H', 'CAC': 'H', 'CAA': 'Q', 'CAG': 'Q',
-                'AAT': 'N', 'AAC': 'N', 'AAA': 'K', 'AAG': 'K',
-                'GAT': 'D', 'GAC': 'D', 'GAA': 'E', 'GAG': 'E',
-                'TGT': 'C', 'TGC': 'C', 'TGA': '*', 'TGG': 'W',
-                'CGT': 'R', 'CGC': 'R', 'CGA': 'R', 'CGG': 'R',
-                'AGT': 'S', 'AGC': 'S', 'AGA': 'R', 'AGG': 'R',
-                'GGT': 'G', 'GGC': 'G', 'GGA': 'G', 'GGG': 'G'
-            };
-
             function getCodons(dnaSequence) {
                 const codons = [];
                 for (let i = 0; i < dnaSequence.length; i += 3) {
@@ -605,64 +561,16 @@
             const mutantCodons = getCodons(mutantSeq);
             let originalHTML = '';
             let mutantHTML = '';
-            let frameshiftOccurred = false;
-            let foundStopCodon = false;
 
-            function applyHighlight(codon, highlightClass) {
-                return `<span class="${highlightClass}">${codon}</span>`;
+            for (let i = 0; i < originalCodons.length; i++) {
+                originalHTML += originalCodons[i] + ' ';
+                if (i < mutantCodons.length) {
+                    mutantHTML += mutantCodons[i] + ' ';
+                }
             }
 
-            function compareAndHighlightCodons(originalCodon, mutantCodon, index) {
-                if (originalCodon === mutantCodon) {
-                    return mutantCodon;
-                }
-
-                // Detect and highlight mutations
-                if (codonTable[originalCodon] === codonTable[mutantCodon]) {
-                    return applyHighlight(mutantCodon, 'highlight-faint-purple'); // Silent mutation
-                } else if (codonTable[originalCodon] !== codonTable[mutantCodon] && codonTable[mutantCodon] !== '*') {
-                    return applyHighlight(mutantCodon, 'highlight-yellow'); // Amino acid substitution
-                } else if (mutantCodon.length !== 3 || mutantCodon.includes('_')) {
-                    frameshiftOccurred = true;
-                    return applyHighlight(mutantCodon, 'highlight-orange'); // Frameshift mutation
-                }
-
-                return mutantCodon;
-            }
-
-            for (let i = 0; i < mutantCodons.length; i++) {
-                const codon = mutantCodons[i];
-                const originalCodon = originalCodons[i];
-
-                // Apply mutations first
-                if (!frameshiftOccurred) {
-                    mutantHTML += compareAndHighlightCodons(originalCodon, codon, i);
-                } else {
-                    if (codonTable[codon] === '*') {
-                        mutantHTML += applyHighlight(codon, 'highlight-red'); // Premature stop codon
-                        frameshiftOccurred = false; // Stop highlighting after first stop codon
-                    } else {
-                        mutantHTML += applyHighlight(codon, 'highlight-orange'); // Frameshifted codons
-                    }
-                }
-
-                // Highlight every second codon in light blue
-                if (!frameshiftOccurred && i % 2 === 0) {
-                    mutantHTML = mutantHTML.replace(codon, applyHighlight(codon, 'highlight-blue'));
-                }
-
-                // Add newline every 10 codons for readability
-                if ((i + 1) % 10 === 0) {
-                    originalHTML += '\n';
-                    mutantHTML += '\n';
-                }
-
-                originalHTML += originalCodon;
-                mutantHTML += codon;
-            }
-
-            document.getElementById('originalSequence').innerHTML = originalHTML;
-            document.getElementById('mutantSequence').innerHTML = mutantHTML;
+            document.getElementById('originalSequence').innerHTML = originalHTML.trim();
+            document.getElementById('mutantSequence').innerHTML = mutantHTML.trim();
         }
 
         function compareSequences() {
@@ -671,10 +579,8 @@
             highlightMutantSequence(originalSeq, mutantSeq);
         }
 
-        // Call compareSequences after translating both sequences
-        document.getElementById('dnaSequence1').addEventListener('change', compareSequences);
-        document.getElementById('dnaSequence2').addEventListener('change', compareSequences);
-
+        document.getElementById('dnaSequence1').addEventListener('input', compareSequences);
+        document.getElementById('dnaSequence2').addEventListener('input', compareSequences);
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
