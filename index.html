@@ -639,10 +639,15 @@
             document.getElementById('mutantSequence').innerHTML = mutantHTML;
         }
 
-        // Example usage:
-        const originalSeq = "ATGCGATACGCTTGA";
-        const mutantSeq = "ATGCGTACGCTTGA";
-        highlightMutantSequence(originalSeq, mutantSeq);
+        function compareSequences() {
+            const originalSeq = document.getElementById('dnaSequence1').value.toUpperCase().replace(/[^ATCG]/g, '');
+            const mutantSeq = document.getElementById('dnaSequence2').value.toUpperCase().replace(/[^ATCG]/g, '');
+            highlightMutantSequence(originalSeq, mutantSeq);
+        }
+
+        // Call compareSequences after translating both sequences
+        document.getElementById('dnaSequence1').addEventListener('change', compareSequences);
+        document.getElementById('dnaSequence2').addEventListener('change', compareSequences);
 
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
