@@ -227,12 +227,20 @@
         <div class="card">
             <div class="card-content">
                 <h2>Space fill structure</h2>
-                <p>In this representation, the space taken up by each amino acid is represented by spheres. In addition, each amino acid is coloured by its hydrophobicity. Refer to the amino acid tuber models and determine which colours represent hydrophobic and hydrophilic amino acid residues.</p>
+                <p>In this representation, the space taken up by each amino acid is represented by spheres. In addition, each amino acid is coloured by its hydrophobicity and charge:</p>
+                <ul>
+                    <li>Yellow: Hydrophobic</li>
+                    <li>White: Hydrophilic</li>
+                    <li>Gray: Neutral</li>
+                    <li>Red: Negatively charged (Asp, Glu)</li>
+                    <li>Blue: Positively charged (Arg, Lys)</li>
+                </ul>
                 <div class="viewer-container">
                     <div id="viewer3" class="viewer"></div>
                     <button class="refresh-button" onclick="reloadViewer('viewer3', 2)">Reset model</button>
                 </div>
-                <p class="big-blue-text">Where are the hydrophilic and hydrophobic amino acids mainly located – inside or outside the protein? Why do you think that might occur?</p>
+                <p class="big-blue-text">Where are the hydrophilic and hydrophobic amino acids mainly located – inside or outside the protein? Why do you think that might occur?<br>
+                Where are the positively and negatively charged amino acids located in relation to one another? Why might this be the case?</p>
             </div>
         </div>
 
@@ -241,6 +249,7 @@
             <div class="card-content">
                 <h2>Active site <span id="activeSite"></span></h2>
                 <p id="activeSiteText"></p>
+                <p>Click on residues in the primary structure to highlight any part of the protein with green spheres.</p>
             </div>
         </div>
 
