@@ -109,6 +109,9 @@
             box-sizing: border-box;
             overflow-y: auto;
         }
+        .sequence-title {
+            font-size: 1.2em;
+        }
     </style>
 </head>
 <body>
@@ -187,11 +190,11 @@
             <div class="card-content">
                 <h2>Compare Original and Mutant Sequences</h2>
                 <div>
-                    <h3>Original Sequence</h3>
+                    <h3 class="sequence-title">Original Sequence</h3>
                     <div id="originalSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
                 </div>
                 <div>
-                    <h3>Mutant Sequence</h3>
+                    <h3 class="sequence-title">Mutant Sequence</h3>
                     <div id="mutantSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
                 </div>
             </div>
@@ -267,7 +270,11 @@
                         const hydrophobic = new Set(['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'PRO', 'GLY']);
                         const hydrophilic = new Set(['ARG', 'LYS', 'ASP', 'GLU', 'ASN', 'GLN']);
                         const neutral = new Set(['SER', 'THR', 'CYS', 'TYR', 'HIS']);
-                        if (hydrophobic.has(atom.resn)) return 'yellow';
+                        const positive = new Set(['ARG', 'LYS']);
+                        const negative = new Set(['ASP', 'GLU']);
+                        if (positive.has(atom.resn)) return 'blue';
+                        else if (negative.has(atom.resn)) return 'red';
+                        else if (hydrophobic.has(atom.resn)) return 'yellow';
                         else if (hydrophilic.has(atom.resn)) return 'white';
                         else if (neutral.has(atom.resn)) return 'gray';
                         return 'green';  // fallback color
