@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -693,13 +694,20 @@
             const maxBFactor = Math.max(...bFactors);
             const minBFactor = Math.min(...bFactors);
 
-            viewer.setStyle({}, {
-                { cartoon: { color: 'spectrum' } 
-                }
-            });
+viewer.setStyle({}, {
+    cartoon: {
+        color: atom => {
+            const bFactor = atom.b;
+            const normalized = (bFactor - minBFactor) / (maxBFactor - minBFactor);
+            const h = (1.0 - normalized) * 240; // 0 (red) to 240 (blue)
+            return `hsl(${h}, 100%, 50%)`;
+        }
+    }
+});
 
-            viewer.zoomTo();
-            viewer.render();
+viewer.zoomTo();
+viewer.render();
+
         }
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
