@@ -299,7 +299,6 @@
                 <div class="row">
                     <div class="col s12 m6">
                         <h3 class="sequence-title"><b>AlphaFold Image</b></h3>
-<div></div>
                         <img id="alphafoldImage" style="max-width: 100%; display: none;" />
                     </div>
                     <div class="col s12 m6">
@@ -689,11 +688,7 @@
             viewer.setStyle({}, {
                 cartoon: {
                     color: atom => {
-                        const bFactor = atom.b;
-                        const normalized = (bFactor - minBFactor) / (maxBFactor - minBFactor);
-                        const red = Math.floor(255 * normalized);
-                        const green = Math.floor(255 * (1 - normalized));
-                        return `rgb(${red},${green},0)`;
+                      
                     }
                 }
             });
