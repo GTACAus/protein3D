@@ -44,7 +44,7 @@
             border-radius: 8px;
             overflow: hidden;
         }
-        .refresh-button, .deselect-button {
+        .refresh-button, .deselect-button, .toggle-style-button {
             margin: 10px;
             padding: 10px 20px;
             background-color: #1e88e5;
@@ -54,7 +54,7 @@
             border-radius: 4px;
             display: inline-block;
         }
-        .refresh-button:hover, .deselect-button:hover {
+        .refresh-button:hover, .deselect-button:hover, .toggle-style-button:hover {
             background-color: #1565c0;
         }
         .viewer {
@@ -195,7 +195,7 @@
             <div class="container card">
                 <div class="card-content">
                     <h2>Translate the <span id="geneName3"></span> gene</h2>
-                    <p>Use the tool below to translate the copied <span id="geneName4"></span> nucleotide sequence to a protein primary structure. Paste the sequence into the sequence box and click/tap TRANSLATE.</p>
+                    <p>Bioinformatics tools can quickly perform this task.  You will use the translate tool to quickly process your coding DNA sequence into a translated amino acid sequence.  Use the tool below to translate the copied <span id="geneName4"></span> nucleotide sequence to a protein primary structure. Paste the sequence into the sequence box and click/tap TRANSLATE.</p>
                     <textarea id="dnaSequence1" rows="10" placeholder="Enter DNA sequence here..."></textarea>
                     <br>
                     <button onclick="translateDNA('dnaSequence1', 'proteinSequence1')">Translate</button>
@@ -225,6 +225,7 @@
                 <div class="card-content">
                     <h2>Compare the original and mutant gene sequences</h2>
                     <div>
+                        <p>Your coding DNA consists of the start codon, the stop codon and all of the nucleotides between.  Each codon in your coding DNA will be transcribed into mRNA and translated into a sequence of amino acids.</p>
                         <h3 class="sequence-title">Original Sequence</h3>
                         <div id="originalSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
                     </div>
@@ -243,7 +244,11 @@
             <div class="container card">
                 <div class="card-content">
                     <h2>Use AI to fold your mutant protein</h2>
-                    <p>Copy the amino acid sequence from your mutant amino acid translation.</p>
+                    <p>Recent advances in artificial intelligence have allowed scientists to use computers to simulate protein folding in order to determine what a protein’s 3D structure might look like without needing to make observations of real proteins.  
+
+AlphaFold is a tool that uses machine learning algorithms to perform high accuracy predictions about what a protein’s 3D structure might look like using only an amino acid sequence as an input.  
+                        
+Copy the amino acid sequence from your mutant amino acid translation.</p>
                     <p>Navigate to this page: <a href="https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb" target="_blank">AlphaFold2 Notebook.</a></p>
                     <p class="big-blue-text">How does your mutation impact the 3D structure of your <span id="proteinName4"></span>?</p>
                 </div>
@@ -253,7 +258,9 @@
             <div class="card">
                 <div class="card-content">
                     <h2>Atomic Structure</h2>
-                    <p>In the atomic structure model, every atom in each amino acid is shown. Carbon, Oxygen, Nitrogen, and Hydrogen are represented in this view.</p>
+                    <p>Amino acid chains fold into tertiary structures that have 3D shapes.  These shapes are closely related to how they function and interact with systems within organisms.  Historically, 3D protein structures have been empirically determined using powerful tools and techniques including X-ray crystallography and electron microscopy.  
+
+In the atomic structure model, every atom in each amino acid is shown. Carbon, Oxygen, Nitrogen, and Hydrogen are represented in this view.</p>
                     <div class="viewer-container">
                         <div id="viewer2" class="viewer"></div>
                         <button class="refresh-button" onclick="reloadViewer('viewer2', 1)">Reset model</button>
@@ -266,7 +273,9 @@
             <div class="card">
                 <div class="card-content">
                     <h2>Space fill structure</h2>
-                    <p>In this representation, the space taken up by each amino acid is represented by spheres. In addition, each amino acid is coloured by its hydrophobicity and charge:</p>
+                    <p>The properties of amino acids determines how they arrange themselves and interact with one another.
+
+In this representation, the space taken up by each amino acid is represented by spheres. In addition, each amino acid is coloured by its hydrophobicity and charge:</p>
                     <ul class="spacefill-key">
                         <li><span style="color: yellow;">●</span> Hydrophobic</li>
                         <li><span class="hydrophilic" style="color: lightgrey;"></span> Hydrophilic</li>
@@ -305,7 +314,8 @@
                             <h3 class="sequence-title"><b>Mutant protein</b></h3>
                             <div id="mutantViewer" class="viewer" style="height: 400px; width: 100%;"></div>
                             <button class="refresh-button" onclick="reloadMutantViewer()">Display mutant protein</button>
-                        </div>                        <div class="col s12 m6">
+                        </div>                        
+                        <div class="col s12 m6">
                             <h3 class="sequence-title"><b>Original protein</b></h3>
                             <div id="alphafoldViewer" class="viewer" style="height: 400px; width: 100%;"></div>
                             <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Display original protein</button>
@@ -322,6 +332,7 @@
                             <img id="alphafoldImage" style="max-width: 100%; display: none;" />
                         </div>
                     </div>
+                    
                     <p class="big-blue-text">How might the mutation impact the ability of <span id="substrateOrDrug"></span> to do their job? How might the mutation impact the ability of this protein to do its job?</p>
                 </div>
             </div>
@@ -332,27 +343,30 @@
         let originalText = "";
         let pdbUri = "";
         let sequence = "";
+        let currentStyle = 'spectrum';
 
         let viewer1, viewer2, viewer3, alphafoldViewer, mutantViewer;
         let selectedResidues = new Set();
-        const originalStyles = [
-            { cartoon: { color: 'spectrum' } },
-            { stick: {} },
-            {
-                sphere: {
-                    colorfunc: function (atom) {
-                        const hydrophobic = new Set(['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'PRO', 'GLY']);
-                        const hydrophilic = new Set(['ARG', 'LYS', 'ASP', 'GLU', 'ASN', 'GLN']);
-                        const positive = new Set(['ARG', 'LYS']);
-                        const negative = new Set(['ASP', 'GLU']);
-                        if (positive.has(atom.resn)) return 'blue';
-                        else if (negative.has(atom.resn)) return 'red';
-                        else if (hydrophobic.has(atom.resn)) return 'yellow';
-                        else if (hydrophilic.has(atom.resn)) return 'lightgrey';
-                        return 'grey';  // fallback color
-                    }
+        const spectrumStyle = { cartoon: { color: 'spectrum' } };
+        const spacefillStyle = {
+            sphere: {
+                colorfunc: function (atom) {
+                    const hydrophobic = new Set(['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'PRO', 'GLY']);
+                    const hydrophilic = new Set(['ARG', 'LYS', 'ASP', 'GLU', 'ASN', 'GLN']);
+                    const positive = new Set(['ARG', 'LYS']);
+                    const negative = new Set(['ASP', 'GLU']);
+                    if (positive.has(atom.resn)) return 'blue';
+                    else if (negative.has(atom.resn)) return 'red';
+                    else if (hydrophobic.has(atom.resn)) return 'yellow';
+                    else if (hydrophilic.has(atom.resn)) return 'lightgrey';
+                    return 'grey';  // fallback color
                 }
             }
+        };
+        const originalStyles = [
+            spectrumStyle,
+            { stick: {} },
+            spacefillStyle
         ];
 
         async function fetchPDBData(pdbUri) {
@@ -694,7 +708,7 @@
             const response = await fetch(pdbUri);
             const pdbText = await response.text();
             viewer.addModel(pdbText, "pdb");
-            viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
+            viewer.setStyle({}, spectrumStyle);
             viewer.zoomTo();
             viewer.render();
         }
@@ -707,7 +721,7 @@
                     const pdbText = e.target.result;
                     const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
                     viewer.addModel(pdbText, "pdb");
-                    viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
+                    viewer.setStyle({}, spectrumStyle);
                     viewer.zoomTo();
                     viewer.render();
                 };
@@ -724,11 +738,26 @@
                     const pdbText = e.target.result;
                     const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
                     viewer.addModel(pdbText, "pdb");
-                    viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
+                    viewer.setStyle({}, spectrumStyle);
                     viewer.zoomTo();
                     viewer.render();
                 };
                 reader.readAsText(file);
+            }
+        }
+
+        function toggleStyles() {
+            currentStyle = currentStyle === 'spectrum' ? 'spacefill' : 'spectrum';
+            const style = currentStyle === 'spectrum' ? spectrumStyle : spacefillStyle;
+
+            if (alphafoldViewer) {
+                alphafoldViewer.setStyle({}, style);
+                alphafoldViewer.render();
+            }
+
+            if (mutantViewer) {
+                mutantViewer.setStyle({}, style);
+                mutantViewer.render();
             }
         }
     </script>
