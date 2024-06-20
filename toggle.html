@@ -195,7 +195,7 @@
             <div class="container card">
                 <div class="card-content">
                     <h2>Translate the <span id="geneName3"></span> gene</h2>
-                    <p>Use the tool below to translate the copied <span id="geneName4"></span> nucleotide sequence to a protein primary structure. Paste the sequence into the sequence box and click/tap TRANSLATE.</p>
+                    <p>Bioinformatics tools can quickly perform this task.  You will use the translate tool to quickly process your coding DNA sequence into a translated amino acid sequence.  Use the tool below to translate the copied <span id="geneName4"></span> nucleotide sequence to a protein primary structure. Paste the sequence into the sequence box and click/tap TRANSLATE.</p>
                     <textarea id="dnaSequence1" rows="10" placeholder="Enter DNA sequence here..."></textarea>
                     <br>
                     <button onclick="translateDNA('dnaSequence1', 'proteinSequence1')">Translate</button>
@@ -225,6 +225,7 @@
                 <div class="card-content">
                     <h2>Compare the original and mutant gene sequences</h2>
                     <div>
+                        <p>Your coding DNA consists of the start codon, the stop codon and all of the nucleotides between.  Each codon in your coding DNA will be transcribed into mRNA and translated into a sequence of amino acids.</p>
                         <h3 class="sequence-title">Original Sequence</h3>
                         <div id="originalSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
                     </div>
@@ -243,7 +244,9 @@
             <div class="container card">
                 <div class="card-content">
                     <h2>Use AI to fold your mutant protein</h2>
-                    <p>Copy the amino acid sequence from your mutant amino acid translation.</p>
+                    <p>Recent advances in artificial intelligence have allowed scientists to use computers to simulate protein folding in order to determine what a protein’s 3D structure might look like without needing to make observations of real proteins.  
+
+AlphaFold is a tool that uses machine learning algorithms to perform high accuracy predictions about what a protein’s 3D structure might look like using only an amino acid sequence as an input.  Copy the amino acid sequence from your mutant amino acid translation.</p>
                     <p>Navigate to this page: <a href="https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb" target="_blank">AlphaFold2 Notebook.</a></p>
                     <p class="big-blue-text">How does your mutation impact the 3D structure of your <span id="proteinName4"></span>?</p>
                 </div>
@@ -253,7 +256,7 @@
             <div class="card">
                 <div class="card-content">
                     <h2>Atomic Structure</h2>
-                    <p>In the atomic structure model, every atom in each amino acid is shown. Carbon, Oxygen, Nitrogen, and Hydrogen are represented in this view.</p>
+                    <p>Amino acid chains fold into tertiary structures that have 3D shapes.  These shapes are closely related to how they function and interact with systems within organisms.  Historically, 3D protein structures have been empirically determined using powerful tools and techniques including X-ray crystallography and electron microscopy.  In the atomic structure model, every atom in each amino acid is shown. Carbon, Oxygen, Nitrogen, and Hydrogen are represented in this view.</p>
                     <div class="viewer-container">
                         <div id="viewer2" class="viewer"></div>
                         <button class="refresh-button" onclick="reloadViewer('viewer2', 1)">Reset model</button>
