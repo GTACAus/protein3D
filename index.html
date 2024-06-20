@@ -121,6 +121,9 @@
         .highlight-purple {
             background-color: #e1bee7;
         }
+        .spacefill-key {
+            margin-top: 10px; /* Add margin to space the key from the viewer */
+        }
         .spacefill-key li {
             display: inline-block;
             margin-right: 10px; /* Adjust this value to control spacing */
@@ -261,6 +264,7 @@
                     <li><span class="hydrophilic">●</span> Hydrophilic</li>
                     <li><span style="color: red;">●</span> Negatively charged (Asp, Glu)</li>
                     <li><span style="color: blue;">●</span> Positively charged (Arg, Lys)</li>
+                    <li><span style="color: lightgrey;">●</span> Neutral</li>
                 </ul>
                 <div class="viewer-container">
                     <div id="viewer3" class="viewer"></div>
@@ -305,7 +309,7 @@
                         <div id="alphafoldViewer" class="viewer" style="height: 400px; width: 100%;"></div>
                     </div>
                 </div>
-                <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Reset model</button>
+                <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Display original AlphaFold Model</button>
             </div>
         </div>
     </div>
@@ -331,7 +335,7 @@
                         else if (negative.has(atom.resn)) return 'red';
                         else if (hydrophobic.has(atom.resn)) return 'yellow';
                         else if (hydrophilic.has(atom.resn)) return 'white';
-                        return 'green';  // fallback color
+                        return 'lightgrey';  // fallback color
                     }
                 }
             }
@@ -431,9 +435,6 @@
 
             viewers.forEach((viewer, index) => {
                 viewer.setStyle({}, originalStyles[index]); // Reset all styles to original
-                if (selectedResidues.size === 0) {
-                    viewer.removeAllShapes(); // Clear any existing highlights
-                }
                 selectedResidues.forEach(residueIndex => {
                     viewer.setStyle({ resi: residueIndex }, highlightStyle);
                 });
