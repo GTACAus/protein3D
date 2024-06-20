@@ -299,21 +299,29 @@
                     <div><h2>Compare your mutant <span id="proteinName5"></span> with the original protein</h2>
                     <p id="proteinFunction"></p>
                     </div>
-                    <p>Upload an image or a PDB file of your AlphaFold result below. The file will be displayed next to the 3D model of the original protein structure.</p>
-                    <input type="file" id="alphafoldFileInput" accept="image/*,.pdb" />
+                    <p>Upload an image of your AlphaFold result below or choose a PDB file to view the structure.</p>
                     <div class="row">
                         <div class="col s12 m6">
-                            <h3 class="sequence-title"><b>AlphaFold Image or PDB</b></h3>
-                            <img id="alphafoldImage" style="max-width: 100%; display: none;" />
-                            <div id="mutantViewer" class="viewer" style="height: 400px; width: 100%; display: none;"></div>
-                        </div>
-                        <div class="col s12 m6">
+                            <h3 class="sequence-title"><b>Mutant protein</b></h3>
+                            <div id="mutantViewer" class="viewer" style="height: 400px; width: 100%;"></div>
+                            <button class="refresh-button" onclick="reloadMutantViewer()">Display mutant protein</button>
+                        </div>                        <div class="col s12 m6">
                             <h3 class="sequence-title"><b>Original protein</b></h3>
                             <div id="alphafoldViewer" class="viewer" style="height: 400px; width: 100%;"></div>
+                            <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Display original protein</button>
                         </div>
                     </div>
-                    <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Display original protein</button>
-
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <h3 class="sequence-title"><b>Upload PDB file</b></h3>
+                            <input type="file" id="pdbFileInput" accept=".pdb" />
+                        </div>
+                        <div class="col s12 m6">
+                            <h3 class="sequence-title"><b>AlphaFold Image</b></h3>
+                            <input type="file" id="alphafoldImageInput" accept="image/*" />
+                            <img id="alphafoldImage" style="max-width: 100%; display: none;" />
+                        </div>
+                    </div>
                     <p class="big-blue-text">How might the mutation impact the ability of <span id="substrateOrDrug"></span> to do their job? How might the mutation impact the ability of this protein to do its job?</p>
                 </div>
             </div>
@@ -669,26 +677,13 @@
         document.getElementById('dnaSequence1').addEventListener('input', compareSequences);
         document.getElementById('dnaSequence2').addEventListener('input', compareSequences);
 
-        document.getElementById('alphafoldFileInput').addEventListener('change', function (event) {
+        document.getElementById('alphafoldImageInput').addEventListener('change', function (event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
                 reader.onload = function (e) {
-                    const fileType = file.type;
-                    if (fileType.startsWith('image/')) {
-                        document.getElementById('alphafoldImage').src = e.target.result;
-                        document.getElementById('alphafoldImage').style.display = 'block';
-                        document.getElementById('mutantViewer').style.display = 'none';
-                    } else if (file.name.endsWith('.pdb')) {
-                        const pdbText = e.target.result;
-                        const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
-                        viewer.addModel(pdbText, "pdb");
-                        viewer.setStyle({}, { cartoon: { color: 'blue' } });
-                        viewer.zoomTo();
-                        viewer.render();
-                        document.getElementById('mutantViewer').style.display = 'block';
-                        document.getElementById('alphafoldImage').style.display = 'none';
-                    }
+                    document.getElementById('alphafoldImage').src = e.target.result;
+                    document.getElementById('alphafoldImage').style.display = 'block';
                 };
                 reader.readAsDataURL(file);
             }
@@ -702,6 +697,39 @@
             viewer.setStyle({}, { cartoon: { color: 'blue' } });
             viewer.zoomTo();
             viewer.render();
+        }
+
+        document.getElementById('pdbFileInput').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const pdbText = e.target.result;
+                    const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
+                    viewer.addModel(pdbText, "pdb");
+                    viewer.setStyle({}, { cartoon: { color: 'blue' } });
+                    viewer.zoomTo();
+                    viewer.render();
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function reloadMutantViewer() {
+            const fileInput = document.getElementById('pdbFileInput');
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const pdbText = e.target.result;
+                    const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
+                    viewer.addModel(pdbText, "pdb");
+                    viewer.setStyle({}, { cartoon: { color: 'blue' } });
+                    viewer.zoomTo();
+                    viewer.render();
+                };
+                reader.readAsText(file);
+            }
         }
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
