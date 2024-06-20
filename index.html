@@ -121,6 +121,14 @@
         .highlight-purple {
             background-color: #e1bee7;
         }
+        .key-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .key-item span {
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -207,11 +215,13 @@
                     <div id="mutantSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
                 </div>
                 <div>
-                    <h3 class="sequence-title">Key</h3>
-                    <ul>
-                        <li><span class="highlight-blue">Every second codon</span></li>
-                        <li><span class="highlight-red">First stop codon</span></li>
-                    </ul>
+                    <h3 class="sequence-title"><b>Key</b></h3>
+                    <div class="key-item">
+                        <span class="highlight-blue">Every second codon</span>
+                    </div>
+                    <div class="key-item">
+                        <span class="highlight-red">Stop codon</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -246,7 +256,7 @@
                 <p>In this representation, the space taken up by each amino acid is represented by spheres. In addition, each amino acid is coloured by its hydrophobicity and charge:</p>
                 <ul>
                     <li><span style="color: yellow;">●</span> Hydrophobic</li>
-                    <li><span style="color: white;">●</span> Hydrophilic</li>
+                    <li><span style="color: white; border: 1px solid black; border-radius: 50%; padding: 2px;">●</span> Hydrophilic</li>
                     <li><span style="color: red;">●</span> Negatively charged (Asp, Glu)</li>
                     <li><span style="color: blue;">●</span> Positively charged (Arg, Lys)</li>
                 </ul>
@@ -268,20 +278,11 @@
             </div>
         </div>
 
-        <!-- Compare Mutant PBP -->
+        <!-- Compare your mutant protein with the original protein -->
         <div class="card">
             <div class="card-content">
-                <h2>Compare your mutant <span id="proteinName5"></span> with the original protein</h2>
-                <p id="proteinFunction"></p>
-                <p class="big-blue-text">How might the mutation impact the ability of <span id="substrateOrDrug"></span> to do their job? How might the mutation impact the ability of this protein to do its job?</p>
-            </div>
-        </div>
-
-        <!-- Upload AlphaFold Result -->
-        <div class="card">
-            <div class="card-content">
-                <h2>Upload your AlphaFold Result</h2>
-                <p>Upload an image of your AlphaFold result below. The image will be displayed next to the 3D model of the protein structure with AlphaFold confidence coloring.</p>
+                <h2>Compare your mutant protein with the original protein</h2>
+                <p>Upload an image of your AlphaFold result below. The image will be displayed next to the 3D model of the protein structure.</p>
                 <input type="file" id="alphafoldImageInput" accept="image/*" />
                 <div class="row">
                     <div class="col s12 m6">
@@ -651,6 +652,7 @@
                 reader.onload = function (e) {
                     document.getElementById('alphafoldImage').src = e.target.result;
                     document.getElementById('alphafoldImage').style.display = 'block';
+                    reloadAlphaFoldViewer();
                 };
                 reader.readAsDataURL(file);
             }
@@ -661,27 +663,7 @@
             const response = await fetch(pdbUri);
             const pdbText = await response.text();
             viewer.addModel(pdbText, "pdb");
-
-            const bFactors = pdbText
-                .split('\n')
-                .filter(line => line.startsWith('ATOM'))
-                .map(line => parseFloat(line.substring(60, 66).trim()));
-
-            const maxBFactor = Math.max(...bFactors);
-            const minBFactor = Math.min(...bFactors);
-
-            viewer.setStyle({}, {
-                cartoon: {
-                    color: atom => {
-                        const bFactor = atom.b;
-                        const normalized = (bFactor - minBFactor) / (maxBFactor - minBFactor);
-                        const red = Math.floor(255 * normalized);
-                        const green = Math.floor(255 * (1 - normalized));
-                        return `rgb(${red},${green},0)`;
-                    }
-                }
-            });
-
+            viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
             viewer.zoomTo();
             viewer.render();
         }
