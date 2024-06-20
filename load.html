@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive 3Dmol Viewer and mecA sequence</title>
+    <title>Interactive 3D protein Viewer</title>
     <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
@@ -144,12 +143,22 @@
         .hidden {
             display: none;
         }
+        .button-container {
+            display: flex;
+            align-items: center;
+        }
+        .button-container button {
+            margin-left: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1 id="mainHeading">Exploring the structure of <span id="proteinName"></span></h1>
-        <input type="file" id="fileInput" accept=".xml" />
+        <div class="button-container">
+            <input type="file" id="fileInput" accept=".xml" />
+            <button onclick="loadDataXML()">Load PBP</button>
+        </div>
         <br><br>
         
         <div id="content" class="hidden">
@@ -164,7 +173,7 @@
                     <tr>
                         <td colspan="50" style="text-align: center;">
                             <button class="deselect-button" onclick="deselectAll()">Deselect</button>
-                            <p id="aminoAcidDescription"></p>
+                            <p id="aminoAcidDescription">The amino acid sequences (primary structures) of the protein are shown in the Sequence viewer. Each letter represents an individual amino acid (e.g. s = serine; t = threonine, i = isoleucine, etc.).</p>
                             <p class="big-blue-text">Identify the primary structure of the <span id="proteinName1"></span>.</p>
                         </td>
                     </tr>
@@ -288,7 +297,8 @@ In this representation, the space taken up by each amino acid is represented by 
                         <div id="viewer3" class="viewer"></div>
                         <button class="refresh-button" onclick="reloadViewer('viewer3', 2)">Reset model</button>
                     </div>
-                    <p class="big-blue-text">Where are the hydrophilic and hydrophobic amino acids mainly located – inside or outside the protein? Why do you think that might occur?<br>Where are the positively and negatively charged amino acids located in relation to one another? Why might this be the case?</p>
+                    <p class="big-blue-text">Where are the hydrophilic and hydrophobic amino acids mainly located – inside or outside the protein? Why do you think that might occur?
+Where are the positively and negatively charged amino acids located in relation to one another? Why might this be the case?</p>
                 </div>
             </div>
 
@@ -646,6 +656,45 @@ In this representation, the space taken up by each amino acid is represented by 
             reader.readAsText(file);
         }
 
+        async function loadDataXML() {
+            const response = await fetch('data.xml');
+            const xmlText = await response.text();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+            
+            const proteinName = xmlDoc.getElementsByTagName('proteinName')[0].textContent;
+            const geneName = xmlDoc.getElementsByTagName('geneName')[0].textContent;
+            const geneSeq = xmlDoc.getElementsByTagName('geneSeq')[0].textContent;
+            const activeSite = xmlDoc.getElementsByTagName('activeSite')[0].textContent;
+            const activeSiteText = xmlDoc.getElementsByTagName('activeSiteText')[0].textContent;
+            const proteinFunction = xmlDoc.getElementsByTagName('proteinFunction')[0].textContent;
+            const substrateOrDrug = xmlDoc.getElementsByTagName('substrateOrDrug')[0].textContent;
+            pdbUri = xmlDoc.getElementsByTagName('PDBurl')[0].textContent;
+
+            document.getElementById('proteinName').textContent = proteinName;
+            document.getElementById('fileName').textContent = proteinName;
+            document.getElementById('proteinName1').textContent = proteinName;
+            document.getElementById('proteinName2').textContent = proteinName;
+            document.getElementById('proteinName3').textContent = proteinName;
+            document.getElementById('proteinName4').textContent = proteinName;
+            document.getElementById('proteinName5').textContent = proteinName;
+            document.getElementById('geneName1').textContent = geneName;
+            document.getElementById('geneName2').textContent = geneName;
+            document.getElementById('geneName3').textContent = geneName;
+            document.getElementById('geneName4').textContent = geneName;
+            document.getElementById('geneName5').textContent = geneName;
+            document.getElementById('activeSite').textContent = activeSite;
+            document.getElementById('activeSiteText').textContent = activeSiteText;
+            document.getElementById('proteinFunction').textContent = proteinFunction;
+            document.getElementById('substrateOrDrug').textContent = substrateOrDrug;
+
+            originalText = geneSeq;
+            document.getElementById('sequence-container').textContent = geneSeq;
+
+            document.getElementById('content').classList.remove('hidden'); // Show content
+            initializeViewers(); // Initialize viewers with new data
+        }
+
         document.getElementById('fileInput').addEventListener('change', loadXMLFile);
 
         function highlightMutantSequence(originalSeq, mutantSeq) {
@@ -708,15 +757,15 @@ In this representation, the space taken up by each amino acid is represented by 
         });
 
         async function reloadAlphaFoldViewer() {
-    const viewer = $3Dmol.createViewer('alphafoldViewer', { backgroundColor: '0xffffff' });
-    const response = await fetch(pdbUri);
-    const pdbText = await response.text();
-    viewer.addModel(pdbText, "pdb");
-    viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
-    viewer.zoomTo();
-    viewer.render();
-    alphafoldViewer = viewer; // Save reference to the viewer
-}
+            const viewer = $3Dmol.createViewer('alphafoldViewer', { backgroundColor: '0xffffff' });
+            const response = await fetch(pdbUri);
+            const pdbText = await response.text();
+            viewer.addModel(pdbText, "pdb");
+            viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+            viewer.zoomTo();
+            viewer.render();
+            alphafoldViewer = viewer; // Save reference to the viewer
+        }
 
         document.getElementById('pdbFileInput').addEventListener('change', function (event) {
             const file = event.target.files[0];
@@ -736,36 +785,38 @@ In this representation, the space taken up by each amino acid is represented by 
 
         let currentMutantStyle = 'spectrum'; // Keep track of the current style
 
-async function reloadMutantViewer() {
-    const fileInput = document.getElementById('pdbFileInput');
-    const file = fileInput.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const pdbText = e.target.result;
-            const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
-            viewer.addModel(pdbText, "pdb");
-            viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
-            viewer.zoomTo();
-            viewer.render();
-            mutantViewer = viewer; // Save reference to the viewer
-        };
-        reader.readAsText(file);
-    }
-}
-function toggleMutantViewerStyle() {
-    currentMutantStyle = currentMutantStyle === 'spectrum' ? 'spacefill' : 'spectrum';
-    if (mutantViewer) {
-        mutantViewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
-        mutantViewer.render();
-    }
-    if (alphafoldViewer) {
-        alphafoldViewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
-        alphafoldViewer.render();
-    }
-}
+        async function reloadMutantViewer() {
+            const fileInput = document.getElementById('pdbFileInput');
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const pdbText = e.target.result;
+                    const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
+                    viewer.addModel(pdbText, "pdb");
+                    viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+                    viewer.zoomTo();
+                    viewer.render();
+                    mutantViewer = viewer; // Save reference to the viewer
+                };
+                reader.readAsText(file);
+            }
+        }
+
+        function toggleMutantViewerStyle() {
+            currentMutantStyle = currentMutantStyle === 'spectrum' ? 'spacefill' : 'spectrum';
+            if (mutantViewer) {
+                mutantViewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+                mutantViewer.render();
+            }
+            if (alphafoldViewer) {
+                alphafoldViewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+                alphafoldViewer.render();
+            }
+        }
+
         // Add event listener to handle file input changes
-document.getElementById('pdbFileInput').addEventListener('change', reloadMutantViewer);
+        document.getElementById('pdbFileInput').addEventListener('change', reloadMutantViewer);
 
         function toggleStyles() {
             currentStyle = currentStyle === 'spectrum' ? 'spacefill' : 'spectrum';
