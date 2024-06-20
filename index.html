@@ -276,7 +276,8 @@
                     <div id="viewer3" class="viewer"></div>
                     <button class="refresh-button" onclick="reloadViewer('viewer3', 2)">Reset model</button>
                 </div>
-                <p class="big-blue-text">Where are the hydrophilic and hydrophobic amino acids mainly located – inside or outside the protein? Why do you think that might occur?<br>Where are the positively and negatively charged amino acids located in relation to one another? Why might this be the case?</p>
+                <p class="big-blue-text">Where are the hydrophilic and hydrophobic amino acids mainly located – inside or outside the protein? Why do you think that might occur?<br>
+        Where are the positively and negatively charged amino acids located in relation to one another? Why might this be the case?</p>
             </div>
         </div>
 
@@ -285,7 +286,7 @@
             <div class="card-content">
                 <h2>Active site</h2>
 
-                <p><span id="activeSite"></span></p>
+                <p><span id="activeSite"></span></p>>
                 <p id="activeSiteText" class="active-site-text"></p>
                 <p>Click on residues in the primary structure to highlight any part of the protein with green spheres.</p>
             <p class="big-blue-text">Where is the sequence located in the 3D structure? How might PBP function be affected if some of the amino acids are changed?</p></div>
@@ -695,7 +696,7 @@
 
             viewer.setStyle({}, {
                 cartoon: {
-                    color: 'spectrum' => {
+                    color: atom => {
                         const bFactor = atom.b;
                         const normalized = (bFactor - minBFactor) / (maxBFactor - minBFactor);
                         const red = Math.floor(255 * normalized);
