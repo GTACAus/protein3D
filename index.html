@@ -676,23 +676,7 @@
             const response = await fetch(pdbUri);
             const pdbText = await response.text();
             viewer.addModel(pdbText, "pdb");
-
-            const bFactors = pdbText
-                .split('\n')
-                .filter(line => line.startsWith('ATOM'))
-                .map(line => parseFloat(line.substring(60, 66).trim()));
-
-            const maxBFactor = Math.max(...bFactors);
-            const minBFactor = Math.min(...bFactors);
-
-            viewer.setStyle({}, {
-                cartoon: {
-                    color: () => 'rgb(0, 0, 255)'
-                      
-                    }
-                }
-            });
-
+            viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
             viewer.zoomTo();
             viewer.render();
         }
@@ -700,3 +684,5 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
 </html>
+
+
