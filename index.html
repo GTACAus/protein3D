@@ -112,6 +112,26 @@
         .sequence-title {
             font-size: 1.2em;
         }
+        .highlight-blue {
+            background-color: #b3e5fc; /* Darker blue */
+        }
+        .highlight-red {
+            background-color: #ef9a9a; /* Darker red */
+        }
+        .highlight-purple {
+            background-color: #e1bee7;
+        }
+        .key-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .key-item span {
+            margin-left: 5px;
+        }
+        ul li span {
+            font-size: 1.2em;
+        }
     </style>
 </head>
 <body>
@@ -227,12 +247,19 @@
         <div class="card">
             <div class="card-content">
                 <h2>Space fill structure</h2>
-                <p>In this representation, the space taken up by each amino acid is represented by spheres. In addition, each amino acid is coloured by its hydrophobicity. Refer to the amino acid tuber models and determine which colours represent hydrophobic and hydrophilic amino acid residues.</p>
+                <p>In this representation, the space taken up by each amino acid is represented by spheres. In addition, each amino acid is coloured by its hydrophobicity and charge:</p>
+                <ul>
+                    <li><span style="color: yellow;">●</span> Hydrophobic</li>
+                    <li><span style="color: white; border: 1px solid black; border-radius: 50%; padding: 2px;">●</span> Hydrophilic</li>
+                    <li><span style="color: red;">●</span> Negatively charged (Asp, Glu)</li>
+                    <li><span style="color: blue;">●</span> Positively charged (Arg, Lys)</li>
+                </ul>
                 <div class="viewer-container">
                     <div id="viewer3" class="viewer"></div>
                     <button class="refresh-button" onclick="reloadViewer('viewer3', 2)">Reset model</button>
                 </div>
-                <p class="big-blue-text">Where are the hydrophilic and hydrophobic amino acids mainly located – inside or outside the protein? Why do you think that might occur?</p>
+                <p class="big-blue-text">Where are the hydrophilic and hydrophobic amino acids mainly located – inside or outside the protein? Why do you think that might occur?<br>
+                Where are the positively and negatively charged amino acids located in relation to one another? Why might this be the case?</p>
             </div>
         </div>
 
@@ -241,15 +268,28 @@
             <div class="card-content">
                 <h2>Active site <span id="activeSite"></span></h2>
                 <p id="activeSiteText"></p>
+                <p>Click on residues in the primary structure to highlight any part of the protein with green spheres.</p>
             </div>
         </div>
 
-        <!-- Compare Mutant PBP -->
-        <div class="card">
+        <!-- Compare your mutant protein with the original protein -->
+        <div class="container card">
             <div class="card-content">
-                <h2>Compare your mutant <span id="proteinName5"></span> with the original protein</h2>
-                <p id="proteinFunction"></p>
-                <p class="big-blue-text">How might the mutation impact the ability of <span id="substrateOrDrug"></span> to do their job? How might the mutation impact the ability of this protein to do its job?</p>
+                <h2>Compare your mutant protein with the original protein</h2>
+                <p>Upload an image of your AlphaFold result below:</p>
+                <input type="file" id="alphafoldImageInput" accept="image/*">
+                <br><br>
+                <div style="display: flex;">
+                    <div style="flex: 1;">
+                        <h3>AlphaFold Image</h3>
+                        <img id="alphafoldImage" style="max-width: 100%; display: none;">
+                    </div>
+                    <div style="flex: 1;">
+                        <h3>AlphaFold Model</h3>
+                        <div id="alphafoldViewer" class="viewer"></div>
+                        <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Reset model</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -259,7 +299,7 @@
         let pdbUri = "";
         let sequence = "";
 
-        let viewer1, viewer2, viewer3;
+        let viewer1, viewer2, viewer3, alphafoldViewer;
         let selectedResidues = new Set();
         const originalStyles = [
             { cartoon: { color: 'spectrum' } },
@@ -269,14 +309,12 @@
                     colorfunc: function (atom) {
                         const hydrophobic = new Set(['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'PRO', 'GLY']);
                         const hydrophilic = new Set(['ARG', 'LYS', 'ASP', 'GLU', 'ASN', 'GLN']);
-                        const neutral = new Set(['SER', 'THR', 'CYS', 'TYR', 'HIS']);
                         const positive = new Set(['ARG', 'LYS']);
                         const negative = new Set(['ASP', 'GLU']);
                         if (positive.has(atom.resn)) return 'blue';
                         else if (negative.has(atom.resn)) return 'red';
                         else if (hydrophobic.has(atom.resn)) return 'yellow';
                         else if (hydrophilic.has(atom.resn)) return 'white';
-                        else if (neutral.has(atom.resn)) return 'gray';
                         return 'green';  // fallback color
                     }
                 }
@@ -373,7 +411,7 @@
 
         function updateResidueHighlighting() {
             const highlightStyle = { stick: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } };
-            const viewers = [viewer1, viewer2, viewer3];
+            const viewers = [viewer1, viewer2, viewer3, alphafoldViewer];
 
             viewers.forEach((viewer, index) => {
                 viewer.setStyle({}, originalStyles[index]); // Reset all styles to original
@@ -588,6 +626,33 @@
 
         document.getElementById('dnaSequence1').addEventListener('input', compareSequences);
         document.getElementById('dnaSequence2').addEventListener('input', compareSequences);
+
+        // Handle AlphaFold image upload
+        document.getElementById('alphafoldImageInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('alphafoldImage').src = e.target.result;
+                    document.getElementById('alphafoldImage').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function reloadAlphaFoldViewer() {
+            const viewer = $3Dmol.createViewer('alphafoldViewer', { backgroundColor: '0xffffff' });
+
+            fetch(pdbUri)
+                .then(response => response.text())
+                .then(data => {
+                    viewer.addModel(data, 'pdb');
+                    viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
+                    viewer.zoomTo();
+                    viewer.render();
+                })
+                .catch(error => console.error('Error fetching the PDB file:', error));
+        }
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
