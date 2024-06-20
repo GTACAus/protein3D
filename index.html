@@ -219,9 +219,7 @@
                     <div class="key-item">
                         <span class="highlight-blue">Every second codon</span>
                     </div>
-                    <div class
-
-="key-item">
+                    <div class="key-item">
                         <span class="highlight-red">Stop codon</span>
                     </div>
                 </div>
@@ -279,26 +277,6 @@
                 <p>Click on residues in the primary structure to highlight any part of the protein with green spheres.</p>
             </div>
         </div>
-
-        <!-- Compare your mutant protein with the original protein -->
-        <div class="card">
-            <div class="card-content">
-                <h2>Compare your mutant protein with the original protein</h2>
-                <p>Upload an image of your AlphaFold result below. The image will be displayed next to the 3D model of the protein structure.</p>
-                <input type="file" id="alphafoldImageInput" accept="image/*" />
-                <div class="row">
-                    <div class="col s12 m6">
-                        <h3 class="sequence-title">AlphaFold Image</h3>
-                        <img id="alphafoldImage" style="max-width: 100%; display: none;" />
-                    </div>
-                    <div class="col s12 m6">
-                        <h3 class="sequence-title">AlphaFold Model</h3>
-                        <div id="alphafoldViewer" class="viewer" style="height: 400px; width: 100%;"></div>
-                    </div>
-                </div>
-                <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Reset model</button>
-            </div>
-        </div>
     </div>
 
     <script>
@@ -306,7 +284,7 @@
         let pdbUri = "";
         let sequence = "";
 
-        let viewer1, viewer2, viewer3, alphafoldViewer;
+        let viewer1, viewer2, viewer3;
         let selectedResidues = new Set();
         const originalStyles = [
             { cartoon: { color: 'spectrum' } },
@@ -417,9 +395,7 @@
         }
 
         function updateResidueHighlighting() {
-           
-
- const highlightStyle = { stick: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } };
+            const highlightStyle = { stick: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } };
             const viewers = [viewer1, viewer2, viewer3];
 
             viewers.forEach((viewer, index) => {
@@ -445,7 +421,6 @@
             viewer1 = initializeViewer("viewer1", 0);
             viewer2 = initializeViewer("viewer2", 1);
             viewer3 = initializeViewer("viewer3", 2);
-            initializeAlphaFoldViewer();
         }
 
         function initializeViewer(viewerElementId, styleIndex) {
@@ -485,19 +460,6 @@
                     viewer.render();
                 })
                 .catch(error => console.error('Error fetching the PDB file:', error));
-        }
-
-        function initializeAlphaFoldViewer() {
-            alphafoldViewer = initializeViewer('alphafoldViewer', 0);
-        }
-
-        async function reloadAlphaFoldViewer() {
-            const response = await fetch(pdbUri);
-            const pdbText = await response.text();
-            alphafoldViewer.addModel(pdbText, "pdb");
-            alphafoldViewer.setStyle({}, { cartoon: { color: 'spectrum' } });
-            alphafoldViewer.zoomTo();
-            alphafoldViewer.render();
         }
 
         // DNA to Protein Translator function
@@ -603,9 +565,7 @@
                 document.getElementById('geneName5').textContent = geneName;
                 document.getElementById('activeSite').textContent = activeSite;
                 document.getElementById('activeSiteText').textContent = activeSiteText;
-                document.getElementBy
-
-Id('proteinFunction').textContent = proteinFunction;
+                document.getElementById('proteinFunction').textContent = proteinFunction;
                 document.getElementById('substrateOrDrug').textContent = substrateOrDrug;
 
                 originalText = geneSeq;
@@ -664,29 +624,6 @@ Id('proteinFunction').textContent = proteinFunction;
 
         document.getElementById('dnaSequence1').addEventListener('input', compareSequences);
         document.getElementById('dnaSequence2').addEventListener('input', compareSequences);
-
-        document.getElementById('alphafoldImageInput').addEventListener('change', function (event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    document.getElementById('alphafoldImage').src = e.target.result;
-                    document.getElementById('alphafoldImage').style.display = 'block';
-                    reloadAlphaFoldViewer();
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        async function reloadAlphaFoldViewer() {
-            const viewer = $3Dmol.createViewer('alphafoldViewer', { backgroundColor: '0xffffff' });
-            const response = await fetch(pdbUri);
-            const pdbText = await response.text();
-            viewer.addModel(pdbText, "pdb");
-            viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
-            viewer.zoomTo();
-            viewer.render();
-        }
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
