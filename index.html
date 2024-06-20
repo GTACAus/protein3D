@@ -136,6 +136,9 @@
             height: 12px;
             width: 12px;
         }
+        .active-site-text {
+            font-size: 0.9em; /* Smaller font size for active site text */
+        }
     </style>
 </head>
 <body>
@@ -192,6 +195,7 @@
                 <button onclick="translateDNA('dnaSequence1', 'proteinSequence1')">Translate</button>
                 <h2>Protein Sequence</h2>
                 <div id="proteinSequence1" style="white-space: pre-wrap; word-wrap: break-word;"></div>
+                <p class="big-blue-text">Compare your protein sequence with the primary structure in the table above. What do you notice?</p>
             </div>
         </div>
 
@@ -206,13 +210,14 @@
                 <h2>Protein Sequence</h2>
                 <div id="proteinSequence2" style="white-space: pre-wrap; word-wrap: break-word;"></div>
                 <button onclick="copyMutantText()">Copy Text</button>
+                <p class="big-blue-text">Compare your mutant protein sequence with your original protein sequence. What do you notice?</p>
             </div>
         </div>
 
-        <!-- Compare Original and Mutant Sequences -->
+        <!-- Compare Original and Mutant Gene Sequences -->
         <div class="container card">
             <div class="card-content">
-                <h2>Compare Original and Mutant Sequences</h2>
+                <h2>Compare the original and mutant gene sequences</h2>
                 <div>
                     <h3 class="sequence-title">Original Sequence</h3>
                     <div id="originalSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
@@ -228,6 +233,7 @@
                         <li><span class="highlight-red">First stop codon</span></li>
                     </ul>
                 </div>
+                <p class="big-blue-text">Identify the impact of your mutation on the codons read from your gene</p>
             </div>
         </div>
 
@@ -261,7 +267,7 @@
                 <p>In this representation, the space taken up by each amino acid is represented by spheres. In addition, each amino acid is coloured by its hydrophobicity and charge:</p>
                 <ul class="spacefill-key">
                     <li><span style="color: yellow;">●</span> Hydrophobic</li>
-                    <li><span class="hydrophilic">●</span> Hydrophilic</li>
+                    <li><span class="hydrophilic" style="color: lightgrey;">●</span> Hydrophilic</li>
                     <li><span style="color: red;">●</span> Negatively charged (Asp, Glu)</li>
                     <li><span style="color: blue;">●</span> Positively charged (Arg, Lys)</li>
                     <li><span style="color: lightgrey;">●</span> Neutral</li>
@@ -279,7 +285,7 @@
         <div class="card">
             <div class="card-content">
                 <h2>Active site <span id="activeSite"></span></h2>
-                <p id="activeSiteText"></p>
+                <p id="activeSiteText" class="active-site-text"></p>
                 <p>Click on residues in the primary structure to highlight any part of the protein with green spheres.</p>
             </div>
         </div>
@@ -294,10 +300,10 @@
         </div>
 
         <!-- Upload AlphaFold Result -->
-        <div class="card">
+        <div class="card" style="margin-bottom: 20px;">
             <div class="card-content">
                 <h2>Upload your AlphaFold Result</h2>
-                <p>Upload an image of your AlphaFold result below. The image will be displayed next to the 3D model of the protein structure with AlphaFold confidence coloring.</p>
+                <p>Upload an image of your AlphaFold result below. The image will be displayed next to the 3D model of the original protein structure.</p>
                 <input type="file" id="alphafoldImageInput" accept="image/*" />
                 <div class="row">
                     <div class="col s12 m6">
@@ -334,8 +340,8 @@
                         if (positive.has(atom.resn)) return 'blue';
                         else if (negative.has(atom.resn)) return 'red';
                         else if (hydrophobic.has(atom.resn)) return 'yellow';
-                        else if (hydrophilic.has(atom.resn)) return 'white';
-                        return 'lightgrey';  // fallback color
+                        else if (hydrophilic.has(atom.resn)) return 'lightgrey';
+                        return 'grey';  // fallback color
                     }
                 }
             }
