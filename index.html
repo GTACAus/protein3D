@@ -178,7 +178,7 @@
         <!-- Copy mecA Gene Sequence -->
         <div class="container card">
             <div class="card-content">
-                <h2>Copy the <span id="geneName1"></span> gene from translation by our bioinformatics tool</h2>
+                <h2>Copy the <span id="geneName1"></span> gene for translation by our bioinformatics tool</h2>
                 <p>Click/tap copy text to take the DNA sequence from <span id="geneName2"></span> for translation.</p>
                 <pre id="sequence-container"></pre>
                 <button onclick="copyText()">Copy Text</button>
@@ -189,7 +189,7 @@
         <div class="container card">
             <div class="card-content">
                 <h2>Translate the <span id="geneName3"></span> gene</h2>
-                <p>Use the tool below to translate the copied <span id="geneName4"></span> nucleotide sequence to a protein primary structure. Paste the sequence into the sequence box and click/tap TRANSLATE</p>
+                <p>Use the tool below to translate the copied <span id="geneName4"></span> nucleotide sequence to a protein primary structure. Paste the sequence into the sequence box and click/tap TRANSLATE.</p>
                 <textarea id="dnaSequence1" rows="10" placeholder="Enter DNA sequence here..."></textarea>
                 <br>
                 <button onclick="translateDNA('dnaSequence1', 'proteinSequence1')">Translate</button>
@@ -227,7 +227,7 @@
                     <div id="mutantSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
                 </div>
                 <div>
-                    <h3 class="sequence-title">Key       <span class="highlight-blue">Every second codon</span><span>      </span><span class="highlight-red">First stop codon</span></h3>
+                    <h3 class="sequence-title"><b>Key</b>       <span class="highlight-blue">Every second codon</span><span>      </span><span class="highlight-red">First stop codon</span></h3>
                 </div>
                 <p class="big-blue-text">Identify the impact of your mutation on the codons read from your gene</p>
             </div>
