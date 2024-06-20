@@ -1,3 +1,6 @@
+I'm sorry for the issues. Let's debug and simplify the code to ensure it works correctly. We'll keep the highlight coloring changes and adjust the structure to fix the broken functionality. Here is the revised code:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -220,7 +223,9 @@
                         <span class="highlight-blue">Every second codon</span>
                     </div>
                     <div class="key-item">
-                        <span class="highlight-red">Stop codon</span>
+                        <
+
+span class="highlight-red">Stop codon</span>
                     </div>
                 </div>
             </div>
@@ -415,7 +420,9 @@
         }
 
         function updateResidueHighlighting() {
-            const highlightStyle = { stick: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } };
+            const highlightStyle = { stick
+
+: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } };
             const viewers = [viewer1, viewer2, viewer3];
 
             viewers.forEach((viewer, index) => {
@@ -600,6 +607,8 @@
 
         function highlightMutantSequence(originalSeq, mutantSeq) {
             function getCodons(dnaSequence) {
+
+
                 const codons = [];
                 for (let i = 0; i < dnaSequence.length; i += 3) {
                     codons.push(dnaSequence.substr(i, 3));
@@ -671,3 +680,4 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
 </html>
+```
