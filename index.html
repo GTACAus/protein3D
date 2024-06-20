@@ -311,26 +311,6 @@
                 <p class="big-blue-text">How might the mutation impact the ability of <span id="substrateOrDrug"></span> to do their job? How might the mutation impact the ability of this protein to do its job?</p>
             </div>
         </div>
-
-        <!-- Upload AlphaFold Result -->
-        <div class="card" style="margin-bottom: 20px;">
-            <div class="card-content">
-                <h2>Upload your AlphaFold Result</h2>
-                <p>Upload an image of your AlphaFold result below. The image will be displayed next to the 3D model of the original protein structure.</p>
-                <input type="file" id="alphafoldImageInput" accept="image/*" />
-                <div class="row">
-                    <div class="col s12 m6">
-                        <h3 class="sequence-title">AlphaFold Image</h3>
-                        <img id="alphafoldImage" style="max-width: 100%; display: none;" />
-                    </div>
-                    <div class="col s12 m6">
-                        <h3 class="sequence-title">AlphaFold Model</h3>
-                        <div id="alphafoldViewer" class="viewer" style="height: 400px; width: 100%;"></div>
-                    </div>
-                </div>
-                <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Display original protein</button>
-            </div>
-        </div>
     </div>
 
     <script>
