@@ -44,7 +44,7 @@
             border-radius: 8px;
             overflow: hidden;
         }
-        .refresh-button, .deselect-button {
+        .refresh-button, .deselect-button, .toggle-style-button {
             margin: 10px;
             padding: 10px 20px;
             background-color: #1e88e5;
@@ -54,7 +54,7 @@
             border-radius: 4px;
             display: inline-block;
         }
-        .refresh-button:hover, .deselect-button:hover {
+        .refresh-button:hover, .deselect-button:hover, .toggle-style-button:hover {
             background-color: #1565c0;
         }
         .viewer {
@@ -305,7 +305,8 @@
                             <h3 class="sequence-title"><b>Mutant protein</b></h3>
                             <div id="mutantViewer" class="viewer" style="height: 400px; width: 100%;"></div>
                             <button class="refresh-button" onclick="reloadMutantViewer()">Display mutant protein</button>
-                        </div>                        <div class="col s12 m6">
+                        </div>                        
+                        <div class="col s12 m6">
                             <h3 class="sequence-title"><b>Original protein</b></h3>
                             <div id="alphafoldViewer" class="viewer" style="height: 400px; width: 100%;"></div>
                             <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Display original protein</button>
@@ -322,6 +323,7 @@
                             <img id="alphafoldImage" style="max-width: 100%; display: none;" />
                         </div>
                     </div>
+                    <button class="toggle-style-button" onclick="toggleStyles()">Toggle Styles</button>
                     <p class="big-blue-text">How might the mutation impact the ability of <span id="substrateOrDrug"></span> to do their job? How might the mutation impact the ability of this protein to do its job?</p>
                 </div>
             </div>
@@ -332,27 +334,30 @@
         let originalText = "";
         let pdbUri = "";
         let sequence = "";
+        let currentStyle = 'spectrum';
 
         let viewer1, viewer2, viewer3, alphafoldViewer, mutantViewer;
         let selectedResidues = new Set();
-        const originalStyles = [
-            { cartoon: { color: 'spectrum' } },
-            { stick: {} },
-            {
-                sphere: {
-                    colorfunc: function (atom) {
-                        const hydrophobic = new Set(['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'PRO', 'GLY']);
-                        const hydrophilic = new Set(['ARG', 'LYS', 'ASP', 'GLU', 'ASN', 'GLN']);
-                        const positive = new Set(['ARG', 'LYS']);
-                        const negative = new Set(['ASP', 'GLU']);
-                        if (positive.has(atom.resn)) return 'blue';
-                        else if (negative.has(atom.resn)) return 'red';
-                        else if (hydrophobic.has(atom.resn)) return 'yellow';
-                        else if (hydrophilic.has(atom.resn)) return 'lightgrey';
-                        return 'grey';  // fallback color
-                    }
+        const spectrumStyle = { cartoon: { color: 'spectrum' } };
+        const spacefillStyle = {
+            sphere: {
+                colorfunc: function (atom) {
+                    const hydrophobic = new Set(['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'PRO', 'GLY']);
+                    const hydrophilic = new Set(['ARG', 'LYS', 'ASP', 'GLU', 'ASN', 'GLN']);
+                    const positive = new Set(['ARG', 'LYS']);
+                    const negative = new Set(['ASP', 'GLU']);
+                    if (positive.has(atom.resn)) return 'blue';
+                    else if (negative.has(atom.resn)) return 'red';
+                    else if (hydrophobic.has(atom.resn)) return 'yellow';
+                    else if (hydrophilic.has(atom.resn)) return 'lightgrey';
+                    return 'grey';  // fallback color
                 }
             }
+        };
+        const originalStyles = [
+            spectrumStyle,
+            { stick: {} },
+            spacefillStyle
         ];
 
         async function fetchPDBData(pdbUri) {
@@ -694,7 +699,7 @@
             const response = await fetch(pdbUri);
             const pdbText = await response.text();
             viewer.addModel(pdbText, "pdb");
-            viewer.setStyle({}, { cartoon: { color: 'blue' } });
+            viewer.setStyle({}, spectrumStyle);
             viewer.zoomTo();
             viewer.render();
         }
@@ -707,7 +712,7 @@
                     const pdbText = e.target.result;
                     const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
                     viewer.addModel(pdbText, "pdb");
-                    viewer.setStyle({}, { cartoon: { color: 'blue' } });
+                    viewer.setStyle({}, spectrumStyle);
                     viewer.zoomTo();
                     viewer.render();
                 };
@@ -724,11 +729,26 @@
                     const pdbText = e.target.result;
                     const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
                     viewer.addModel(pdbText, "pdb");
-                    viewer.setStyle({}, { cartoon: { color: 'blue' } });
+                    viewer.setStyle({}, spectrumStyle);
                     viewer.zoomTo();
                     viewer.render();
                 };
                 reader.readAsText(file);
+            }
+        }
+
+        function toggleStyles() {
+            currentStyle = currentStyle === 'spectrum' ? 'spacefill' : 'spectrum';
+            const style = currentStyle === 'spectrum' ? spectrumStyle : spacefillStyle;
+
+            if (alphafoldViewer) {
+                alphafoldViewer.setStyle({}, style);
+                alphafoldViewer.render();
+            }
+
+            if (mutantViewer) {
+                mutantViewer.setStyle({}, style);
+                mutantViewer.render();
             }
         }
     </script>
