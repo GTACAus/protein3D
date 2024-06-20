@@ -316,7 +316,7 @@ In this representation, the space taken up by each amino acid is represented by 
                 <h3 class="sequence-title"><b>Mutant protein</b></h3>
                 <div id="mutantViewer" class="viewer" style="height: 400px; width: 100%;"></div>
                 <button class="refresh-button" onclick="reloadMutantViewer()">Display mutant protein</button>
-                <button class="toggle-style-button" onclick="toggleMutantViewerStyle()">Toggle Style</button>
+                <button class="toggle-style-button" onclick="toggleMutantViewerStyle()">Toggle secondary structure/spacefill</button>
             </div>                        
             <div class="col s12 m6">
                 <h3 class="sequence-title"><b>Original protein</b></h3>
@@ -708,14 +708,15 @@ In this representation, the space taken up by each amino acid is represented by 
         });
 
         async function reloadAlphaFoldViewer() {
-            const viewer = $3Dmol.createViewer('alphafoldViewer', { backgroundColor: '0xffffff' });
-            const response = await fetch(pdbUri);
-            const pdbText = await response.text();
-            viewer.addModel(pdbText, "pdb");
-            viewer.setStyle({}, spectrumStyle);
-            viewer.zoomTo();
-            viewer.render();
-        }
+    const viewer = $3Dmol.createViewer('alphafoldViewer', { backgroundColor: '0xffffff' });
+    const response = await fetch(pdbUri);
+    const pdbText = await response.text();
+    viewer.addModel(pdbText, "pdb");
+    viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+    viewer.zoomTo();
+    viewer.render();
+    alphafoldViewer = viewer; // Save reference to the viewer
+}
 
         document.getElementById('pdbFileInput').addEventListener('change', function (event) {
             const file = event.target.files[0];
@@ -757,6 +758,10 @@ function toggleMutantViewerStyle() {
     if (mutantViewer) {
         mutantViewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
         mutantViewer.render();
+    }
+    if (alphafoldViewer) {
+        alphafoldViewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+        alphafoldViewer.render();
     }
 }
         // Add event listener to handle file input changes
