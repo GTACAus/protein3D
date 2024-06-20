@@ -676,7 +676,7 @@
             const response = await fetch(pdbUri);
             const pdbText = await response.text();
             viewer.addModel(pdbText, "pdb");
-            viewer.setStyle({}, { cartoon: { color: 'ss' } });
+            viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
             viewer.zoomTo();
             viewer.render();
         }
