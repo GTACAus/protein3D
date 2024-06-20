@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -195,7 +196,7 @@
             <div class="container card">
                 <div class="card-content">
                     <h2>Translate the <span id="geneName3"></span> gene</h2>
-                    <p>Use the tool below to translate the copied <span id="geneName4"></span> nucleotide sequence to a protein primary structure. Paste the sequence into the sequence box and click/tap TRANSLATE.</p>
+                    <p>Bioinformatics tools can quickly perform this task.  You will use the translate tool to quickly process your coding DNA sequence into a translated amino acid sequence.  Use the tool below to translate the copied <span id="geneName4"></span> nucleotide sequence to a protein primary structure. Paste the sequence into the sequence box and click/tap TRANSLATE.</p>
                     <textarea id="dnaSequence1" rows="10" placeholder="Enter DNA sequence here..."></textarea>
                     <br>
                     <button onclick="translateDNA('dnaSequence1', 'proteinSequence1')">Translate</button>
@@ -225,6 +226,7 @@
                 <div class="card-content">
                     <h2>Compare the original and mutant gene sequences</h2>
                     <div>
+                        <p>Your coding DNA consists of the start codon, the stop codon and all of the nucleotides between.  Each codon in your coding DNA will be transcribed into mRNA and translated into a sequence of amino acids.</p>
                         <h3 class="sequence-title">Original Sequence</h3>
                         <div id="originalSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
                     </div>
@@ -243,7 +245,11 @@
             <div class="container card">
                 <div class="card-content">
                     <h2>Use AI to fold your mutant protein</h2>
-                    <p>Copy the amino acid sequence from your mutant amino acid translation.</p>
+                    <p>Recent advances in artificial intelligence have allowed scientists to use computers to simulate protein folding in order to determine what a protein’s 3D structure might look like without needing to make observations of real proteins.  
+
+AlphaFold is a tool that uses machine learning algorithms to perform high accuracy predictions about what a protein’s 3D structure might look like using only an amino acid sequence as an input.  
+                        
+Copy the amino acid sequence from your mutant amino acid translation.</p>
                     <p>Navigate to this page: <a href="https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb" target="_blank">AlphaFold2 Notebook.</a></p>
                     <p class="big-blue-text">How does your mutation impact the 3D structure of your <span id="proteinName4"></span>?</p>
                 </div>
@@ -253,7 +259,9 @@
             <div class="card">
                 <div class="card-content">
                     <h2>Atomic Structure</h2>
-                    <p>In the atomic structure model, every atom in each amino acid is shown. Carbon, Oxygen, Nitrogen, and Hydrogen are represented in this view.</p>
+                    <p>Amino acid chains fold into tertiary structures that have 3D shapes.  These shapes are closely related to how they function and interact with systems within organisms.  Historically, 3D protein structures have been empirically determined using powerful tools and techniques including X-ray crystallography and electron microscopy.  
+
+In the atomic structure model, every atom in each amino acid is shown. Carbon, Oxygen, Nitrogen, and Hydrogen are represented in this view.</p>
                     <div class="viewer-container">
                         <div id="viewer2" class="viewer"></div>
                         <button class="refresh-button" onclick="reloadViewer('viewer2', 1)">Reset model</button>
@@ -266,7 +274,9 @@
             <div class="card">
                 <div class="card-content">
                     <h2>Space fill structure</h2>
-                    <p>In this representation, the space taken up by each amino acid is represented by spheres. In addition, each amino acid is coloured by its hydrophobicity and charge:</p>
+                    <p>The properties of amino acids determines how they arrange themselves and interact with one another.
+
+In this representation, the space taken up by each amino acid is represented by spheres. In addition, each amino acid is coloured by its hydrophobicity and charge:</p>
                     <ul class="spacefill-key">
                         <li><span style="color: yellow;">●</span> Hydrophobic</li>
                         <li><span class="hydrophilic" style="color: lightgrey;"></span> Hydrophilic</li>
@@ -294,39 +304,42 @@
             </div>
 
             <!-- Compare Mutant PBP -->
-            <div class="card">
-                <div class="card-content">
-                    <div><h2>Compare your mutant <span id="proteinName5"></span> with the original protein</h2>
-                    <p id="proteinFunction"></p>
-                    </div>
-                    <p>Upload an image of your AlphaFold result below or choose a PDB file to view the structure.</p>
-                    <div class="row">
-                        <div class="col s12 m6">
-                            <h3 class="sequence-title"><b>Mutant protein</b></h3>
-                            <div id="mutantViewer" class="viewer" style="height: 400px; width: 100%;"></div>
-                            <button class="refresh-button" onclick="reloadMutantViewer()">Display mutant protein</button>
-                        </div>                        
-                        <div class="col s12 m6">
-                            <h3 class="sequence-title"><b>Original protein</b></h3>
-                            <div id="alphafoldViewer" class="viewer" style="height: 400px; width: 100%;"></div>
-                            <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Display original protein</button>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col s12 m6">
-                            <h3 class="sequence-title"><b>Upload PDB file</b></h3>
-                            <input type="file" id="pdbFileInput" accept=".pdb" />
-                        </div>
-                        <div class="col s12 m6">
-                            <h3 class="sequence-title"><b>AlphaFold Image</b></h3>
-                            <input type="file" id="alphafoldImageInput" accept="image/*" />
-                            <img id="alphafoldImage" style="max-width: 100%; display: none;" />
-                        </div>
-                    </div>
-                    <button class="toggle-style-button" onclick="toggleStyles()">Toggle Styles</button>
-                    <p class="big-blue-text">How might the mutation impact the ability of <span id="substrateOrDrug"></span> to do their job? How might the mutation impact the ability of this protein to do its job?</p>
-                </div>
+<div class="card">
+    <div class="card-content">
+        <div>
+            <h2>Compare your mutant <span id="proteinName5"></span> with the original protein</h2>
+            <p id="proteinFunction"></p>
+        </div>
+        <p>Upload an image of your AlphaFold result below or choose a PDB file to view the structure.</p>
+        <div class="row">
+            <div class="col s12 m6">
+                <h3 class="sequence-title"><b>Mutant protein</b></h3>
+                <div id="mutantViewer" class="viewer" style="height: 400px; width: 100%;"></div>
+                <button class="refresh-button" onclick="reloadMutantViewer()">Display mutant protein</button>
+                <button class="toggle-style-button" onclick="toggleMutantViewerStyle()">Toggle Style</button>
+            </div>                        
+            <div class="col s12 m6">
+                <h3 class="sequence-title"><b>Original protein</b></h3>
+                <div id="alphafoldViewer" class="viewer" style="height: 400px; width: 100%;"></div>
+                <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Display original protein</button>
             </div>
+        </div>
+        <div class="row">
+            <div class="col s12 m6">
+                <h3 class="sequence-title"><b>Upload PDB file</b></h3>
+                <input type="file" id="pdbFileInput" accept=".pdb" />
+            </div>
+            <div class="col s12 m6">
+                <h3 class="sequence-title"><b>AlphaFold Image</b></h3>
+                <input type="file" id="alphafoldImageInput" accept="image/*" />
+                <img id="alphafoldImage" style="max-width: 100%; display: none;" />
+            </div>
+        </div>
+        
+        <p class="big-blue-text">How might the mutation impact the ability of <span id="substrateOrDrug"></span> to do their job? How might the mutation impact the ability of this protein to do its job?</p>
+    </div>
+</div>
+
         </div>
     </div>
 
@@ -354,6 +367,11 @@
                 }
             }
         };
+        const originalStyles = [
+            spectrumStyle,
+            { stick: {} },
+            spacefillStyle
+        ];
 
         async function fetchPDBData(pdbUri) {
             const response = await fetch(pdbUri);
@@ -469,12 +487,12 @@
             document.getElementById('sequenceTitle').textContent = 'Sequence of ' + title;
             createSequenceTable(sequence);
 
-            viewer1 = initializeViewer("viewer1", spectrumStyle);
-            viewer2 = initializeViewer("viewer2", { stick: {} });
-            viewer3 = initializeViewer("viewer3", spacefillStyle);
+            viewer1 = initializeViewer("viewer1", 0);
+            viewer2 = initializeViewer("viewer2", 1);
+            viewer3 = initializeViewer("viewer3", 2);
         }
 
-        function initializeViewer(viewerElementId, style) {
+        function initializeViewer(viewerElementId, styleIndex) {
             const config = { backgroundColor: '0xffffff' };
             const viewer = $3Dmol.createViewer(viewerElementId, config);
 
@@ -482,7 +500,7 @@
                 .then(response => response.text())
                 .then(data => {
                     viewer.addModel(data, "pdb");
-                    viewer.setStyle({}, style);
+                    viewer.setStyle({}, originalStyles[styleIndex]);
                     viewer.zoomTo();
                     viewer.render();
                     // Apply highlighted residues
@@ -495,13 +513,13 @@
             return viewer;
         }
 
-        function reloadViewer(viewerElementId, style) {
+        function reloadViewer(viewerElementId, styleIndex) {
             const viewer = $3Dmol.createViewer(viewerElementId, { backgroundColor: '0xffffff' });
             fetch(pdbUri)
                 .then(response => response.text())
                 .then(data => {
                     viewer.addModel(data, "pdb");
-                    viewer.setStyle({}, style);
+                    viewer.setStyle({}, originalStyles[styleIndex]);
                     viewer.zoomTo();
                     viewer.render();
                     // Apply highlighted residues
@@ -694,7 +712,7 @@
             const response = await fetch(pdbUri);
             const pdbText = await response.text();
             viewer.addModel(pdbText, "pdb");
-            viewer.setStyle({}, currentStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+            viewer.setStyle({}, spectrumStyle);
             viewer.zoomTo();
             viewer.render();
         }
@@ -707,7 +725,7 @@
                     const pdbText = e.target.result;
                     const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
                     viewer.addModel(pdbText, "pdb");
-                    viewer.setStyle({}, currentStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+                    viewer.setStyle({}, spectrumStyle);
                     viewer.zoomTo();
                     viewer.render();
                 };
@@ -715,22 +733,34 @@
             }
         });
 
-        function reloadMutantViewer() {
-            const fileInput = document.getElementById('pdbFileInput');
-            const file = fileInput.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const pdbText = e.target.result;
-                    const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
-                    viewer.addModel(pdbText, "pdb");
-                    viewer.setStyle({}, currentStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
-                    viewer.zoomTo();
-                    viewer.render();
-                };
-                reader.readAsText(file);
-            }
-        }
+        let currentMutantStyle = 'spectrum'; // Keep track of the current style
+
+async function reloadMutantViewer() {
+    const fileInput = document.getElementById('pdbFileInput');
+    const file = fileInput.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const pdbText = e.target.result;
+            const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
+            viewer.addModel(pdbText, "pdb");
+            viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+            viewer.zoomTo();
+            viewer.render();
+            mutantViewer = viewer; // Save reference to the viewer
+        };
+        reader.readAsText(file);
+    }
+}
+function toggleMutantViewerStyle() {
+    currentMutantStyle = currentMutantStyle === 'spectrum' ? 'spacefill' : 'spectrum';
+    if (mutantViewer) {
+        mutantViewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+        mutantViewer.render();
+    }
+}
+        // Add event listener to handle file input changes
+document.getElementById('pdbFileInput').addEventListener('change', reloadMutantViewer);
 
         function toggleStyles() {
             currentStyle = currentStyle === 'spectrum' ? 'spacefill' : 'spectrum';
