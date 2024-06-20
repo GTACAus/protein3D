@@ -136,6 +136,9 @@
             height: 12px;
             width: 12px;
         }
+        .active-site-text {
+            font-size: 0.9em; /* Smaller font size for active site text */
+        }
     </style>
 </head>
 <body>
@@ -267,7 +270,7 @@
                     <li><span class="hydrophilic" style="color: lightgrey;">●</span> Hydrophilic</li>
                     <li><span style="color: red;">●</span> Negatively charged (Asp, Glu)</li>
                     <li><span style="color: blue;">●</span> Positively charged (Arg, Lys)</li>
-                    <li><span style="color: lightgrey;">●</span> Neutral</li>
+                   
                 </ul>
                 <div class="viewer-container">
                     <div id="viewer3" class="viewer"></div>
@@ -282,7 +285,7 @@
         <div class="card">
             <div class="card-content">
                 <h2>Active site <span id="activeSite"></span></h2>
-                <p id="activeSiteText"></p>
+                <p id="activeSiteText" class="active-site-text"></p>
                 <p>Click on residues in the primary structure to highlight any part of the protein with green spheres.</p>
             </div>
         </div>
@@ -297,10 +300,10 @@
         </div>
 
         <!-- Upload AlphaFold Result -->
-        <div class="card">
+        <div class="card" style="margin-bottom: 20px;">
             <div class="card-content">
                 <h2>Upload your AlphaFold Result</h2>
-                <p>Upload an image of your AlphaFold result below. The image will be displayed next to the 3D model of the protein structure with AlphaFold confidence coloring.</p>
+                <p>Upload an image of your AlphaFold result below. The image will be displayed next to the 3D model of the original protein structure.</p>
                 <input type="file" id="alphafoldImageInput" accept="image/*" />
                 <div class="row">
                     <div class="col s12 m6">
