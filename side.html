@@ -354,11 +354,6 @@
                 }
             }
         };
-        const originalStyles = [
-            spectrumStyle,
-            { stick: {} },
-            spacefillStyle
-        ];
 
         async function fetchPDBData(pdbUri) {
             const response = await fetch(pdbUri);
@@ -474,12 +469,12 @@
             document.getElementById('sequenceTitle').textContent = 'Sequence of ' + title;
             createSequenceTable(sequence);
 
-            viewer1 = initializeViewer("viewer1", 0);
-            viewer2 = initializeViewer("viewer2", 1);
-            viewer3 = initializeViewer("viewer3", 2);
+            viewer1 = initializeViewer("viewer1", spectrumStyle);
+            viewer2 = initializeViewer("viewer2", { stick: {} });
+            viewer3 = initializeViewer("viewer3", spacefillStyle);
         }
 
-        function initializeViewer(viewerElementId, styleIndex) {
+        function initializeViewer(viewerElementId, style) {
             const config = { backgroundColor: '0xffffff' };
             const viewer = $3Dmol.createViewer(viewerElementId, config);
 
@@ -487,7 +482,7 @@
                 .then(response => response.text())
                 .then(data => {
                     viewer.addModel(data, "pdb");
-                    viewer.setStyle({}, originalStyles[styleIndex]);
+                    viewer.setStyle({}, style);
                     viewer.zoomTo();
                     viewer.render();
                     // Apply highlighted residues
@@ -500,13 +495,13 @@
             return viewer;
         }
 
-        function reloadViewer(viewerElementId, styleIndex) {
+        function reloadViewer(viewerElementId, style) {
             const viewer = $3Dmol.createViewer(viewerElementId, { backgroundColor: '0xffffff' });
             fetch(pdbUri)
                 .then(response => response.text())
                 .then(data => {
                     viewer.addModel(data, "pdb");
-                    viewer.setStyle({}, originalStyles[styleIndex]);
+                    viewer.setStyle({}, style);
                     viewer.zoomTo();
                     viewer.render();
                     // Apply highlighted residues
@@ -699,7 +694,7 @@
             const response = await fetch(pdbUri);
             const pdbText = await response.text();
             viewer.addModel(pdbText, "pdb");
-            viewer.setStyle({}, spectrumStyle);
+            viewer.setStyle({}, currentStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
             viewer.zoomTo();
             viewer.render();
         }
@@ -712,7 +707,7 @@
                     const pdbText = e.target.result;
                     const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
                     viewer.addModel(pdbText, "pdb");
-                    viewer.setStyle({}, spectrumStyle);
+                    viewer.setStyle({}, currentStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
                     viewer.zoomTo();
                     viewer.render();
                 };
@@ -729,7 +724,7 @@
                     const pdbText = e.target.result;
                     const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
                     viewer.addModel(pdbText, "pdb");
-                    viewer.setStyle({}, spectrumStyle);
+                    viewer.setStyle({}, currentStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
                     viewer.zoomTo();
                     viewer.render();
                 };
