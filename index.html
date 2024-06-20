@@ -116,7 +116,7 @@
             background-color: #e0f7fa;
         }
         .highlight-red {
-            background-color: #ffebee;
+            background-color: #d54056;
         }
         .highlight-purple {
             background-color: #e1bee7;
@@ -127,6 +127,7 @@
         .spacefill-key li {
             display: inline-block;
             margin-right: 10px; /* Adjust this value to control spacing */
+            font-size: 1.5em;
         }
         .spacefill-key li span.hydrophilic {
             background-color: white;
@@ -195,7 +196,7 @@
                 <button onclick="translateDNA('dnaSequence1', 'proteinSequence1')">Translate</button>
                 <h2>Protein Sequence</h2>
                 <div id="proteinSequence1" style="white-space: pre-wrap; word-wrap: break-word;"></div>
-                <p class="big-blue-text">Compare your protein sequence with the primary structure in the table above. What do you notice?</p>
+                <p class="big-blue-text">Compare your protein sequence with the primary structure in the table at the top of the page. What do you notice?</p>
             </div>
         </div>
 
@@ -229,7 +230,7 @@
                 <div>
                     <h3 class="sequence-title"><b>Key</b>       <span class="highlight-blue">Every second codon</span><span>      </span><span class="highlight-red">First stop codon</span></h3>
                 </div>
-                <p class="big-blue-text">Identify the impact of your mutation on the codons read from your gene</p>
+                <p class="big-blue-text">Identify the impact of your mutation: compare the codons in your original and mutant gene</p>
             </div>
         </div>
 
@@ -237,8 +238,8 @@
         <div class="container card">
             <div class="card-content">
                 <h2>Use AI to fold your mutant protein</h2>
-                <p>Copy the amino acid sequence from your translation</p>
-                <p>Navigate to this page: <a href="https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb" target="_blank">AlphaFold2 Notebook</a></p>
+                <p>Copy the amino acid sequence from your mutant amino acid translation.</p>
+                <p>Navigate to this page: <a href="https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb" target="_blank">AlphaFold2 Notebook.</a></p>
                 <p class="big-blue-text">How does your mutation impact the 3D structure of your <span id="proteinName4"></span>?</p>
             </div>
         </div>
