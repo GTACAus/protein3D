@@ -112,6 +112,23 @@
         .sequence-title {
             font-size: 1.2em;
         }
+        .highlight-blue {
+            background-color: #e0f7fa;
+        }
+        .highlight-red {
+            background-color: #ffebee;
+        }
+        .highlight-purple {
+            background-color: #e1bee7;
+        }
+        .key-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .key-item span {
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -197,6 +214,15 @@
                     <h3 class="sequence-title">Mutant Sequence</h3>
                     <div id="mutantSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
                 </div>
+                <div>
+                    <h3 class="sequence-title"><b>Key</b></h3>
+                    <div class="key-item">
+                        <span class="highlight-blue">Every second codon</span>
+                    </div>
+                    <div class="key-item">
+                        <span class="highlight-red">Stop codon</span>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -229,11 +255,10 @@
                 <h2>Space fill structure</h2>
                 <p>In this representation, the space taken up by each amino acid is represented by spheres. In addition, each amino acid is coloured by its hydrophobicity and charge:</p>
                 <ul>
-                    <li>Yellow: Hydrophobic</li>
-                    <li>White: Hydrophilic</li>
-                    <li>Gray: Neutral</li>
-                    <li>Red: Negatively charged (Asp, Glu)</li>
-                    <li>Blue: Positively charged (Arg, Lys)</li>
+                    <li><span style="color: yellow;">●</span> Hydrophobic</li>
+                    <li><span style="color: white; border: 1px solid black; border-radius: 50%; padding: 2px;">●</span> Hydrophilic</li>
+                    <li><span style="color: red;">●</span> Negatively charged (Asp, Glu)</li>
+                    <li><span style="color: blue;">●</span> Positively charged (Arg, Lys)</li>
                 </ul>
                 <div class="viewer-container">
                     <div id="viewer3" class="viewer"></div>
@@ -253,12 +278,23 @@
             </div>
         </div>
 
-        <!-- Compare Mutant PBP -->
+        <!-- Compare your mutant protein with the original protein -->
         <div class="card">
             <div class="card-content">
-                <h2>Compare your mutant <span id="proteinName5"></span> with the original protein</h2>
-                <p id="proteinFunction"></p>
-                <p class="big-blue-text">How might the mutation impact the ability of <span id="substrateOrDrug"></span> to do their job? How might the mutation impact the ability of this protein to do its job?</p>
+                <h2>Compare your mutant protein with the original protein</h2>
+                <p>Upload an image of your AlphaFold result below. The image will be displayed next to the 3D model of the protein structure.</p>
+                <input type="file" id="alphafoldImageInput" accept="image/*" />
+                <div class="row">
+                    <div class="col s12 m6">
+                        <h3 class="sequence-title">AlphaFold Image</h3>
+                        <img id="alphafoldImage" style="max-width: 100%; display: none;" />
+                    </div>
+                    <div class="col s12 m6">
+                        <h3 class="sequence-title">AlphaFold Model</h3>
+                        <div id="alphafoldViewer" class="viewer" style="height: 400px; width: 100%;"></div>
+                    </div>
+                </div>
+                <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Reset model</button>
             </div>
         </div>
     </div>
@@ -268,7 +304,7 @@
         let pdbUri = "";
         let sequence = "";
 
-        let viewer1, viewer2, viewer3;
+        let viewer1, viewer2, viewer3, alphafoldViewer;
         let selectedResidues = new Set();
         const originalStyles = [
             { cartoon: { color: 'spectrum' } },
@@ -278,14 +314,12 @@
                     colorfunc: function (atom) {
                         const hydrophobic = new Set(['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'PRO', 'GLY']);
                         const hydrophilic = new Set(['ARG', 'LYS', 'ASP', 'GLU', 'ASN', 'GLN']);
-                        const neutral = new Set(['SER', 'THR', 'CYS', 'TYR', 'HIS']);
                         const positive = new Set(['ARG', 'LYS']);
                         const negative = new Set(['ASP', 'GLU']);
                         if (positive.has(atom.resn)) return 'blue';
                         else if (negative.has(atom.resn)) return 'red';
                         else if (hydrophobic.has(atom.resn)) return 'yellow';
                         else if (hydrophilic.has(atom.resn)) return 'white';
-                        else if (neutral.has(atom.resn)) return 'gray';
                         return 'green';  // fallback color
                     }
                 }
@@ -579,9 +613,22 @@
             let mutantHTML = '';
 
             for (let i = 0; i < originalCodons.length; i++) {
-                originalHTML += originalCodons[i] + ' ';
-                if (i < mutantCodons.length) {
-                    mutantHTML += mutantCodons[i] + ' ';
+                let originalCodon = originalCodons[i];
+                let mutantCodon = mutantCodons[i] || '';
+
+                if (i % 2 === 1) {
+                    originalHTML += `<span class="highlight-blue">${originalCodon}</span> `;
+                    mutantHTML += `<span class="highlight-blue">${mutantCodon}</span> `;
+                } else {
+                    originalHTML += `${originalCodon} `;
+                    mutantHTML += `${mutantCodon} `;
+                }
+
+                if (codonTable[originalCodon] === '*' && !originalHTML.includes('highlight-red')) {
+                    originalHTML = originalHTML.replace(`<span class="highlight-blue">${originalCodon}</span> `, `<span class="highlight-red">${originalCodon}</span> `);
+                }
+                if (codonTable[mutantCodon] === '*' && !mutantHTML.includes('highlight-red')) {
+                    mutantHTML = mutantHTML.replace(`<span class="highlight-blue">${mutantCodon}</span> `, `<span class="highlight-red">${mutantCodon}</span> `);
                 }
             }
 
@@ -597,6 +644,29 @@
 
         document.getElementById('dnaSequence1').addEventListener('input', compareSequences);
         document.getElementById('dnaSequence2').addEventListener('input', compareSequences);
+
+        document.getElementById('alphafoldImageInput').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('alphafoldImage').src = e.target.result;
+                    document.getElementById('alphafoldImage').style.display = 'block';
+                    reloadAlphaFoldViewer();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        async function reloadAlphaFoldViewer() {
+            const viewer = $3Dmol.createViewer('alphafoldViewer', { backgroundColor: '0xffffff' });
+            const response = await fetch(pdbUri);
+            const pdbText = await response.text();
+            viewer.addModel(pdbText, "pdb");
+            viewer.setStyle({}, { cartoon: { color: 'spectrum' } });
+            viewer.zoomTo();
+            viewer.render();
+        }
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
