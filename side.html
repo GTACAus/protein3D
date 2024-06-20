@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -117,21 +116,22 @@
             background-color: #e0f7fa;
         }
         .highlight-red {
-            background-color: #ffebee;
+            background-color: #d54056;
         }
         .highlight-purple {
             background-color: #e1bee7;
         }
         .spacefill-key {
-            margin-top: 10px; /* Add margin to space the key from the viewer */
+            margin-top: 2px; /* Add margin to space the key from the viewer */
         }
         .spacefill-key li {
             display: inline-block;
             margin-right: 10px; /* Adjust this value to control spacing */
+            font-size: 1.5em;
         }
         .spacefill-key li span.hydrophilic {
             background-color: white;
-            border: 1px solid black;
+            border: 0.5px solid black;
             border-radius: 50%;
             display: inline-block;
             height: 12px;
@@ -179,7 +179,7 @@
         <!-- Copy mecA Gene Sequence -->
         <div class="container card">
             <div class="card-content">
-                <h2>Copy the <span id="geneName1"></span> gene from translation by our bioinformatics tool</h2>
+                <h2>Copy the <span id="geneName1"></span> gene for translation by our bioinformatics tool</h2>
                 <p>Click/tap copy text to take the DNA sequence from <span id="geneName2"></span> for translation.</p>
                 <pre id="sequence-container"></pre>
                 <button onclick="copyText()">Copy Text</button>
@@ -190,13 +190,13 @@
         <div class="container card">
             <div class="card-content">
                 <h2>Translate the <span id="geneName3"></span> gene</h2>
-                <p>Use the tool below to translate the copied <span id="geneName4"></span> nucleotide sequence to a protein primary structure. Paste the sequence into the sequence box and click/tap TRANSLATE!</p>
+                <p>Use the tool below to translate the copied <span id="geneName4"></span> nucleotide sequence to a protein primary structure. Paste the sequence into the sequence box and click/tap TRANSLATE.</p>
                 <textarea id="dnaSequence1" rows="10" placeholder="Enter DNA sequence here..."></textarea>
                 <br>
                 <button onclick="translateDNA('dnaSequence1', 'proteinSequence1')">Translate</button>
                 <h2>Protein Sequence</h2>
                 <div id="proteinSequence1" style="white-space: pre-wrap; word-wrap: break-word;"></div>
-                <p class="big-blue-text">Compare your protein sequence with the primary structure in the table above. What do you notice?</p>
+                <p class="big-blue-text">Compare your protein sequence with the primary structure in the table at the top of the page. What do you notice?</p>
             </div>
         </div>
 
@@ -204,7 +204,7 @@
         <div class="container card">
             <div class="card-content">
                 <h2>Mutate the <span id="geneName5"></span> gene</h2>
-                <p>Paste the same sequence into the sequence box. Delete 1, 2 or 3 nucleotides and click/tap TRANSLATE! to generate a mutant primary structure.</p>
+                <p>Paste the same sequence into the sequence box. Delete 1, 2 or 3 nucleotides and click/tap TRANSLATE to generate a mutant primary structure.</p>
                 <textarea id="dnaSequence2" rows="10" placeholder="Enter DNA sequence here..."></textarea>
                 <br>
                 <button onclick="translateDNA('dnaSequence2', 'proteinSequence2')">Translate</button>
@@ -228,13 +228,9 @@
                     <div id="mutantSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
                 </div>
                 <div>
-                    <h3 class="sequence-title">Key</h3>
-                    <ul>
-                        <li><span class="highlight-blue">Every second codon</span></li>
-                        <li><span class="highlight-red">First stop codon</span></li>
-                    </ul>
+                    <h3 class="sequence-title"><b>Key</b>       <span class="highlight-blue">Every second codon</span><span>      </span><span class="highlight-red">First stop codon</span></h3>
                 </div>
-                <p class="big-blue-text">Identify the impact of your mutation on the codons read from your gene</p>
+                <p class="big-blue-text">Identify the impact of your mutation: compare the codons in your original and mutant gene</p>
             </div>
         </div>
 
@@ -242,8 +238,8 @@
         <div class="container card">
             <div class="card-content">
                 <h2>Use AI to fold your mutant protein</h2>
-                <p>Copy the amino acid sequence from your translation</p>
-                <p>Navigate to this page: <a href="https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb" target="_blank">AlphaFold2 Notebook</a></p>
+                <p>Copy the amino acid sequence from your mutant amino acid translation.</p>
+                <p>Navigate to this page: <a href="https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb" target="_blank">AlphaFold2 Notebook.</a></p>
                 <p class="big-blue-text">How does your mutation impact the 3D structure of your <span id="proteinName4"></span>?</p>
             </div>
         </div>
@@ -295,29 +291,24 @@
         <!-- Compare Mutant PBP -->
         <div class="card">
             <div class="card-content">
-                <h2>Compare your mutant <span id="proteinName5"></span> with the original protein</h2>
+                <div><h2>Compare your mutant <span id="proteinName5"></span> with the original protein</h2>
                 <p id="proteinFunction"></p>
-                <p class="big-blue-text">How might the mutation impact the ability of <span id="substrateOrDrug"></span> to do their job? How might the mutation impact the ability of this protein to do its job?</p>
-            </div>
-        </div>
-
-        <!-- Upload AlphaFold Result -->
-        <div class="card" style="margin-bottom: 20px;">
-            <div class="card-content">
-                <h2>Upload your AlphaFold Result</h2>
+                </div>
                 <p>Upload an image of your AlphaFold result below. The image will be displayed next to the 3D model of the original protein structure.</p>
                 <input type="file" id="alphafoldImageInput" accept="image/*" />
                 <div class="row">
                     <div class="col s12 m6">
-                        <h3 class="sequence-title">AlphaFold Image</h3>
+                        <h3 class="sequence-title"><b>AlphaFold Image</b></h3>
                         <img id="alphafoldImage" style="max-width: 100%; display: none;" />
                     </div>
                     <div class="col s12 m6">
-                        <h3 class="sequence-title">AlphaFold Model</h3>
+                        <h3 class="sequence-title"><b>Original protein</b></h3>
                         <div id="alphafoldViewer" class="viewer" style="height: 400px; width: 100%;"></div>
                     </div>
                 </div>
-                <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Display original AlphaFold Model</button>
+                <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Display original protein</button>
+
+                <p class="big-blue-text">How might the mutation impact the ability of <span id="substrateOrDrug"></span> to do their job? How might the mutation impact the ability of this protein to do its job?</p>
             </div>
         </div>
     </div>
@@ -685,29 +676,9 @@
             const response = await fetch(pdbUri);
             const pdbText = await response.text();
             viewer.addModel(pdbText, "pdb");
-
-            const bFactors = pdbText
-                .split('\n')
-                .filter(line => line.startsWith('ATOM'))
-                .map(line => parseFloat(line.substring(60, 66).trim()));
-
-            const maxBFactor = Math.max(...bFactors);
-            const minBFactor = Math.min(...bFactors);
-
-viewer.setStyle({}, {
-    cartoon: {
-        color: atom => {
-            const bFactor = atom.b;
-            const normalized = (bFactor - minBFactor) / (maxBFactor - minBFactor);
-            const h = (1.0 - normalized) * 240; // 0 (red) to 240 (blue)
-            return `hsl(${h}, 100%, 50%)`;
-        }
-    }
-});
-
-viewer.zoomTo();
-viewer.render();
-
+            viewer.setStyle({}, { cartoon: { color: 'lDDT' } });
+            viewer.zoomTo();
+            viewer.render();
         }
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
