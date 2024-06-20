@@ -1,6 +1,3 @@
-I'm sorry for the issues. Let's debug and simplify the code to ensure it works correctly. We'll keep the highlight coloring changes and adjust the structure to fix the broken functionality. Here is the revised code:
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -222,10 +219,10 @@ I'm sorry for the issues. Let's debug and simplify the code to ensure it works c
                     <div class="key-item">
                         <span class="highlight-blue">Every second codon</span>
                     </div>
-                    <div class="key-item">
-                        <
+                    <div class
 
-span class="highlight-red">Stop codon</span>
+="key-item">
+                        <span class="highlight-red">Stop codon</span>
                     </div>
                 </div>
             </div>
@@ -420,9 +417,9 @@ span class="highlight-red">Stop codon</span>
         }
 
         function updateResidueHighlighting() {
-            const highlightStyle = { stick
+           
 
-: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } };
+ const highlightStyle = { stick: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } };
             const viewers = [viewer1, viewer2, viewer3];
 
             viewers.forEach((viewer, index) => {
@@ -448,6 +445,7 @@ span class="highlight-red">Stop codon</span>
             viewer1 = initializeViewer("viewer1", 0);
             viewer2 = initializeViewer("viewer2", 1);
             viewer3 = initializeViewer("viewer3", 2);
+            initializeAlphaFoldViewer();
         }
 
         function initializeViewer(viewerElementId, styleIndex) {
@@ -487,6 +485,19 @@ span class="highlight-red">Stop codon</span>
                     viewer.render();
                 })
                 .catch(error => console.error('Error fetching the PDB file:', error));
+        }
+
+        function initializeAlphaFoldViewer() {
+            alphafoldViewer = initializeViewer('alphafoldViewer', 0);
+        }
+
+        async function reloadAlphaFoldViewer() {
+            const response = await fetch(pdbUri);
+            const pdbText = await response.text();
+            alphafoldViewer.addModel(pdbText, "pdb");
+            alphafoldViewer.setStyle({}, { cartoon: { color: 'spectrum' } });
+            alphafoldViewer.zoomTo();
+            alphafoldViewer.render();
         }
 
         // DNA to Protein Translator function
@@ -592,7 +603,9 @@ span class="highlight-red">Stop codon</span>
                 document.getElementById('geneName5').textContent = geneName;
                 document.getElementById('activeSite').textContent = activeSite;
                 document.getElementById('activeSiteText').textContent = activeSiteText;
-                document.getElementById('proteinFunction').textContent = proteinFunction;
+                document.getElementBy
+
+Id('proteinFunction').textContent = proteinFunction;
                 document.getElementById('substrateOrDrug').textContent = substrateOrDrug;
 
                 originalText = geneSeq;
@@ -607,8 +620,6 @@ span class="highlight-red">Stop codon</span>
 
         function highlightMutantSequence(originalSeq, mutantSeq) {
             function getCodons(dnaSequence) {
-
-
                 const codons = [];
                 for (let i = 0; i < dnaSequence.length; i += 3) {
                     codons.push(dnaSequence.substr(i, 3));
@@ -680,4 +691,3 @@ span class="highlight-red">Stop codon</span>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
 </html>
-```
