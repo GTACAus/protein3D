@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive 3D protein Viewer</title>
+    <title>Interactive 3D Protein Viewer</title>
     <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
@@ -43,6 +43,7 @@
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             overflow: hidden;
+            width: 100%;
         }
         .refresh-button, .deselect-button, .toggle-style-button {
             margin: 10px;
@@ -58,8 +59,8 @@
             background-color: #1565c0;
         }
         .viewer {
-            height: 600px;
-            width: 600px;
+            height: 400px;
+            width: 100%;
             position: relative;
             background-color: white;
         }
@@ -70,23 +71,23 @@
         }
         .card-content {
             padding: 20px;
-            word-wrap: break-word; /* Ensure long words or sequences wrap */
-            white-space: pre-wrap; /* Preserve whitespace and wrap text */
+            word-wrap: break-word;
+            white-space: pre-wrap;
         }
         h1 {
             color: #424242;
-            font-size: 3.5em;
+            font-size: 2.5em;
         }
         h2 {
             color: #424242;
-            font-size: 2.5em;
+            font-size: 1.5em;
         }
         p {
             color: #757575;
-            font-size: 1.5em;
+            font-size: 1.2em;
         }
         .big-blue-text {
-            font-size: 1.8em;
+            font-size: 1.5em;
             color: #1e88e5;
         }
         textarea {
@@ -122,11 +123,11 @@
             background-color: #e1bee7;
         }
         .spacefill-key {
-            margin-top: 2px; /* Add margin to space the key from the viewer */
+            margin-top: 2px;
         }
         .spacefill-key li {
             display: inline-block;
-            margin-right: 10px; /* Adjust this value to control spacing */
+            margin-right: 10px;
             font-size: 1.5em;
         }
         .spacefill-key li span.hydrophilic {
@@ -138,7 +139,7 @@
             width: 12px;
         }
         .active-site-text {
-            font-size: 1.5em; /* Smaller font size for active site text */
+            font-size: 1.5em;
         }
         .hidden {
             display: none;
@@ -149,6 +150,50 @@
         }
         .button-container button {
             margin-left: 20px;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .viewer {
+                height: 300px;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            h2 {
+                font-size: 1.3em;
+            }
+            p {
+                font-size: 1em;
+            }
+            .big-blue-text {
+                font-size: 1.2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .viewer {
+                height: 250px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            h2 {
+                font-size: 1.1em;
+            }
+            p {
+                font-size: 0.9em;
+            }
+            .big-blue-text {
+                font-size: 1em;
+            }
+            .button-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .button-container button {
+                margin: 10px 0 0 0;
+            }
         }
     </style>
 </head>
@@ -314,41 +359,41 @@ Where are the positively and negatively charged amino acids located in relation 
             </div>
 
             <!-- Compare Mutant PBP -->
-<div class="card">
-    <div class="card-content">
-        <div>
-            <h2>Compare your mutant <span id="proteinName5"></span> with the original protein</h2>
-            <p id="proteinFunction"></p>
-        </div>
-        <p>Upload an image of your AlphaFold result below or choose a PDB file to view the structure.</p>
-        <div class="row">
-            <div class="col s12 m6">
-                <h3 class="sequence-title"><b>Mutant protein</b></h3>
-                <div id="mutantViewer" class="viewer" style="height: 400px; width: 100%;"></div>
-                <button class="refresh-button" onclick="reloadMutantViewer()">Display mutant protein</button>
-                <button class="toggle-style-button" onclick="toggleMutantViewerStyle()">Toggle secondary structure/spacefill</button>
-            </div>                        
-            <div class="col s12 m6">
-                <h3 class="sequence-title"><b>Original protein</b></h3>
-                <div id="alphafoldViewer" class="viewer" style="height: 400px; width: 100%;"></div>
-                <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Display original protein</button>
+            <div class="card">
+                <div class="card-content">
+                    <div>
+                        <h2>Compare your mutant <span id="proteinName5"></span> with the original protein</h2>
+                        <p id="proteinFunction"></p>
+                    </div>
+                    <p>Upload an image of your AlphaFold result below or choose a PDB file to view the structure.</p>
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <h3 class="sequence-title"><b>Mutant protein</b></h3>
+                            <div id="mutantViewer" class="viewer" style="height: 400px; width: 100%;"></div>
+                            <button class="refresh-button" onclick="reloadMutantViewer()">Display mutant protein</button>
+                            <button class="toggle-style-button" onclick="toggleMutantViewerStyle()">Toggle secondary structure/spacefill</button>
+                        </div>                        
+                        <div class="col s12 m6">
+                            <h3 class="sequence-title"><b>Original protein</b></h3>
+                            <div id="alphafoldViewer" class="viewer" style="height: 400px; width: 100%;"></div>
+                            <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Display original protein</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <h3 class="sequence-title"><b>Upload PDB file</b></h3>
+                            <input type="file" id="pdbFileInput" accept=".pdb" />
+                        </div>
+                        <div class="col s12 m6">
+                            <h3 class="sequence-title"><b>AlphaFold Image</b></h3>
+                            <input type="file" id="alphafoldImageInput" accept="image/*" />
+                            <img id="alphafoldImage" style="max-width: 100%; display: none;" />
+                        </div>
+                    </div>
+                    
+                    <p class="big-blue-text">How might the mutation impact the ability of <span id="substrateOrDrug"></span> to do their job? How might the mutation impact the ability of this protein to do its job?</p>
+                </div>
             </div>
-        </div>
-        <div class="row">
-            <div class="col s12 m6">
-                <h3 class="sequence-title"><b>Upload PDB file</b></h3>
-                <input type="file" id="pdbFileInput" accept=".pdb" />
-            </div>
-            <div class="col s12 m6">
-                <h3 class="sequence-title"><b>AlphaFold Image</b></h3>
-                <input type="file" id="alphafoldImageInput" accept="image/*" />
-                <img id="alphafoldImage" style="max-width: 100%; display: none;" />
-            </div>
-        </div>
-        
-        <p class="big-blue-text">How might the mutation impact the ability of <span id="substrateOrDrug"></span> to do their job? How might the mutation impact the ability of this protein to do its job?</p>
-    </div>
-</div>
 
         </div>
     </div>
@@ -358,6 +403,7 @@ Where are the positively and negatively charged amino acids located in relation 
         let pdbUri = "";
         let sequence = "";
         let currentStyle = 'spectrum';
+        let residuesPerLine = 50;
 
         let viewer1, viewer2, viewer3, alphafoldViewer, mutantViewer;
         let selectedResidues = new Set();
@@ -373,7 +419,7 @@ Where are the positively and negatively charged amino acids located in relation 
                     else if (negative.has(atom.resn)) return 'red';
                     else if (hydrophobic.has(atom.resn)) return 'yellow';
                     else if (hydrophilic.has(atom.resn)) return 'lightgrey';
-                    return 'grey';  // fallback color
+                    return 'grey';
                 }
             }
         };
@@ -411,7 +457,7 @@ Where are the positively and negatively charged amino acids located in relation 
             };
             let sequence = '';
             residues.forEach((resName) => {
-                sequence += oneLetterMapping[resName] || 'X'; // X for unknown
+                sequence += oneLetterMapping[resName] || 'X';
             });
             return sequence;
         }
@@ -429,12 +475,12 @@ Where are the positively and negatively charged amino acids located in relation 
 
         function createSequenceTable(sequence) {
             const tableBody = document.getElementById('sequenceTable');
-            tableBody.innerHTML = '';  // Clear any existing content
-            for (let i = 0; i < sequence.length; i += 50) {
+            tableBody.innerHTML = '';
+            for (let i = 0; i < sequence.length; i += residuesPerLine) {
                 const positionRow = document.createElement('tr');
                 const sequenceRow = document.createElement('tr');
 
-                for (let j = 0; j < 50; j++) {
+                for (let j = 0; j < residuesPerLine; j++) {
                     if (i + j >= sequence.length) break;
 
                     if (j % 10 === 0) {
@@ -477,7 +523,7 @@ Where are the positively and negatively charged amino acids located in relation 
 
             viewers.forEach((viewer, index) => {
                 if (viewer) {
-                    viewer.setStyle({}, originalStyles[index]); // Reset all styles to original
+                    viewer.setStyle({}, originalStyles[index]);
                     selectedResidues.forEach(residueIndex => {
                         viewer.setStyle({ resi: residueIndex }, highlightStyle);
                     });
@@ -513,7 +559,6 @@ Where are the positively and negatively charged amino acids located in relation 
                     viewer.setStyle({}, originalStyles[styleIndex]);
                     viewer.zoomTo();
                     viewer.render();
-                    // Apply highlighted residues
                     selectedResidues.forEach(residueIndex => {
                         viewer.setStyle({ resi: residueIndex }, { stick: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } });
                     });
@@ -532,7 +577,6 @@ Where are the positively and negatively charged amino acids located in relation 
                     viewer.setStyle({}, originalStyles[styleIndex]);
                     viewer.zoomTo();
                     viewer.render();
-                    // Apply highlighted residues
                     selectedResidues.forEach(residueIndex => {
                         viewer.setStyle({ resi: residueIndex }, { stick: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } });
                     });
@@ -541,7 +585,6 @@ Where are the positively and negatively charged amino acids located in relation 
                 .catch(error => console.error('Error fetching the PDB file:', error));
         }
 
-        // DNA to Protein Translator function
         const codonTable = {
             'TTT': 'F', 'TTC': 'F', 'TTA': 'L', 'TTG': 'L',
             'CTT': 'L', 'CTC': 'L', 'CTA': 'L', 'CTG': 'L',
@@ -650,8 +693,8 @@ Where are the positively and negatively charged amino acids located in relation 
                 originalText = geneSeq;
                 document.getElementById('sequence-container').textContent = geneSeq;
 
-                document.getElementById('content').classList.remove('hidden'); // Show content
-                initializeViewers(); // Initialize viewers with new data
+                document.getElementById('content').classList.remove('hidden');
+                initializeViewers();
             };
             reader.readAsText(file);
         }
@@ -691,8 +734,8 @@ Where are the positively and negatively charged amino acids located in relation 
             originalText = geneSeq;
             document.getElementById('sequence-container').textContent = geneSeq;
 
-            document.getElementById('content').classList.remove('hidden'); // Show content
-            initializeViewers(); // Initialize viewers with new data
+            document.getElementById('content').classList.remove('hidden');
+            initializeViewers();
         }
 
         document.getElementById('fileInput').addEventListener('change', loadXMLFile);
@@ -764,7 +807,7 @@ Where are the positively and negatively charged amino acids located in relation 
             viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
             viewer.zoomTo();
             viewer.render();
-            alphafoldViewer = viewer; // Save reference to the viewer
+            alphafoldViewer = viewer;
         }
 
         document.getElementById('pdbFileInput').addEventListener('change', function (event) {
@@ -783,7 +826,7 @@ Where are the positively and negatively charged amino acids located in relation 
             }
         });
 
-        let currentMutantStyle = 'spectrum'; // Keep track of the current style
+        let currentMutantStyle = 'spectrum';
 
         async function reloadMutantViewer() {
             const fileInput = document.getElementById('pdbFileInput');
@@ -797,7 +840,7 @@ Where are the positively and negatively charged amino acids located in relation 
                     viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
                     viewer.zoomTo();
                     viewer.render();
-                    mutantViewer = viewer; // Save reference to the viewer
+                    mutantViewer = viewer;
                 };
                 reader.readAsText(file);
             }
@@ -815,7 +858,6 @@ Where are the positively and negatively charged amino acids located in relation 
             }
         }
 
-        // Add event listener to handle file input changes
         document.getElementById('pdbFileInput').addEventListener('change', reloadMutantViewer);
 
         function toggleStyles() {
@@ -832,6 +874,24 @@ Where are the positively and negatively charged amino acids located in relation 
                 mutantViewer.render();
             }
         }
+
+        // Adjust residues per line based on screen width
+        function adjustResiduesPerLine() {
+            const screenWidth = window.innerWidth;
+            if (screenWidth <= 480) {
+                residuesPerLine = 20;
+            } else if (screenWidth <= 768) {
+                residuesPerLine = 30;
+            } else {
+                residuesPerLine = 50;
+            }
+            createSequenceTable(sequence);
+        }
+
+        // Call adjustResiduesPerLine on load and on resize
+        window.addEventListener('load', adjustResiduesPerLine);
+        //window.addEventListener('resize', adjustResiduesPerLine);
+
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
