@@ -767,16 +767,14 @@ Where are the positively and negatively charged amino acids located in relation 
             const mutantCodons = getCodons(mutantSeq);
             let originalHTML = '';
             let mutantHTML = '';
-            let foundMutation = false;
 
             for (let i = 0; i < originalCodons.length; i++) {
                 let originalCodon = originalCodons[i];
                 let mutantCodon = mutantCodons[i] || '';
 
-                if (!foundMutation && originalCodon !== mutantCodon) {
+                if (originalCodon !== mutantCodon) {
                     originalHTML += `${originalCodon} `;
                     mutantHTML += `<span class="highlight-orange">${mutantCodon}</span> `;
-                    foundMutation = true;
                 } else {
                     if (i % 2 === 1) {
                         originalHTML += `<span class="highlight-blue">${originalCodon}</span> `;
@@ -785,13 +783,13 @@ Where are the positively and negatively charged amino acids located in relation 
                         originalHTML += `${originalCodon} `;
                         mutantHTML += `${mutantCodon} `;
                     }
+                }
 
-                    if (codonTable[originalCodon] === '*' && !originalHTML.includes('highlight-red')) {
-                        originalHTML = originalHTML.replace(`<span class="highlight-blue">${originalCodon}</span> `, `<span class="highlight-red">${originalCodon}</span> `);
-                    }
-                    if (codonTable[mutantCodon] === '*' && !mutantHTML.includes('highlight-red')) {
-                        mutantHTML = mutantHTML.replace(`<span class="highlight-blue">${mutantCodon}</span> `, `<span class="highlight-red">${mutantCodon}</span> `);
-                    }
+                if (codonTable[originalCodon] === '*' && !originalHTML.includes('highlight-red')) {
+                    originalHTML = originalHTML.replace(`<span class="highlight-blue">${originalCodon}</span> `, `<span class="highlight-red">${originalCodon}</span> `);
+                }
+                if (codonTable[mutantCodon] === '*' && !mutantHTML.includes('highlight-red')) {
+                    mutantHTML = mutantHTML.replace(`<span class="highlight-orange">${mutantCodon}</span> `, `<span class="highlight-red">${mutantCodon}</span> `);
                 }
             }
 
