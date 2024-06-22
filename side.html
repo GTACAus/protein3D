@@ -14,7 +14,7 @@
         }
         body {
             background-color: #fafafa;
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Roboto', sans-serif';
         }
         .sequence-table {
             width: 100%;
@@ -43,7 +43,7 @@
             background-color: #e0f7fa;
         }
         .highlight-red {
-            background-color: #d54056;
+            background-color: #d54056 !important;
         }
         .viewer-container {
             position: relative;
@@ -764,19 +764,21 @@ Where are the positively and negatively charged amino acids located in relation 
             const mutantCodons = getCodons(mutantSeq);
             let originalHTML = '';
             let mutantHTML = '';
+            let firstStopCodonHighlighted = false;
 
             for (let i = 0; i < originalCodons.length; i++) {
                 let originalCodon = originalCodons[i];
                 let mutantCodon = mutantCodons[i] || '';
 
-                if (originalCodon !== mutantCodon) {
+                if (!firstStopCodonHighlighted && codonTable[originalCodon] === '*') {
+                    originalHTML += `<span class="highlight-red">${originalCodon}</span> `;
+                    mutantHTML += `<span class="highlight-red">${mutantCodon}</span> `;
+                    firstStopCodonHighlighted = true;
+                } else if (originalCodon !== mutantCodon) {
                     originalHTML += `${originalCodon} `;
                     mutantHTML += `<span class="highlight-orange">${mutantCodon}</span> `;
                 } else {
-                    if (codonTable[originalCodon] === '*') {
-                        originalHTML += `<span class="highlight-red">${originalCodon}</span> `;
-                        mutantHTML += `<span class="highlight-red">${mutantCodon}</span> `;
-                    } else if (i % 2 === 1) {
+                    if (i % 2 === 1) {
                         originalHTML += `<span class="highlight-blue">${originalCodon}</span> `;
                         mutantHTML += `<span class="highlight-blue">${mutantCodon}</span> `;
                     } else {
@@ -902,7 +904,7 @@ Where are the positively and negatively charged amino acids located in relation 
 
         // Call adjustResiduesPerLine on load and on resize
         window.addEventListener('load', adjustResiduesPerLine);
-        //window.addEventListener('resize', adjustResiduesPerLine);
+        window.addEventListener('resize', adjustResiduesPerLine);
 
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
