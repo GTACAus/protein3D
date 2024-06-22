@@ -788,7 +788,7 @@
             initializeViewers();
         }
          async function loadDataXMLMC1R() {
-            const response = await fetch('MC1R.xml');
+            const response = await fetch('CLDN8.xml');
             const xmlText = await response.text();
             const parser = new DOMParser();
             const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
