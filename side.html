@@ -758,40 +758,48 @@ Where are the positively and negatively charged amino acids located in relation 
         document.getElementById('fileInput').addEventListener('change', handleFileInput);
         document.getElementById('pdbFileInput').addEventListener('change', handleFileInput);
 
-       function highlightMutantSequence(originalSeq, mutantSeq) {
-    function getCodons(dnaSequence) {
-        const codons = [];
-        for (let i = 0; i < dnaSequence.length; i += 3) {
-            codons.push(dnaSequence.substr(i, 3));
+        function highlightMutantSequence(originalSeq, mutantSeq) {
+            function getCodons(dnaSequence) {
+                const codons = [];
+                for (let i = 0; i < dnaSequence.length; i += 3) {
+                    codons.push(dnaSequence.substr(i, 3));
+                }
+                return codons;
+            }
+
+            const originalCodons = getCodons(originalSeq);
+            const mutantCodons = getCodons(mutantSeq);
+            let originalHTML = '';
+            let mutantHTML = '';
+            let foundStopCodon = false;
+
+            for (let i = 0; i < originalCodons.length; i++) {
+                let originalCodon = originalCodons[i];
+                let mutantCodon = mutantCodons[i] || '';
+
+                // Apply blue highlight only if no stop codon has been found yet
+                if (!foundStopCodon && i % 2 === 1) {
+                    originalHTML += `<span class="highlight-blue">${originalCodon}</span> `;
+                    mutantHTML += `<span class="highlight-blue">${mutantCodon}</span> `;
+                } else {
+                    originalHTML += `${originalCodon} `;
+                    mutantHTML += `${mutantCodon} `;
+                }
+
+                // Check for stop codon and apply red highlight
+                if (codonTable[originalCodon] === '*' && !originalHTML.includes('highlight-red')) {
+                    foundStopCodon = true;
+                    originalHTML = originalHTML.replace(`<span class="highlight-blue">${originalCodon}</span> `, `<span class="highlight-red">${originalCodon}</span> `);
+                }
+                if (codonTable[mutantCodon] === '*' && !mutantHTML.includes('highlight-red')) {
+                    foundStopCodon = true;
+                    mutantHTML = mutantHTML.replace(`<span class="highlight-blue">${mutantCodon}</span> `, `<span class="highlight-red">${mutantCodon}</span> `);
+                }
+            }
+
+            document.getElementById('originalSequence').innerHTML = originalHTML.trim();
+            document.getElementById('mutantSequence').innerHTML = mutantHTML.trim();
         }
-        return codons;
-    }
-
-    const originalCodons = getCodons(originalSeq);
-    const mutantCodons = getCodons(mutantSeq);
-    let originalHTML = '';
-    let mutantHTML = '';
-
-    for (let i = 0; i < originalCodons.length; i++) {
-        let originalCodon = originalCodons[i];
-        let mutantCodon = mutantCodons[i] || '';
-
-        if (i % 2 === 1) {
-            originalHTML += `<span class="highlight-blue">${originalCodon}</span> `;
-            mutantHTML += `<span class="highlight-blue">${mutantCodon}</span> `;
-        } else {
-            originalHTML += `${originalCodon} `;
-            mutantHTML += `${mutantCodon} `;
-        }
-    }
-
-    // Apply red highlight for stop codons after blue highlights
-    originalHTML = originalHTML.replace(new RegExp(`(${Object.keys(codonTable).filter(codon => codonTable[codon] === '*').join('|')})`, 'g'), '<span class="highlight-red">$1</span>');
-    mutantHTML = mutantHTML.replace(new RegExp(`(${Object.keys(codonTable).filter(codon => codonTable[codon] === '*').join('|')})`, 'g'), '<span class="highlight-red">$1</span>');
-
-    document.getElementById('originalSequence').innerHTML = originalHTML.trim();
-    document.getElementById('mutantSequence').innerHTML = mutantHTML.trim();
-}
 
         function compareSequences() {
             const originalSeq = document.getElementById('dnaSequence1').value.toUpperCase().replace(/[^ATCG]/g, '');
