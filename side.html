@@ -14,7 +14,7 @@
         }
         body {
             background-color: #fafafa;
-            font-family: 'Roboto', sans-serif';
+            font-family: 'Roboto', sans-serif;
         }
         .sequence-table {
             width: 100%;
@@ -33,17 +33,14 @@
             color: #1e88e5;
             font-weight: bold;
         }
-        .highlight {
-            background-color: #a5d6a7;
-        }
-        .highlight-orange {
-            background-color: #ffa726 !important;
-        }
         .highlight-blue {
             background-color: #e0f7fa;
         }
+        .highlight-orange {
+            background-color: #ffa726;
+        }
         .highlight-red {
-            background-color: #d54056 !important;
+            background-color: #d54056;
         }
         .viewer-container {
             position: relative;
@@ -124,8 +121,8 @@
         }
         .spacefill-key span {
             display: inline-block;
-            width: 16px; /* Adjust width as needed */
-            text-align: left; /* Ensure left alignment */
+            width: 16px;
+            text-align: left;
         }
         .spacefill-key li {
             display: flex;
@@ -160,7 +157,7 @@
                 height: 300px;
             }
             .active-site-text {
-            font-size: 1em;
+                font-size: 1em;
             }
             h1 {
                 font-size: 2em;
@@ -181,7 +178,7 @@
                 height: 250px;
             }
             .active-site-text {
-            font-size: 0.9em;
+                font-size: 0.9em;
             }
             h1 {
                 font-size: 1.5em;
@@ -298,10 +295,10 @@
                     </div>
                     <div>
                         <h3 class="sequence-title">
-                        <span class="highlight-blue" style="display: block;">Every second codon</span>
-                        <span class="highlight-red" style="display: block; margin-top: 2px;">First stop codon</span>
+                            <span class="highlight-blue" style="display: block;">Every second codon</span>
+                            <span class="highlight-red" style="display: block; margin-top: 2px;">First stop codon</span>
                         </h3>
-                        </div>                    
+                    </div>                    
                     <p class="big-blue-text">Identify the impact of your mutation: compare the codons in your original and mutant gene</p>
                 </div>
             </div>
@@ -347,7 +344,7 @@ In this representation, the space taken up by each amino acid is represented by 
                         <li><span class="hydrophilic" style="color: lightgrey;"></span> Hydrophilic</li>
                         <li><span style="color: red;">●</span> Negatively charged (Asp, Glu)</li>
                         <li><span style="color: blue;">●</span> Positively charged (Arg, Lys)</li>
-                       <li><span style="color: white;">●</span></li>
+                        <li><span style="color: white;">●</span></li>
                     </ul>
                     <div class="viewer-container">
                         <div id="viewer3" class="viewer"></div>
@@ -366,7 +363,8 @@ Where are the positively and negatively charged amino acids located in relation 
                     <p><span id="activeSite"></span></p>
                     <p id="activeSiteText" class="active-site-text"></p>
                     <p>Select residues in the primary structure by clicking or tapping the single letter code to highlight any part of the protein with green spheres.</p>
-                <p class="big-blue-text">Where is the sequence located in the 3D structure? How might PBP function be affected if some of the amino acids are changed?</p></div>
+                    <p class="big-blue-text">Where is the sequence located in the 3D structure? How might PBP function be affected if some of the amino acids are changed?</p>
+                </div>
             </div>
 
             <!-- Compare Mutant PBP -->
