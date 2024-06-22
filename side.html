@@ -304,7 +304,7 @@
                         <span class="highlight-blue" style="display: block;">Every second codon</span>
                         <span class="highlight-red" style="display: block; margin-top: 2px;">First stop codon</span>
                         </h3>
-                        </div>                    
+                    </div>                    
                     <p class="big-blue-text">Identify the impact of your mutation: compare the codons in your original and mutant gene</p>
                 </div>
             </div>
@@ -624,25 +624,11 @@ Where are the positively and negatively charged amino acids located in relation 
         function translateDNA(inputId, outputId) {
             const dnaSequence = document.getElementById(inputId).value.toUpperCase().replace(/[^ATCG]/g, '');
             let proteinSequence = '';
-            let foundStopCodon = false;
 
             for (let i = 0; i < dnaSequence.length; i += 3) {
                 const codon = dnaSequence.substr(i, 3);
                 if (codonTable[codon]) {
-                    if (!foundStopCodon) {
-                        if (codonTable[codon] === '*') {
-                            foundStopCodon = true;
-                            proteinSequence += `<span class="highlight-red">${codonTable[codon]}</span>`;
-                        } else {
-                            if (i % 6 === 3) {
-                                proteinSequence += `<span class="highlight-blue">${codonTable[codon]}</span>`;
-                            } else {
-                                proteinSequence += codonTable[codon];
-                            }
-                        }
-                    } else {
-                        proteinSequence += codonTable[codon];
-                    }
+                    proteinSequence += codonTable[codon];
                 } else {
                     proteinSequence += '?';
                 }
@@ -753,7 +739,7 @@ Where are the positively and negatively charged amino acids located in relation 
         document.getElementById('fileInput').addEventListener('change', handleFileInput);
         document.getElementById('pdbFileInput').addEventListener('change', handleFileInput);
 
-        function highlightMutantSequence(originalSeq, mutantSeq) {
+        function highlightOriginalSequence(originalSeq) {
             function getCodons(dnaSequence) {
                 const codons = [];
                 for (let i = 0; i < dnaSequence.length; i += 3) {
@@ -763,22 +749,17 @@ Where are the positively and negatively charged amino acids located in relation 
             }
 
             const originalCodons = getCodons(originalSeq);
-            const mutantCodons = getCodons(mutantSeq);
             let originalHTML = '';
-            let mutantHTML = '';
             let foundStopCodon = false;
 
             for (let i = 0; i < originalCodons.length; i++) {
                 let originalCodon = originalCodons[i];
-                let mutantCodon = mutantCodons[i] || '';
 
                 // Apply blue highlight only if no stop codon has been found yet
                 if (!foundStopCodon && i % 2 === 1) {
                     originalHTML += `<span class="highlight-blue">${originalCodon}</span> `;
-                    mutantHTML += `<span class="highlight-blue">${mutantCodon}</span> `;
                 } else {
                     originalHTML += `${originalCodon} `;
-                    mutantHTML += `${mutantCodon} `;
                 }
 
                 // Check for stop codon and apply red highlight
@@ -786,20 +767,49 @@ Where are the positively and negatively charged amino acids located in relation 
                     foundStopCodon = true;
                     originalHTML = originalHTML.replace(`${originalCodon}`, `<span class="highlight-red">${originalCodon}</span>`);
                 }
+            }
+
+            document.getElementById('originalSequence').innerHTML = originalHTML.trim();
+        }
+
+        function highlightMutantSequence(mutantSeq) {
+            function getCodons(dnaSequence) {
+                const codons = [];
+                for (let i = 0; i < dnaSequence.length; i += 3) {
+                    codons.push(dnaSequence.substr(i, 3));
+                }
+                return codons;
+            }
+
+            const mutantCodons = getCodons(mutantSeq);
+            let mutantHTML = '';
+            let foundStopCodon = false;
+
+            for (let i = 0; i < mutantCodons.length; i++) {
+                let mutantCodon = mutantCodons[i];
+
+                // Apply blue highlight only if no stop codon has been found yet
+                if (!foundStopCodon && i % 2 === 1) {
+                    mutantHTML += `<span class="highlight-blue">${mutantCodon}</span> `;
+                } else {
+                    mutantHTML += `${mutantCodon} `;
+                }
+
+                // Check for stop codon and apply red highlight
                 if (codonTable[mutantCodon] === '*' && !foundStopCodon) {
                     foundStopCodon = true;
                     mutantHTML = mutantHTML.replace(`${mutantCodon}`, `<span class="highlight-red">${mutantCodon}</span>`);
                 }
             }
 
-            document.getElementById('originalSequence').innerHTML = originalHTML.trim();
             document.getElementById('mutantSequence').innerHTML = mutantHTML.trim();
         }
 
         function compareSequences() {
             const originalSeq = document.getElementById('dnaSequence1').value.toUpperCase().replace(/[^ATCG]/g, '');
             const mutantSeq = document.getElementById('dnaSequence2').value.toUpperCase().replace(/[^ATCG]/g, '');
-            highlightMutantSequence(originalSeq, mutantSeq);
+            highlightOriginalSequence(originalSeq);
+            highlightMutantSequence(mutantSeq);
         }
 
         document.getElementById('dnaSequence1').addEventListener('input', compareSequences);
