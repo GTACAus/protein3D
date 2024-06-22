@@ -773,7 +773,8 @@ Where are the positively and negatively charged amino acids located in relation 
                 let originalCodon = originalCodons[i];
                 let mutantCodon = mutantCodons[i] || '';
 
-                if (originalCodon !== mutantCodon && !foundMutation) {
+                if (!foundMutation && originalCodon !== mutantCodon) {
+                    originalHTML += `${originalCodon} `;
                     mutantHTML += `<span class="highlight-orange">${mutantCodon}</span> `;
                     foundMutation = true;
                 } else {
