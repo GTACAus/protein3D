@@ -786,7 +786,7 @@ Where are the positively and negatively charged amino acids located in relation 
                 }
 
                 if (codonTable[originalCodon] === '*' && !originalHTML.includes('highlight-red')) {
-                    originalHTML = originalHTML.replace(`<span class="highlight-blue">${originalCodon}</span> `, `<span class="highlight-red">${originalCodon}</span> `);
+                    originalHTML = originalHTML.replace(`${originalCodon} `, `<span class="highlight-red">${originalCodon}</span> `);
                 }
                 if (codonTable[mutantCodon] === '*' && !mutantHTML.includes('highlight-red')) {
                     mutantHTML = mutantHTML.replace(`<span class="highlight-orange">${mutantCodon}</span> `, `<span class="highlight-red">${mutantCodon}</span> `);
