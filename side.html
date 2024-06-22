@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -122,8 +123,10 @@
         .highlight-purple {
             background-color: #e1bee7;
         }
-        .spacefill-key {
-            margin-top: 2px;
+        .spacefill-key span {
+            display: inline-block;
+            width: 16px; /* Adjust width as needed */
+            text-align: left; /* Ensure left alignment */
         }
         .spacefill-key li {
             display: inline-block;
@@ -139,7 +142,7 @@
             width: 12px;
         }
         .active-site-text {
-            font-size: 1.5em;
+            font-size: 1.2em;
         }
         .hidden {
             display: none;
@@ -156,6 +159,9 @@
         @media (max-width: 768px) {
             .viewer {
                 height: 300px;
+            }
+            .active-site-text {
+            font-size: 1em;
             }
             h1 {
                 font-size: 2em;
@@ -174,6 +180,9 @@
         @media (max-width: 480px) {
             .viewer {
                 height: 250px;
+            }
+            .active-site-text {
+            font-size: 0.9em;
             }
             h1 {
                 font-size: 1.5em;
@@ -289,8 +298,11 @@
                         <div id="mutantSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
                     </div>
                     <div>
-                        <h3 class="sequence-title"><b>Key</b>       <span class="highlight-blue">Every second codon</span><span>      </span><span class="highlight-red">First stop codon</span></h3>
-                    </div>
+                        <h3 class="sequence-title">
+                        <span class="highlight-blue" style="display: block;">Every second codon</span>
+                        <span class="highlight-red" style="display: block; margin-top: 2px;">First stop codon</span>
+                        </h3>
+                        </div>                    
                     <p class="big-blue-text">Identify the impact of your mutation: compare the codons in your original and mutant gene</p>
                 </div>
             </div>
