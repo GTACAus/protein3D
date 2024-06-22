@@ -214,6 +214,7 @@
         <div class="button-container">
             <input type="file" id="fileInput" accept=".xml" />
             <button onclick="loadDataXML()">Load PBP</button>
+            <button onclick="reloadPage()">Reload page for new data</button>
         </div>
         <br><br>
         
@@ -440,7 +441,9 @@
             const title = parseTitleFromPDB(pdbText);
             return { sequence, title };
         }
-
+        function reloadPage() {
+        location.reload();
+        }
         function parseSequenceFromPDB(pdbText) {
             const lines = pdbText.split('\n');
             const residues = new Map();
