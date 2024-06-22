@@ -3,11 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive 3Dmol Viewer and mecA sequence</title>
-    <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+    <title>Interactive 3D Protein Viewer</title>
+    <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+    <script src="https://stuk.github.io/jszip/dist/jszip.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <style>
+        /* Add your CSS styles here */
+        /* Keeping the previous styles as is */
         pre {
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -43,8 +46,9 @@
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             overflow: hidden;
+            width: 100%;
         }
-        .refresh-button, .deselect-button {
+        .refresh-button, .deselect-button, .toggle-style-button {
             margin: 10px;
             padding: 10px 20px;
             background-color: #1e88e5;
@@ -54,12 +58,12 @@
             border-radius: 4px;
             display: inline-block;
         }
-        .refresh-button:hover, .deselect-button:hover {
+        .refresh-button:hover, .deselect-button:hover, .toggle-style-button:hover {
             background-color: #1565c0;
         }
         .viewer {
-            height: 600px;
-            width: 600px;
+            height: 400px;
+            width: 100%;
             position: relative;
             background-color: white;
         }
@@ -70,23 +74,23 @@
         }
         .card-content {
             padding: 20px;
-            word-wrap: break-word; /* Ensure long words or sequences wrap */
-            white-space: pre-wrap; /* Preserve whitespace and wrap text */
+            word-wrap: break-word;
+            white-space: pre-wrap;
         }
         h1 {
             color: #424242;
-            font-size: 3.5em;
+            font-size: 2.5em;
         }
         h2 {
             color: #424242;
-            font-size: 2.5em;
+            font-size: 1.5em;
         }
         p {
             color: #757575;
-            font-size: 1.5em;
+            font-size: 1.2em;
         }
         .big-blue-text {
-            font-size: 1.8em;
+            font-size: 1.5em;
             color: #1e88e5;
         }
         textarea {
@@ -121,12 +125,14 @@
         .highlight-purple {
             background-color: #e1bee7;
         }
-        .spacefill-key {
-            margin-top: 2px; /* Add margin to space the key from the viewer */
+        .spacefill-key span {
+            display: inline-block;
+            width: 16px; /* Adjust width as needed */
+            text-align: left; /* Ensure left alignment */
         }
         .spacefill-key li {
-            display: inline-block;
-            margin-right: 10px; /* Adjust this value to control spacing */
+            display: flex;
+            margin-right: 10px;
             font-size: 1.5em;
         }
         .spacefill-key li span.hydrophilic {
@@ -138,17 +144,77 @@
             width: 12px;
         }
         .active-site-text {
-            font-size: 1.5em; /* Smaller font size for active site text */
+            font-size: 1.2em;
         }
         .hidden {
             display: none;
+        }
+        .button-container {
+            display: flex;
+            align-items: center;
+        }
+        .button-container button {
+            margin-left: 20px;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .viewer {
+                height: 300px;
+            }
+            .active-site-text {
+                font-size: 1em;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            h2 {
+                font-size: 1.3em;
+            }
+            p {
+                font-size: 1em;
+            }
+            .big-blue-text {
+                font-size: 1.2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .viewer {
+                height: 250px;
+            }
+            .active-site-text {
+                font-size: 0.9em;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            h2 {
+                font-size: 1.1em;
+            }
+            p {
+                font-size: 0.9em;
+            }
+            .big-blue-text {
+                font-size: 1em;
+            }
+            .button-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .button-container button {
+                margin: 10px 0 0 0;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1 id="mainHeading">Exploring the structure of <span id="proteinName"></span></h1>
-        <input type="file" id="fileInput" accept=".xml" />
+        <div class="button-container">
+            <input type="file" id="fileInput" accept=".xml" />
+            <button onclick="loadDataXML()">Load PBP</button>
+        </div>
         <br><br>
         
         <div id="content" class="hidden">
@@ -163,7 +229,7 @@
                     <tr>
                         <td colspan="50" style="text-align: center;">
                             <button class="deselect-button" onclick="deselectAll()">Deselect</button>
-                            <p id="aminoAcidDescription"></p>
+                            <p id="aminoAcidDescription">The amino acid sequences (primary structures) of the protein are shown in the Sequence viewer. Each letter represents an individual amino acid (e.g. s = serine; t = threonine, i = isoleucine, etc.).</p>
                             <p class="big-blue-text">Identify the primary structure of the <span id="proteinName1"></span>.</p>
                         </td>
                     </tr>
@@ -195,7 +261,7 @@
             <div class="container card">
                 <div class="card-content">
                     <h2>Translate the <span id="geneName3"></span> gene</h2>
-                    <p>Use the tool below to translate the copied <span id="geneName4"></span> nucleotide sequence to a protein primary structure. Paste the sequence into the sequence box and click/tap TRANSLATE.</p>
+                    <p>Bioinformatics tools can quickly perform this task. You will use the translate tool to quickly process your coding DNA sequence into a translated amino acid sequence. Use the tool below to translate the copied <span id="geneName4"></span> nucleotide sequence to a protein primary structure. Paste the sequence into the sequence box and click/tap TRANSLATE.</p>
                     <textarea id="dnaSequence1" rows="10" placeholder="Enter DNA sequence here..."></textarea>
                     <br>
                     <button onclick="translateDNA('dnaSequence1', 'proteinSequence1')">Translate</button>
@@ -225,6 +291,7 @@
                 <div class="card-content">
                     <h2>Compare the original and mutant gene sequences</h2>
                     <div>
+                        <p>Your coding DNA consists of the start codon, the stop codon and all of the nucleotides between. Each codon in your coding DNA will be transcribed into mRNA and translated into a sequence of amino acids.</p>
                         <h3 class="sequence-title">Original Sequence</h3>
                         <div id="originalSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
                     </div>
@@ -233,8 +300,11 @@
                         <div id="mutantSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
                     </div>
                     <div>
-                        <h3 class="sequence-title"><b>Key</b>       <span class="highlight-blue">Every second codon</span><span>      </span><span class="highlight-red">First stop codon</span></h3>
-                    </div>
+                        <h3 class="sequence-title">
+                            <span class="highlight-blue" style="display: block;">Every second codon</span>
+                            <span class="highlight-red" style="display: block; margin-top: 2px;">First stop codon</span>
+                        </h3>
+                    </div>                    
                     <p class="big-blue-text">Identify the impact of your mutation: compare the codons in your original and mutant gene</p>
                 </div>
             </div>
@@ -243,8 +313,8 @@
             <div class="container card">
                 <div class="card-content">
                     <h2>Use AI to fold your mutant protein</h2>
-                    <p>Copy the amino acid sequence from your mutant amino acid translation.</p>
-                    <p>Navigate to this page: <a href="https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb" target="_blank">AlphaFold2 Notebook.</a></p>
+                    <p>Recent advances in artificial intelligence have allowed scientists to use computers to simulate protein folding in order to determine what a protein’s 3D structure might look like without needing to make observations of real proteins. AlphaFold is a tool that uses machine learning algorithms to perform high accuracy predictions about what a protein’s 3D structure might look like using only an amino acid sequence as an input. Copy the amino acid sequence from your mutant amino acid translation.</p>
+                    <p>Navigate to this page: <a href="https://alphafoldserver.com/" target="_blank">AlphaFold Server.</a></p>
                     <p class="big-blue-text">How does your mutation impact the 3D structure of your <span id="proteinName4"></span>?</p>
                 </div>
             </div>
@@ -253,7 +323,7 @@
             <div class="card">
                 <div class="card-content">
                     <h2>Atomic Structure</h2>
-                    <p>In the atomic structure model, every atom in each amino acid is shown. Carbon, Oxygen, Nitrogen, and Hydrogen are represented in this view.</p>
+                    <p>Amino acid chains fold into tertiary structures that have 3D shapes. These shapes are closely related to how they function and interact with systems within organisms. Historically, 3D protein structures have been empirically determined using powerful tools and techniques including X-ray crystallography and electron microscopy. In the atomic structure model, every atom in each amino acid is shown. Carbon, Oxygen, Nitrogen, and Hydrogen are represented in this view.</p>
                     <div class="viewer-container">
                         <div id="viewer2" class="viewer"></div>
                         <button class="refresh-button" onclick="reloadViewer('viewer2', 1)">Reset model</button>
@@ -266,7 +336,7 @@
             <div class="card">
                 <div class="card-content">
                     <h2>Space fill structure</h2>
-                    <p>In this representation, the space taken up by each amino acid is represented by spheres. In addition, each amino acid is coloured by its hydrophobicity and charge:</p>
+                    <p>The properties of amino acids determines how they arrange themselves and interact with one another. In this representation, the space taken up by each amino acid is represented by spheres. In addition, each amino acid is coloured by its hydrophobicity and charge:</p>
                     <ul class="spacefill-key">
                         <li><span style="color: yellow;">●</span> Hydrophobic</li>
                         <li><span class="hydrophilic" style="color: lightgrey;"></span> Hydrophilic</li>
@@ -278,7 +348,7 @@
                         <div id="viewer3" class="viewer"></div>
                         <button class="refresh-button" onclick="reloadViewer('viewer3', 2)">Reset model</button>
                     </div>
-                    <p class="big-blue-text">Where are the hydrophilic and hydrophobic amino acids mainly located – inside or outside the protein? Why do you think that might occur?<br>Where are the positively and negatively charged amino acids located in relation to one another? Why might this be the case?</p>
+                    <p class="big-blue-text">Where are the hydrophilic and hydrophobic amino acids mainly located – inside or outside the protein? Why do you think that might occur? Where are the positively and negatively charged amino acids located in relation to one another? Why might this be the case?</p>
                 </div>
             </div>
 
@@ -286,47 +356,49 @@
             <div class="card">
                 <div class="card-content">
                     <h2>Active site</h2>
-
                     <p><span id="activeSite"></span></p>
                     <p id="activeSiteText" class="active-site-text"></p>
-                    <p>Click on residues in the primary structure to highlight any part of the protein with green spheres.</p>
-                <p class="big-blue-text">Where is the sequence located in the 3D structure? How might PBP function be affected if some of the amino acids are changed?</p></div>
+                    <p>Select residues in the primary structure by clicking or tapping the single letter code to highlight any part of the protein with green spheres.</p>
+                    <p class="big-blue-text">Where is the sequence located in the 3D structure? How might PBP function be affected if some of the amino acids are changed?</p>
+                </div>
             </div>
 
             <!-- Compare Mutant PBP -->
             <div class="card">
                 <div class="card-content">
-                    <div><h2>Compare your mutant <span id="proteinName5"></span> with the original protein</h2>
-                    <p id="proteinFunction"></p>
+                    <div>
+                        <h2>Compare your mutant <span id="proteinName5"></span> with the original protein</h2>
+                        <p id="proteinFunction"></p>
                     </div>
-                    <p>Upload an image of your AlphaFold result below or choose a PDB file to view the structure.</p>
+                    <p>Return to <a href="https://alphafoldserver.com/" target="_blank">AlphaFold Server</a> and download and/or screenshot your model. Upload and view the mutant protein.</p>
                     <div class="row">
+                        <div class="col s12 m6">
+                            <h3 class="sequence-title"><b>Mutant protein</b></h3>
+                            <div id="mutantViewer" class="viewer" style="height: 400px; width: 100%;"></div>
+                            <button class="refresh-button" onclick="reloadMutantViewer()">Reset mutant protein</button>
+                            <button class="toggle-style-button" onclick="toggleMutantViewerStyle()">Toggle secondary structure/spacefill</button>
+                        </div>                        
+                        <div class="col s12 m6">
+                            <h3 class="sequence-title"><b>Original protein</b></h3>
+                            <div id="alphafoldViewer" class="viewer" style="height: 400px; width: 100%;"></div>
+                            <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Reset original protein</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <h3 class="sequence-title"><b>Upload PDB or ZIP file</b></h3>
+                            <input type="file" id="pdbFileInput" accept=".pdb, .zip, .cif" />
+                        </div>
                         <div class="col s12 m6">
                             <h3 class="sequence-title"><b>AlphaFold Image</b></h3>
                             <input type="file" id="alphafoldImageInput" accept="image/*" />
                             <img id="alphafoldImage" style="max-width: 100%; display: none;" />
                         </div>
-                        <div class="col s12 m6">
-                            <h3 class="sequence-title"><b>Original protein</b></h3>
-                            <div id="alphafoldViewer" class="viewer" style="height: 400px; width: 100%;"></div>
-                            <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Display original protein</button>
-                        </div>
-                    </div>
-                    <h3 class="sequence-title"><b>OR</b></h3>
-                    <div class="row">
-                        <div class="col s12 m6">
-                            <h3 class="sequence-title"><b>Upload PDB file</b></h3>
-                            <input type="file" id="pdbFileInput" accept=".pdb" />
-                        </div>
-                        <div class="col s12 m6">
-                            <h3 class="sequence-title"><b>Mutant protein</b></h3>
-                            <div id="mutantViewer" class="viewer" style="height: 400px; width: 100%;"></div>
-                            <button class="refresh-button" onclick="reloadMutantViewer()">Display mutant protein</button>
-                        </div>
                     </div>
                     <p class="big-blue-text">How might the mutation impact the ability of <span id="substrateOrDrug"></span> to do their job? How might the mutation impact the ability of this protein to do its job?</p>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -334,27 +406,31 @@
         let originalText = "";
         let pdbUri = "";
         let sequence = "";
+        let currentStyle = 'spectrum';
+        let residuesPerLine = 50;
 
         let viewer1, viewer2, viewer3, alphafoldViewer, mutantViewer;
         let selectedResidues = new Set();
-        const originalStyles = [
-            { cartoon: { color: 'spectrum' } },
-            { stick: {} },
-            {
-                sphere: {
-                    colorfunc: function (atom) {
-                        const hydrophobic = new Set(['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'PRO', 'GLY']);
-                        const hydrophilic = new Set(['ARG', 'LYS', 'ASP', 'GLU', 'ASN', 'GLN']);
-                        const positive = new Set(['ARG', 'LYS']);
-                        const negative = new Set(['ASP', 'GLU']);
-                        if (positive.has(atom.resn)) return 'blue';
-                        else if (negative.has(atom.resn)) return 'red';
-                        else if (hydrophobic.has(atom.resn)) return 'yellow';
-                        else if (hydrophilic.has(atom.resn)) return 'lightgrey';
-                        return 'grey';  // fallback color
-                    }
+        const spectrumStyle = { cartoon: { color: 'spectrum' } };
+        const spacefillStyle = {
+            sphere: {
+                colorfunc: function (atom) {
+                    const hydrophobic = new Set(['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'PRO', 'GLY']);
+                    const hydrophilic = new Set(['ARG', 'LYS', 'ASP', 'GLU', 'ASN', 'GLN']);
+                    const positive = new Set(['ARG', 'LYS']);
+                    const negative = new Set(['ASP', 'GLU']);
+                    if (positive.has(atom.resn)) return 'blue';
+                    else if (negative.has(atom.resn)) return 'red';
+                    else if (hydrophobic.has(atom.resn)) return 'yellow';
+                    else if (hydrophilic.has(atom.resn)) return 'lightgrey';
+                    return 'grey';
                 }
             }
+        };
+        const originalStyles = [
+            spectrumStyle,
+            { stick: {} },
+            spacefillStyle
         ];
 
         async function fetchPDBData(pdbUri) {
@@ -385,7 +461,7 @@
             };
             let sequence = '';
             residues.forEach((resName) => {
-                sequence += oneLetterMapping[resName] || 'X'; // X for unknown
+                sequence += oneLetterMapping[resName] || 'X';
             });
             return sequence;
         }
@@ -403,12 +479,12 @@
 
         function createSequenceTable(sequence) {
             const tableBody = document.getElementById('sequenceTable');
-            tableBody.innerHTML = '';  // Clear any existing content
-            for (let i = 0; i < sequence.length; i += 50) {
+            tableBody.innerHTML = '';
+            for (let i = 0; i < sequence.length; i += residuesPerLine) {
                 const positionRow = document.createElement('tr');
                 const sequenceRow = document.createElement('tr');
 
-                for (let j = 0; j < 50; j++) {
+                for (let j = 0; j < residuesPerLine; j++) {
                     if (i + j >= sequence.length) break;
 
                     if (j % 10 === 0) {
@@ -447,11 +523,11 @@
 
         function updateResidueHighlighting() {
             const highlightStyle = { stick: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } };
-            const viewers = [viewer1, viewer2, viewer3, alphafoldViewer, mutantViewer];
+            const viewers = [viewer1, viewer2, viewer3];
 
             viewers.forEach((viewer, index) => {
                 if (viewer) {
-                    viewer.setStyle({}, originalStyles[index]); // Reset all styles to original
+                    viewer.setStyle({}, originalStyles[index]);
                     selectedResidues.forEach(residueIndex => {
                         viewer.setStyle({ resi: residueIndex }, highlightStyle);
                     });
@@ -474,6 +550,9 @@
             viewer1 = initializeViewer("viewer1", 0);
             viewer2 = initializeViewer("viewer2", 1);
             viewer3 = initializeViewer("viewer3", 2);
+
+            // Load alphafoldViewer with the original PDB from XML
+            reloadAlphaFoldViewer();
         }
 
         function initializeViewer(viewerElementId, styleIndex) {
@@ -487,7 +566,6 @@
                     viewer.setStyle({}, originalStyles[styleIndex]);
                     viewer.zoomTo();
                     viewer.render();
-                    // Apply highlighted residues
                     selectedResidues.forEach(residueIndex => {
                         viewer.setStyle({ resi: residueIndex }, { stick: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } });
                     });
@@ -506,7 +584,6 @@
                     viewer.setStyle({}, originalStyles[styleIndex]);
                     viewer.zoomTo();
                     viewer.render();
-                    // Apply highlighted residues
                     selectedResidues.forEach(residueIndex => {
                         viewer.setStyle({ resi: residueIndex }, { stick: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } });
                     });
@@ -515,7 +592,6 @@
                 .catch(error => console.error('Error fetching the PDB file:', error));
         }
 
-        // DNA to Protein Translator function
         const codonTable = {
             'TTT': 'F', 'TTC': 'F', 'TTA': 'L', 'TTG': 'L',
             'CTT': 'L', 'CTC': 'L', 'CTA': 'L', 'CTG': 'L',
@@ -624,13 +700,53 @@
                 originalText = geneSeq;
                 document.getElementById('sequence-container').textContent = geneSeq;
 
-                document.getElementById('content').classList.remove('hidden'); // Show content
-                initializeViewers(); // Initialize viewers with new data
+                document.getElementById('content').classList.remove('hidden');
+                initializeViewers();
             };
             reader.readAsText(file);
         }
 
-        document.getElementById('fileInput').addEventListener('change', loadXMLFile);
+        async function loadDataXML() {
+            const response = await fetch('data.xml');
+            const xmlText = await response.text();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+            
+            const proteinName = xmlDoc.getElementsByTagName('proteinName')[0].textContent;
+            const geneName = xmlDoc.getElementsByTagName('geneName')[0].textContent;
+            const geneSeq = xmlDoc.getElementsByTagName('geneSeq')[0].textContent;
+            const activeSite = xmlDoc.getElementsByTagName('activeSite')[0].textContent;
+            const activeSiteText = xmlDoc.getElementsByTagName('activeSiteText')[0].textContent;
+            const proteinFunction = xmlDoc.getElementsByTagName('proteinFunction')[0].textContent;
+            const substrateOrDrug = xmlDoc.getElementsByTagName('substrateOrDrug')[0].textContent;
+            pdbUri = xmlDoc.getElementsByTagName('PDBurl')[0].textContent;
+
+            document.getElementById('proteinName').textContent = proteinName;
+            document.getElementById('fileName').textContent = proteinName;
+            document.getElementById('proteinName1').textContent = proteinName;
+            document.getElementById('proteinName2').textContent = proteinName;
+            document.getElementById('proteinName3').textContent = proteinName;
+            document.getElementById('proteinName4').textContent = proteinName;
+            document.getElementById('proteinName5').textContent = proteinName;
+            document.getElementById('geneName1').textContent = geneName;
+            document.getElementById('geneName2').textContent = geneName;
+            document.getElementById('geneName3').textContent = geneName;
+            document.getElementById('geneName4').textContent = geneName;
+            document.getElementById('geneName5').textContent = geneName;
+            document.getElementById('activeSite').textContent = activeSite;
+            document.getElementById('activeSiteText').textContent = activeSiteText;
+            document.getElementById('proteinFunction').textContent = proteinFunction;
+            document.getElementById('substrateOrDrug').textContent = substrateOrDrug;
+
+            originalText = geneSeq;
+            document.getElementById('sequence-container').textContent = geneSeq;
+
+            document.getElementById('content').classList.remove('hidden');
+            initializeViewers();
+        }
+
+        document.getElementById('fileInput').addEventListener('change', handleFileInput);
+        document.getElementById('pdbFileInput').addEventListener('change', handleFileInput);
 
         function highlightMutantSequence(originalSeq, mutantSeq) {
             function getCodons(dnaSequence) {
@@ -696,43 +812,169 @@
             const response = await fetch(pdbUri);
             const pdbText = await response.text();
             viewer.addModel(pdbText, "pdb");
-            viewer.setStyle({}, { cartoon: { color: 'blue' } });
+            viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
             viewer.zoomTo();
             viewer.render();
+            alphafoldViewer = viewer;
         }
 
-        document.getElementById('pdbFileInput').addEventListener('change', function (event) {
+        let currentMutantStyle = 'spectrum';
+
+        async function reloadMutantViewer() {
+            if (mutantContent) {
+                const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
+                viewer.addModel(mutantContent.content, mutantContent.format);
+                viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+                viewer.zoomTo();
+                viewer.render();
+                mutantViewer = viewer;
+            } else {
+                alert("No mutant model loaded yet.");
+            }
+        }
+
+        function toggleMutantViewerStyle() {
+            currentMutantStyle = currentMutantStyle === 'spectrum' ? 'spacefill' : 'spectrum';
+            if (mutantViewer) {
+                mutantViewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+                mutantViewer.render();
+            }
+            if (alphafoldViewer) {
+                alphafoldViewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+                alphafoldViewer.render();
+            }
+        }
+
+        function toggleStyles() {
+            currentStyle = currentStyle === 'spectrum' ? 'spacefill' : 'spectrum';
+            const style = currentStyle === 'spectrum' ? spectrumStyle : spacefillStyle;
+
+            if (alphafoldViewer) {
+                alphafoldViewer.setStyle({}, style);
+                alphafoldViewer.render();
+            }
+
+            if (mutantViewer) {
+                mutantViewer.setStyle({}, style);
+                mutantViewer.render();
+            }
+        }
+
+        // Adjust residues per line based on screen width
+        function adjustResiduesPerLine() {
+            const screenWidth = window.innerWidth;
+            if (screenWidth <= 480) {
+                residuesPerLine = 20;
+            } else if (screenWidth <= 768) {
+                residuesPerLine = 30;
+            } else {
+                residuesPerLine = 50;
+            }
+            createSequenceTable(sequence);
+        }
+
+        // Call adjustResiduesPerLine on load and on resize
+        window.addEventListener('load', adjustResiduesPerLine);
+        //window.addEventListener('resize', adjustResiduesPerLine);
+
+        function handleFileInput(event) {
             const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const pdbText = e.target.result;
-                    const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
-                    viewer.addModel(pdbText, "pdb");
-                    viewer.setStyle({}, { cartoon: { color: 'blue' } });
-                    viewer.zoomTo();
-                    viewer.render();
-                };
-                reader.readAsText(file);
-            }
-        });
-
-        function reloadMutantViewer() {
-            const fileInput = document.getElementById('pdbFileInput');
-            const file = fileInput.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const pdbText = e.target.result;
-                    const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
-                    viewer.addModel(pdbText, "pdb");
-                    viewer.setStyle({}, { cartoon: { color: 'blue' } });
-                    viewer.zoomTo();
-                    viewer.render();
-                };
-                reader.readAsText(file);
+            if (file.name.endsWith('.xml')) {
+                loadXMLFile();
+            } else if (file.name.endsWith('.zip')) {
+                handleZipFile(file);
+            } else if (file.name.endsWith('.pdb')) {
+                handlePdbFile(file);
+            } else if (file.name.endsWith('.cif')) {
+                handleCifFile(file);
             }
         }
+
+        function handleZipFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const zip = new JSZip();
+                zip.loadAsync(e.target.result).then(function(zip) {
+                    let foundFile = false;
+                    zip.forEach(function (relativePath, zipEntry) {
+                        if (!foundFile && zipEntry.name.endsWith('.pdb')) {
+                            foundFile = true;
+                            zipEntry.async("string").then(function (content) {
+                                loadModelIntoViewer(content, 'pdb');
+                            });
+                        } else if (!foundFile && zipEntry.name.endsWith('.cif')) {
+                            foundFile = true;
+                            zipEntry.async("string").then(function (content) {
+                                loadModelIntoViewer(content, 'cif');
+                            });
+                        }
+                    });
+                    if (!foundFile) {
+                        alert('No PDB or CIF file found in the ZIP archive.');
+                    }
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function handlePdbFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                loadModelIntoViewer(content, 'pdb');
+            };
+            reader.readAsText(file);
+        }
+
+        function handleCifFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                loadModelIntoViewer(content, 'cif');
+            };
+            reader.readAsText(file);
+        }
+
+        function loadModelIntoViewer(content, format) {
+            // Load the model into mutantViewer and store the content for later reloading
+            const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
+            viewer.addModel(content, format);
+            viewer.setStyle({}, spectrumStyle);
+            viewer.zoomTo();
+            viewer.render();
+            mutantViewer = viewer;
+            mutantContent = { content: content, format: format }; // Save the content for reloading
+
+            // Reload the alphafoldViewer with the original protein
+            reloadAlphaFoldViewer();
+        }
+
+        let mutantContent = null;
+
+        async function reloadAlphaFoldViewer() {
+            const viewer = $3Dmol.createViewer('alphafoldViewer', { backgroundColor: '0xffffff' });
+            const response = await fetch(pdbUri);
+            const pdbText = await response.text();
+            viewer.addModel(pdbText, "pdb");
+            viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+            viewer.zoomTo();
+            viewer.render();
+            alphafoldViewer = viewer;
+        }
+
+        async function reloadMutantViewer() {
+            if (mutantContent) {
+                const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
+                viewer.addModel(mutantContent.content, mutantContent.format);
+                viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+                viewer.zoomTo();
+                viewer.render();
+                mutantViewer = viewer;
+            } else {
+                alert("No mutant model loaded yet.");
+            }
+        }
+
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
