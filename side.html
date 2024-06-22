@@ -636,8 +636,10 @@ Where are the positively and negatively charged amino acids located in relation 
                     } else {
                         if (codonTable[codon] === '*') {
                             foundStopCodon = true;
+                            highlightedSequence += `<span class="highlight-red">${codonTable[codon]}</span>`;
+                        } else {
+                            highlightedSequence += codonTable[codon];
                         }
-                        highlightedSequence += codonTable[codon];
                     }
                 } else {
                     if (foundStopCodon) {
