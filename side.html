@@ -4,10 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive 3D Protein Viewer</title>
-    <script src="https://3Dmol.org/build/3Dmol-min.js"></script>
+    <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+    <script src="https://stuk.github.io/jszip/dist/jszip.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <style>
+        /* Add your CSS styles here */
+        /* Keeping the previous styles as is */
         pre {
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -119,8 +122,8 @@
         .highlight-red {
             background-color: #d54056;
         }
-        .highlight-orange {
-            background-color: #ffcc80;
+        .highlight-purple {
+            background-color: #e1bee7;
         }
         .spacefill-key span {
             display: inline-block;
@@ -315,7 +318,7 @@
 AlphaFold is a tool that uses machine learning algorithms to perform high accuracy predictions about what a protein’s 3D structure might look like using only an amino acid sequence as an input.  
                         
 Copy the amino acid sequence from your mutant amino acid translation.</p>
-                    <p>Navigate to this page: <a href="https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb" target="_blank">AlphaFold2 Notebook.</a></p>
+                    <p>Navigate to this page: <a href="https://alphafoldserver.com/" target="_blank">AlphaFold Server.</a></p>
                     <p class="big-blue-text">How does your mutation impact the 3D structure of your <span id="proteinName4"></span>?</p>
                 </div>
             </div>
@@ -376,24 +379,24 @@ Where are the positively and negatively charged amino acids located in relation 
                         <h2>Compare your mutant <span id="proteinName5"></span> with the original protein</h2>
                         <p id="proteinFunction"></p>
                     </div>
-                    <p>Upload an image of your AlphaFold result below or choose a PDB file to view the structure.</p>
+                    <p>Return to <a href="https://alphafoldserver.com/" target="_blank">AlphaFold Server</a> and download and/or screenshot your model.  Upload and view the mutant protein.</p>
                     <div class="row">
                         <div class="col s12 m6">
                             <h3 class="sequence-title"><b>Mutant protein</b></h3>
                             <div id="mutantViewer" class="viewer" style="height: 400px; width: 100%;"></div>
-                            <button class="refresh-button" onclick="reloadMutantViewer()">Display mutant protein</button>
+                            <button class="refresh-button" onclick="reloadMutantViewer()">Reset mutant protein</button>
                             <button class="toggle-style-button" onclick="toggleMutantViewerStyle()">Toggle secondary structure/spacefill</button>
                         </div>                        
                         <div class="col s12 m6">
                             <h3 class="sequence-title"><b>Original protein</b></h3>
                             <div id="alphafoldViewer" class="viewer" style="height: 400px; width: 100%;"></div>
-                            <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Display original protein</button>
+                            <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Reset original protein</button>
                         </div>
                     </div>
                     <div class="row">
                         <div class="col s12 m6">
-                            <h3 class="sequence-title"><b>Upload PDB file</b></h3>
-                            <input type="file" id="pdbFileInput" accept=".pdb" />
+                            <h3 class="sequence-title"><b>Upload PDB or ZIP file</b></h3>
+                            <input type="file" id="pdbFileInput" accept=".pdb, .zip, .cif" />
                         </div>
                         <div class="col s12 m6">
                             <h3 class="sequence-title"><b>AlphaFold Image</b></h3>
@@ -530,7 +533,7 @@ Where are the positively and negatively charged amino acids located in relation 
 
         function updateResidueHighlighting() {
             const highlightStyle = { stick: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } };
-            const viewers = [viewer1, viewer2, viewer3, alphafoldViewer, mutantViewer];
+            const viewers = [viewer1, viewer2, viewer3];
 
             viewers.forEach((viewer, index) => {
                 if (viewer) {
@@ -557,6 +560,9 @@ Where are the positively and negatively charged amino acids located in relation 
             viewer1 = initializeViewer("viewer1", 0);
             viewer2 = initializeViewer("viewer2", 1);
             viewer3 = initializeViewer("viewer3", 2);
+
+            // Load alphafoldViewer with the original PDB from XML
+            reloadAlphaFoldViewer();
         }
 
         function initializeViewer(viewerElementId, styleIndex) {
@@ -630,7 +636,6 @@ Where are the positively and negatively charged amino acids located in relation 
                     } else {
                         if (codonTable[codon] === '*') {
                             foundStopCodon = true;
-                            break;
                         }
                         highlightedSequence += codonTable[codon];
                     }
@@ -749,7 +754,8 @@ Where are the positively and negatively charged amino acids located in relation 
             initializeViewers();
         }
 
-        document.getElementById('fileInput').addEventListener('change', loadXMLFile);
+        document.getElementById('fileInput').addEventListener('change', handleFileInput);
+        document.getElementById('pdbFileInput').addEventListener('change', handleFileInput);
 
         function highlightMutantSequence(originalSeq, mutantSeq) {
             function getCodons(dnaSequence) {
@@ -764,8 +770,9 @@ Where are the positively and negatively charged amino acids located in relation 
             const mutantCodons = getCodons(mutantSeq);
             let originalHTML = '';
             let mutantHTML = '';
-            let foundMutation = false;
-            let foundStopCodon = false;
+
+            let originalStopFound = false;
+            let mutantStopFound = false;
 
             for (let i = 0; i < originalCodons.length; i++) {
                 let originalCodon = originalCodons[i];
@@ -773,32 +780,19 @@ Where are the positively and negatively charged amino acids located in relation 
 
                 if (i % 2 === 1) {
                     originalHTML += `<span class="highlight-blue">${originalCodon}</span> `;
-                    if (mutantCodon !== originalCodon && !foundMutation) {
-                        mutantHTML += `<span class="highlight-orange">${mutantCodon}</span> `;
-                        foundMutation = true;
-                    } else {
-                        mutantHTML += `<span class="highlight-blue">${mutantCodon}</span> `;
-                    }
+                    mutantHTML += `<span class="highlight-blue">${mutantCodon}</span> `;
                 } else {
                     originalHTML += `${originalCodon} `;
-                    if (mutantCodon !== originalCodon && !foundMutation) {
-                        mutantHTML += `<span class="highlight-orange">${mutantCodon}</span> `;
-                        foundMutation = true;
-                    } else {
-                        mutantHTML += `${mutantCodon} `;
-                    }
+                    mutantHTML += `${mutantCodon} `;
                 }
 
-                if (codonTable[originalCodon] === '*' && !originalHTML.includes('highlight-red')) {
+                if (codonTable[originalCodon] === '*' && !originalStopFound) {
                     originalHTML = originalHTML.replace(`<span class="highlight-blue">${originalCodon}</span> `, `<span class="highlight-red">${originalCodon}</span> `);
+                    originalStopFound = true;
                 }
-                if (codonTable[mutantCodon] === '*' && !mutantHTML.includes('highlight-red')) {
-                    mutantHTML = mutantHTML.replace(`<span class="highlight-orange">${mutantCodon}</span> `, `<span class="highlight-red">${mutantCodon}</span> `);
-                    foundStopCodon = true;
-                }
-
-                if (foundMutation && !foundStopCodon) {
-                    mutantHTML += `<span class="highlight-orange">${mutantCodon}</span> `;
+                if (codonTable[mutantCodon] === '*' && !mutantStopFound) {
+                    mutantHTML = mutantHTML.replace(`<span class="highlight-blue">${mutantCodon}</span> `, `<span class="highlight-red">${mutantCodon}</span> `);
+                    mutantStopFound = true;
                 }
             }
 
@@ -838,39 +832,18 @@ Where are the positively and negatively charged amino acids located in relation 
             alphafoldViewer = viewer;
         }
 
-        document.getElementById('pdbFileInput').addEventListener('change', function (event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const pdbText = e.target.result;
-                    const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
-                    viewer.addModel(pdbText, "pdb");
-                    viewer.setStyle({}, spectrumStyle);
-                    viewer.zoomTo();
-                    viewer.render();
-                };
-                reader.readAsText(file);
-            }
-        });
-
         let currentMutantStyle = 'spectrum';
 
         async function reloadMutantViewer() {
-            const fileInput = document.getElementById('pdbFileInput');
-            const file = fileInput.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    const pdbText = e.target.result;
-                    const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
-                    viewer.addModel(pdbText, "pdb");
-                    viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
-                    viewer.zoomTo();
-                    viewer.render();
-                    mutantViewer = viewer;
-                };
-                reader.readAsText(file);
+            if (mutantContent) {
+                const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
+                viewer.addModel(mutantContent.content, mutantContent.format);
+                viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+                viewer.zoomTo();
+                viewer.render();
+                mutantViewer = viewer;
+            } else {
+                alert("No mutant model loaded yet.");
             }
         }
 
@@ -885,8 +858,6 @@ Where are the positively and negatively charged amino acids located in relation 
                 alphafoldViewer.render();
             }
         }
-
-        document.getElementById('pdbFileInput').addEventListener('change', reloadMutantViewer);
 
         function toggleStyles() {
             currentStyle = currentStyle === 'spectrum' ? 'spacefill' : 'spectrum';
@@ -918,7 +889,92 @@ Where are the positively and negatively charged amino acids located in relation 
 
         // Call adjustResiduesPerLine on load and on resize
         window.addEventListener('load', adjustResiduesPerLine);
-        window.addEventListener('resize', adjustResiduesPerLine);
+        //window.addEventListener('resize', adjustResiduesPerLine);
+
+        function handleFileInput(event) {
+            const file = event.target.files[0];
+            if (file.name.endsWith('.xml')) {
+                loadXMLFile();
+            } else if (file.name.endsWith('.zip')) {
+                handleZipFile(file);
+            } else if (file.name.endsWith('.pdb')) {
+                handlePdbFile(file);
+            } else if (file.name.endsWith('.cif')) {
+                handleCifFile(file);
+            }
+        }
+
+        function handleZipFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const zip = new JSZip();
+                zip.loadAsync(e.target.result).then(function(zip) {
+                    let foundFile = false;
+                    zip.forEach(function (relativePath, zipEntry) {
+                        if (!foundFile && zipEntry.name.endsWith('.pdb')) {
+                            foundFile = true;
+                            zipEntry.async("string").then(function (content) {
+                                loadModelIntoViewer(content, 'pdb');
+                            });
+                        } else if (!foundFile && zipEntry.name.endsWith('.cif')) {
+                            foundFile = true;
+                            zipEntry.async("string").then(function (content) {
+                                loadModelIntoViewer(content, 'cif');
+                            });
+                        }
+                    });
+                    if (!foundFile) {
+                        alert('No PDB or CIF file found in the ZIP archive.');
+                    }
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function handlePdbFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                loadModelIntoViewer(content, 'pdb');
+            };
+            reader.readAsText(file);
+        }
+
+        function handleCifFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                loadModelIntoViewer(content, 'cif');
+            };
+            reader.readAsText(file);
+        }
+
+        function loadModelIntoViewer(content, format) {
+            // Load the model into mutantViewer and store the content for later reloading
+            const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
+            viewer.addModel(content, format);
+            viewer.setStyle({}, spectrumStyle);
+            viewer.zoomTo();
+            viewer.render();
+            mutantViewer = viewer;
+            mutantContent = { content: content, format: format }; // Save the content for reloading
+
+            // Reload the alphafoldViewer with the original protein
+            reloadAlphaFoldViewer();
+        }
+
+        let mutantContent = null;
+
+        async function reloadAlphaFoldViewer() {
+            const viewer = $3Dmol.createViewer('alphafoldViewer', { backgroundColor: '0xffffff' });
+            const response = await fetch(pdbUri);
+            const pdbText = await response.text();
+            viewer.addModel(pdbText, "pdb");
+            viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+            viewer.zoomTo();
+            viewer.render();
+            alphafoldViewer = viewer;
+        }
 
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
