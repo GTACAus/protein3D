@@ -624,34 +624,29 @@ Where are the positively and negatively charged amino acids located in relation 
         function translateDNA(inputId, outputId) {
             const dnaSequence = document.getElementById(inputId).value.toUpperCase().replace(/[^ATCG]/g, '');
             let proteinSequence = '';
-            let highlightedSequence = '';
-            let restOfSequence = '';
             let foundStopCodon = false;
 
             for (let i = 0; i < dnaSequence.length; i += 3) {
                 const codon = dnaSequence.substr(i, 3);
                 if (codonTable[codon]) {
-                    if (foundStopCodon) {
-                        restOfSequence += codonTable[codon];
-                    } else {
+                    if (!foundStopCodon) {
                         if (codonTable[codon] === '*') {
                             foundStopCodon = true;
-                            break;
+                            proteinSequence += `<span class="highlight-red">${codonTable[codon]}</span>`;
+                        } else {
+                            if (i % 6 === 3) {
+                                proteinSequence += `<span class="highlight-blue">${codonTable[codon]}</span>`;
+                            } else {
+                                proteinSequence += codonTable[codon];
+                            }
                         }
-                        highlightedSequence += codonTable[codon];
+                    } else {
+                        proteinSequence += codonTable[codon];
                     }
                 } else {
-                    if (foundStopCodon) {
-                        restOfSequence += '?';
-                    } else {
-                        highlightedSequence += '?';
-                    }
+                    proteinSequence += '?';
                 }
             }
-
-            const highlightedHtml = `<span class="highlight">${highlightedSequence}</span>`;
-            const restOfSequenceHtml = `<span>${restOfSequence}</span>`;
-            proteinSequence = highlightedHtml + restOfSequenceHtml;
 
             document.getElementById(outputId).innerHTML = proteinSequence;
         }
@@ -787,13 +782,13 @@ Where are the positively and negatively charged amino acids located in relation 
                 }
 
                 // Check for stop codon and apply red highlight
-                if (codonTable[originalCodon] === '*' && !originalHTML.includes('highlight-red')) {
+                if (codonTable[originalCodon] === '*' && !foundStopCodon) {
                     foundStopCodon = true;
-                    originalHTML = originalHTML.replace(`<span class="highlight-blue">${originalCodon}</span> `, `<span class="highlight-red">${originalCodon}</span> `);
+                    originalHTML = originalHTML.replace(`${originalCodon}`, `<span class="highlight-red">${originalCodon}</span>`);
                 }
-                if (codonTable[mutantCodon] === '*' && !mutantHTML.includes('highlight-red')) {
+                if (codonTable[mutantCodon] === '*' && !foundStopCodon) {
                     foundStopCodon = true;
-                    mutantHTML = mutantHTML.replace(`<span class="highlight-blue">${mutantCodon}</span> `, `<span class="highlight-red">${mutantCodon}</span> `);
+                    mutantHTML = mutantHTML.replace(`${mutantCodon}`, `<span class="highlight-red">${mutantCodon}</span>`);
                 }
             }
 
