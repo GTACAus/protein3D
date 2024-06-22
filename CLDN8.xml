@@ -1,0 +1,16 @@
+<proteinInfo>
+    <proteinName>Claudin-8 Protein (CLDN8)</proteinName>
+    <geneName>CLDN8</geneName>
+    <geneSeq>
+        ATGGCAACCCATGCCTTAGAAATCGCTGGGCTGTTTCTTGGTGGTGTTGGAATGGTGGGCACAGTGGCTGTCACTGTCATGCCTCAGTGGAGAGTGTCGGCCTTCATTGAAAACAACATCGTGGTTTTTGAAAACTTCTGGGAAGGACTGTGGATGAATTGCGTGAGGCAGGCTAACATCAGGATGCAGTGCAAAATCTATGATTCCCTGCTGGCTCTTTCTCCGGACCTACAGGCAGCCAGAGGACTGATGTGTGCTGCTTCCGTGATGTCCTTCTTGGCTTTCATGATGGCCATCCTTGGCATGAAATGCACCAGGTGCACGGGGGACAATGAGAAGGTGAAGGCTCACATTCTGCTGACGGCTGGAATCATCTTCATCATCACGGGCATGGTGGTGCTCATCCCTGTGAGCTGGGTTGCCAATGCCATCATCAGAGATTTCTATAACTCAATAGTGAATGTTGCCCAAAAACGTGAGCTTGGAGAAGCTCTCTACTTAGGATGGACCACGGCACTGGTGCTGATTGTTGGAGGAGCTCTGTTCTGCTGCGTTTTTTGTTGCAACGAAAAGAGCAGTAGCTACAGATACTCGATACCTTCCCATCGCACAACCCAAAAAAGTTATCACACCGGAAAGAAGTCACCGAGCGTCTACTCCAGAAGTCAGTATGTGTAGTTGTGTATGTTTTTTTAACTTTACTATAAAGCCATGCAAATGACAAAAATCTATATTACTTCTCAAAATGGACCCCAAAGAAACTTTGATTTACTGTTCTTAACTGCCTAATCTTAATTACAGGAACTGTGCATCAGCTATTTATGATTCTATAAGCTATTTCAGCAGAATGAGATATTAAACCCAATGCTTTGATTGTTCTAGAAAGTATAGTAATTTGTTTTCTAAGGTGGTTCAAGCATCTACTCTTTTTATCATTTACTTCAAAATGACATTGCTAAAGACTGCATTATTTTACTACTGTAATTTCTCCACGACAT
+    </geneSeq>
+    <activeSite>KAHILLTAGIIFIITGMVVLIPVSWVANAIIRDFYNSIVNVAQKRELGEALYLGWTTALVLIVGGALFCCVFCCNEKSSSYRYSIPSHRTTQKSYHTGKKSPSVYSRSQYV</activeSite>
+    <activeSiteText>The active site of Claudin 8 likely includes transmembrane domain residues and extracellular loop residues that are crucial for its role in the paracellular cation barrier. These regions may contain conserved and charged residues that facilitate interactions with other claudins and ions, maintaining tight junction integrity and preventing sodium back-leakage.
+
+In the sequence table at the top of this page, to highlight a significant sequence, you would need to click on each amino acid starting with the 115th and ending with the last - it might take a while. 
+
+This sequence includes charged and Polar Residues - lysine (K), arginine (R), and aspartic acid (D) are often involved in binding and transport.  It also includes transmembrane and extracellular regions which are critical for interactions with ions and other tight junction components.</activeSiteText>
+    <proteinFunction>Claudins are integral membrane proteins and components of tight junction strands. Tight junction strands serve as a physical barrier to prevent solutes and water from passing freely through the paracellular space between epithelial or endothelial cell sheets, and also play critical roles in maintaining cell polarity and signal transductions.</proteinFunction>
+    <substrateOrDrug>tight junctions between cells</substrateOrDrug>
+    <PDBurl>https://alphafold.ebi.ac.uk/files/AF-P56748-F1-model_v4.pdb</PDBurl>
+</proteinInfo>
