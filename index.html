@@ -396,6 +396,7 @@
                             <h3 class="sequence-title"><b>AlphaFold Image</b></h3>
                             <input type="file" id="alphafoldImageInput" accept="image/*" />
                             <img id="alphafoldImage" style="max-width: 100%; display: none;" />
+                            <button id="pasteImageButton" onclick="pasteImageFromClipboard()">Insert image from clipboard</button>
                         </div>
                     </div>
                     <p class="big-blue-text">How might the mutation impact the ability of <span id="substrateOrDrug"></span> to do their job? How might the mutation impact the ability of this protein to do its job?</p>
@@ -1084,6 +1085,25 @@
             }
         }
 
+        async function pasteImageFromClipboard() {
+            try {
+                const clipboardItems = await navigator.clipboard.read();
+                for (const clipboardItem of clipboardItems) {
+                    if (clipboardItem.types.includes('image/png')) {
+                        const blob = await clipboardItem.getType('image/png');
+                        const reader = new FileReader();
+                        reader.onload = function (event) {
+                            document.getElementById('alphafoldImage').src = event.target.result;
+                            document.getElementById('alphafoldImage').style.display = 'block';
+                        };
+                        reader.readAsDataURL(blob);
+                        break;
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to read clipboard contents: ', err);
+            }
+        }
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
