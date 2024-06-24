@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <style>
+        /* Add your CSS styles here */
+        /* Keeping the previous styles as is */
         pre {
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -120,10 +122,13 @@
         .highlight-red {
             background-color: #d54056;
         }
+        .highlight-purple {
+            background-color: #e1bee7;
+        }
         .spacefill-key span {
             display: inline-block;
-            width: 16px;
-            text-align: left;
+            width: 16px; /* Adjust width as needed */
+            text-align: left; /* Ensure left alignment */
         }
         .spacefill-key li {
             display: flex;
@@ -151,6 +156,8 @@
         .button-container button {
             margin-left: 20px;
         }
+
+        /* Responsive styles */
         @media (max-width: 768px) {
             .viewer {
                 height: 300px;
@@ -171,6 +178,7 @@
                 font-size: 1.2em;
             }
         }
+
         @media (max-width: 480px) {
             .viewer {
                 height: 250px;
@@ -206,6 +214,9 @@
         <div class="button-container">
             <input type="file" id="fileInput" accept=".xml" />
             <button onclick="loadDataXML()">Load PBP</button>
+            <button onclick="loadDataXMLCLDN8()">Load CLDN8</button>
+            <button onclick="loadDataXMLMC1R()">Load MC1R</button>
+            <button onclick="reloadPage()">Reload page for new data</button>
         </div>
         <br><br>
         
@@ -238,6 +249,8 @@
                     <p class="big-blue-text">Identify alpha helices, beta-pleated sheets, and random coils in the <span id="proteinName3"></span>.</p>
                 </div>
             </div>
+
+            <!-- Copy mecA Gene Sequence -->
             <div class="container card">
                 <div class="card-content">
                     <h2>Copy the <span id="geneName1"></span> gene for translation by our bioinformatics tool</h2>
@@ -246,6 +259,8 @@
                     <button onclick="copyText()">Copy Text</button>
                 </div>
             </div>
+
+            <!-- Translate the mecA Gene -->
             <div class="container card">
                 <div class="card-content">
                     <h2>Translate the <span id="geneName3"></span> gene</h2>
@@ -258,6 +273,8 @@
                     <p class="big-blue-text">Compare your protein sequence with the primary structure in the table at the top of the page. What do you notice?</p>
                 </div>
             </div>
+
+            <!-- Mutate the mecA Gene -->
             <div class="container card">
                 <div class="card-content">
                     <h2>Mutate the <span id="geneName5"></span> gene</h2>
@@ -271,6 +288,8 @@
                     <p class="big-blue-text">Compare your mutant protein sequence with your original protein sequence. What do you notice?</p>
                 </div>
             </div>
+
+            <!-- Compare Original and Mutant Gene Sequences -->
             <div class="container card">
                 <div class="card-content">
                     <h2>Compare the original and mutant gene sequences</h2>
@@ -292,6 +311,8 @@
                     <p class="big-blue-text">Identify the impact of your mutation: compare the codons in your original and mutant gene</p>
                 </div>
             </div>
+
+            <!-- Use AI to Fold Protein -->
             <div class="container card">
                 <div class="card-content">
                     <h2>Use AI to fold your mutant protein</h2>
@@ -300,6 +321,8 @@
                     <p class="big-blue-text">How does your mutation impact the 3D structure of your <span id="proteinName4"></span>?</p>
                 </div>
             </div>
+
+            <!-- Atomic Structure -->
             <div class="card">
                 <div class="card-content">
                     <h2>Atomic Structure</h2>
@@ -308,9 +331,11 @@
                         <div id="viewer2" class="viewer"></div>
                         <button class="refresh-button" onclick="reloadViewer('viewer2', 1)">Reset model</button>
                     </div>
-                    <p class="big-blue-text">Suggest which elements are represented by the green, blue, red, and yellow atoms.</p>
+                    <p class="big-blue-text">Suggest which elements are represented by the grey, blue, red, and yellow atoms.</p>
                 </div>
             </div>
+
+            <!-- Space Fill Structure -->
             <div class="card">
                 <div class="card-content">
                     <h2>Space fill structure</h2>
@@ -329,6 +354,8 @@
                     <p class="big-blue-text">Where are the hydrophilic and hydrophobic amino acids mainly located – inside or outside the protein? Why do you think that might occur? Where are the positively and negatively charged amino acids located in relation to one another? Why might this be the case?</p>
                 </div>
             </div>
+
+            <!-- Active Site -->
             <div class="card">
                 <div class="card-content">
                     <h2>Active site</h2>
@@ -338,6 +365,8 @@
                     <p class="big-blue-text">Where is the sequence located in the 3D structure? How might PBP function be affected if some of the amino acids are changed?</p>
                 </div>
             </div>
+
+            <!-- Compare Mutant PBP -->
             <div class="card">
                 <div class="card-content">
                     <div>
@@ -367,11 +396,13 @@
                             <h3 class="sequence-title"><b>AlphaFold Image</b></h3>
                             <input type="file" id="alphafoldImageInput" accept="image/*" />
                             <img id="alphafoldImage" style="max-width: 100%; display: none;" />
+                            <button id="pasteImageButton" onclick="pasteImageFromClipboard()">Insert image from clipboard</button>
                         </div>
                     </div>
                     <p class="big-blue-text">How might the mutation impact the ability of <span id="substrateOrDrug"></span> to do their job? How might the mutation impact the ability of this protein to do its job?</p>
                 </div>
             </div>
+
         </div>
     </div>
 
@@ -413,7 +444,9 @@
             const title = parseTitleFromPDB(pdbText);
             return { sequence, title };
         }
-
+        function reloadPage() {
+        location.reload();
+        }
         function parseSequenceFromPDB(pdbText) {
             const lines = pdbText.split('\n');
             const residues = new Map();
@@ -524,6 +557,7 @@
             viewer2 = initializeViewer("viewer2", 1);
             viewer3 = initializeViewer("viewer3", 2);
 
+            // Load alphafoldViewer with the original PDB from XML
             reloadAlphaFoldViewer();
         }
 
@@ -673,30 +707,12 @@
                 document.getElementById('sequence-container').textContent = geneSeq;
 
                 document.getElementById('content').classList.remove('hidden');
-                selectedResidues.clear();
                 initializeViewers();
             };
             reader.readAsText(file);
         }
 
         async function loadDataXML() {
-            // Reset variables and UI elements
-            pdbUri = "";
-            sequence = "";
-            document.getElementById('sequenceTitle').textContent = 'Sequence of';
-            document.getElementById('sequenceTable').innerHTML = '';
-            document.getElementById('fileName').textContent = '';
-            document.getElementById('sequence-container').textContent = '';
-            document.getElementById('originalSequence').innerHTML = '';
-            document.getElementById('mutantSequence').innerHTML = '';
-            document.getElementById('proteinSequence1').innerHTML = '';
-            document.getElementById('proteinSequence2').innerHTML = '';
-            document.getElementById('activeSite').textContent = '';
-            document.getElementById('activeSiteText').textContent = '';
-            document.getElementById('proteinFunction').textContent = '';
-            document.getElementById('substrateOrDrug').textContent = '';
-            selectedResidues.clear();
-
             const response = await fetch('data.xml');
             const xmlText = await response.text();
             const parser = new DOMParser();
@@ -734,7 +750,82 @@
             document.getElementById('content').classList.remove('hidden');
             initializeViewers();
         }
+        async function loadDataXMLCLDN8() {
+            const response = await fetch('CLDN8.xml');
+            const xmlText = await response.text();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+            
+            const proteinName = xmlDoc.getElementsByTagName('proteinName')[0].textContent;
+            const geneName = xmlDoc.getElementsByTagName('geneName')[0].textContent;
+            const geneSeq = xmlDoc.getElementsByTagName('geneSeq')[0].textContent;
+            const activeSite = xmlDoc.getElementsByTagName('activeSite')[0].textContent;
+            const activeSiteText = xmlDoc.getElementsByTagName('activeSiteText')[0].textContent;
+            const proteinFunction = xmlDoc.getElementsByTagName('proteinFunction')[0].textContent;
+            const substrateOrDrug = xmlDoc.getElementsByTagName('substrateOrDrug')[0].textContent;
+            pdbUri = xmlDoc.getElementsByTagName('PDBurl')[0].textContent;
 
+            document.getElementById('proteinName').textContent = proteinName;
+            document.getElementById('fileName').textContent = proteinName;
+            document.getElementById('proteinName1').textContent = proteinName;
+            document.getElementById('proteinName2').textContent = proteinName;
+            document.getElementById('proteinName3').textContent = proteinName;
+            document.getElementById('proteinName4').textContent = proteinName;
+            document.getElementById('proteinName5').textContent = proteinName;
+            document.getElementById('geneName1').textContent = geneName;
+            document.getElementById('geneName2').textContent = geneName;
+            document.getElementById('geneName3').textContent = geneName;
+            document.getElementById('geneName4').textContent = geneName;
+            document.getElementById('geneName5').textContent = geneName;
+            document.getElementById('activeSite').textContent = activeSite;
+            document.getElementById('activeSiteText').textContent = activeSiteText;
+            document.getElementById('proteinFunction').textContent = proteinFunction;
+            document.getElementById('substrateOrDrug').textContent = substrateOrDrug;
+
+            originalText = geneSeq;
+            document.getElementById('sequence-container').textContent = geneSeq;
+
+            document.getElementById('content').classList.remove('hidden');
+            initializeViewers();
+        }
+         async function loadDataXMLMC1R() {
+            const response = await fetch('MC1R.xml');
+            const xmlText = await response.text();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+            
+            const proteinName = xmlDoc.getElementsByTagName('proteinName')[0].textContent;
+            const geneName = xmlDoc.getElementsByTagName('geneName')[0].textContent;
+            const geneSeq = xmlDoc.getElementsByTagName('geneSeq')[0].textContent;
+            const activeSite = xmlDoc.getElementsByTagName('activeSite')[0].textContent;
+            const activeSiteText = xmlDoc.getElementsByTagName('activeSiteText')[0].textContent;
+            const proteinFunction = xmlDoc.getElementsByTagName('proteinFunction')[0].textContent;
+            const substrateOrDrug = xmlDoc.getElementsByTagName('substrateOrDrug')[0].textContent;
+            pdbUri = xmlDoc.getElementsByTagName('PDBurl')[0].textContent;
+
+            document.getElementById('proteinName').textContent = proteinName;
+            document.getElementById('fileName').textContent = proteinName;
+            document.getElementById('proteinName1').textContent = proteinName;
+            document.getElementById('proteinName2').textContent = proteinName;
+            document.getElementById('proteinName3').textContent = proteinName;
+            document.getElementById('proteinName4').textContent = proteinName;
+            document.getElementById('proteinName5').textContent = proteinName;
+            document.getElementById('geneName1').textContent = geneName;
+            document.getElementById('geneName2').textContent = geneName;
+            document.getElementById('geneName3').textContent = geneName;
+            document.getElementById('geneName4').textContent = geneName;
+            document.getElementById('geneName5').textContent = geneName;
+            document.getElementById('activeSite').textContent = activeSite;
+            document.getElementById('activeSiteText').textContent = activeSiteText;
+            document.getElementById('proteinFunction').textContent = proteinFunction;
+            document.getElementById('substrateOrDrug').textContent = substrateOrDrug;
+
+            originalText = geneSeq;
+            document.getElementById('sequence-container').textContent = geneSeq;
+
+            document.getElementById('content').classList.remove('hidden');
+            initializeViewers();
+        }
         document.getElementById('fileInput').addEventListener('change', handleFileInput);
         document.getElementById('pdbFileInput').addEventListener('change', handleFileInput);
 
@@ -754,12 +845,14 @@
             for (let i = 0; i < originalCodons.length; i++) {
                 let originalCodon = originalCodons[i];
 
+                // Apply blue highlight only if no stop codon has been found yet
                 if (!foundStopCodon && i % 2 === 1) {
                     originalHTML += `<span class="highlight-blue">${originalCodon}</span> `;
                 } else {
                     originalHTML += `${originalCodon} `;
                 }
 
+                // Check for stop codon and apply red highlight
                 if (codonTable[originalCodon] === '*' && !foundStopCodon) {
                     foundStopCodon = true;
                     originalHTML = originalHTML.replace(`${originalCodon}`, `<span class="highlight-red">${originalCodon}</span>`);
@@ -785,12 +878,14 @@
             for (let i = 0; i < mutantCodons.length; i++) {
                 let mutantCodon = mutantCodons[i];
 
+                // Apply blue highlight only if no stop codon has been found yet
                 if (!foundStopCodon && i % 2 === 1) {
                     mutantHTML += `<span class="highlight-blue">${mutantCodon}</span> `;
                 } else {
                     mutantHTML += `${mutantCodon} `;
                 }
 
+                // Check for stop codon and apply red highlight
                 if (codonTable[mutantCodon] === '*' && !foundStopCodon) {
                     foundStopCodon = true;
                     mutantHTML = mutantHTML.replace(`${mutantCodon}`, `<span class="highlight-red">${mutantCodon}</span>`);
@@ -890,7 +985,7 @@
 
         // Call adjustResiduesPerLine on load and on resize
         window.addEventListener('load', adjustResiduesPerLine);
-        window.addEventListener('resize', adjustResiduesPerLine);
+        //window.addEventListener('resize', adjustResiduesPerLine);
 
         function handleFileInput(event) {
             const file = event.target.files[0];
@@ -951,13 +1046,16 @@
         }
 
         function loadModelIntoViewer(content, format) {
+            // Load the model into mutantViewer and store the content for later reloading
             const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
             viewer.addModel(content, format);
             viewer.setStyle({}, spectrumStyle);
             viewer.zoomTo();
             viewer.render();
             mutantViewer = viewer;
-            mutantContent = { content: content, format: format };
+            mutantContent = { content: content, format: format }; // Save the content for reloading
+
+            // Reload the alphafoldViewer with the original protein
             reloadAlphaFoldViewer();
         }
 
@@ -987,6 +1085,25 @@
             }
         }
 
+        async function pasteImageFromClipboard() {
+            try {
+                const clipboardItems = await navigator.clipboard.read();
+                for (const clipboardItem of clipboardItems) {
+                    if (clipboardItem.types.includes('image/png')) {
+                        const blob = await clipboardItem.getType('image/png');
+                        const reader = new FileReader();
+                        reader.onload = function (event) {
+                            document.getElementById('alphafoldImage').src = event.target.result;
+                            document.getElementById('alphafoldImage').style.display = 'block';
+                        };
+                        reader.readAsDataURL(blob);
+                        break;
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to read clipboard contents: ', err);
+            }
+        }
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
