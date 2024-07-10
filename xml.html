@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protein Info XML Generator</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            padding: 20px;
+            width: 100%;
+            max-width: 800px;
+            margin: 20px;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        input[type="text"], textarea {
+            font-size: 16px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus, textarea:focus {
+            border-color: #4285f4;
+            outline: none;
+        }
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        button {
+            background-color: #4285f4;
+            color: #fff;
+            border: none;
+            padding: 10px 15px;
+            font-size: 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #357ae8;
+        }
+        h2 {
+            font-size: 20px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+        pre {
+            background-color: #f4f4f4;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            white-space: pre-wrap; /* Allows line wrapping */
+            word-wrap: break-word; /* Allows long words to be broken and wrap to the next line */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Protein Info XML Generator</h1>
+        <form id="proteinForm">
+            <label for="proteinName">Protein Name:</label>
+            <input type="text" id="proteinName" placeholder="Penicillin binding protein (PBP)" oninput="updateXML()">
+            
+            <label for="geneName">Gene Name:</label>
+            <input type="text" id="geneName" placeholder="mecA" oninput="updateXML()">
+            
+            <label for="geneSeq">Gene Sequence:</label>
+            <textarea id="geneSeq" placeholder="ATGAGAATAGAACGAGTAGATGATACAACTGTAAAATTGTTTATAACATATAGCGATATCGAGGCCCGTGGATTTAGTCGTGAAGATTTATGGACAAATCGCAAACGTGGCGAAGAATTCTTTTGGTCAATGATGGATGAAATTAACGAAGAAGAAGATTTTGTTGTAGAAGGTCCATTATGGATTCAAGTACATGCCTTTGAAAAAGGTGTCGAAGTCACAATTTCTAAATCTAAAAATGAAGATATGATGAATATGTCTGATGATGATGCAACTGATCAATTTGATGAACAAGTTCAAGAATTGTTAGCTCAAACATTAGAAGGTGAAGATCAATTAGAAGAATTATTCGAGCAACGAACAAAAGAAAAAGAAGCTCAAGGTTCTAAACGTCAAAAGTCTTCAGCACGTAAAAATACAAGAACAATCATTGTGAAATTTAACGATTTAGAAGATGTTATTAATTATGCATATCATAGCAATCCAATAACTACAGAGTTTGAAGATCTGTTATATATGGTTGACGGTACTTATTATTATGCTGTACATTTTGATAGTCATGTTGATCAAGAAGTCATTAATGATAGTTACAGTCAATTGCTTGAATTTGCTTATCCAACAGACAGAACAGAAGTTTATTTAAATGACTATGCTAAAATAATTATGAGTCATAACGTAACAGCTCAAGTTCGACGTTATTTTCCAGAGACAACTGAATAA" oninput="updateXML()"></textarea>
+            
+            <label for="activeSite">Active Site:</label>
+            <input type="text" id="activeSite" placeholder="GVEVTISKSKNEDM" oninput="updateXML()">
+            
+            <label for="activeSiteText">Active Site Text:</label>
+            <textarea id="activeSiteText" placeholder="In the sequence table at the top of this page, click on each amino acid starting with the 70th and ending with the 84th. This will highlight amino acids in the active site of the penicillin binding protein. In non-resistant bacteria, this is where penicillin binds. It is also an important part of the protein in that it facilitates its role in cell wall production." oninput="updateXML()"></textarea>
+            
+            <label for="proteinFunction">Protein Function:</label>
+            <textarea id="proteinFunction" placeholder="Penicillin-Binding Proteins (PBPs) are enzymes involved in the synthesis of bacterial cell walls. Beta-lactam antibiotics (like penicillin) bind to the active site of these PBPs, inhibiting their function and preventing cell wall synthesis." oninput="updateXML()"></textarea>
+            
+            <label for="substrateOrDrug">Substrate or Drug:</label>
+            <input type="text" id="substrateOrDrug" placeholder="antibiotics" oninput="updateXML()">
+            
+            <label for="PDBurl">PDB URL:</label>
+            <input type="text" id="PDBurl" placeholder="https://alphafold.ebi.ac.uk/files/AF-P60185-F1-model_v4.pdb" oninput="updateXML()">
+            
+            <button type="button" onclick="exportXML()">Export as XML</button>
+        </form>
+        <h2>XML Preview</h2>
+        <pre id="xmlPreview"></pre>
+    </div>
+    
+    <script>
+        function updateXML() {
+            const proteinName = document.getElementById('proteinName').value;
+            const geneName = document.getElementById('geneName').value;
+            let geneSeq = document.getElementById('geneSeq').value.replace(/\s+/g, '').toUpperCase();
+            const activeSite = document.getElementById('activeSite').value;
+            const activeSiteText = document.getElementById('activeSiteText').value;
+            const proteinFunction = document.getElementById('proteinFunction').value;
+            const substrateOrDrug = document.getElementById('substrateOrDrug').value;
+            const PDBurl = document.getElementById('PDBurl').value;
+            
+            const xmlContent = `<proteinInfo>
+    <proteinName>${proteinName}</proteinName>
+    <geneName>${geneName}</geneName>
+    <geneSeq>${geneSeq}</geneSeq>
+    <activeSite>${activeSite}</activeSite>
+    <activeSiteText>${activeSiteText}</activeSiteText>
+    <proteinFunction>${proteinFunction}</proteinFunction>
+    <substrateOrDrug>${substrateOrDrug}</substrateOrDrug>
+    <PDBurl>${PDBurl}</PDBurl>
+</proteinInfo>`;
+            document.getElementById('xmlPreview').textContent = xmlContent;
+        }
+        
+        function exportXML() {
+            const xmlContent = document.getElementById('xmlPreview').textContent;
+            const blob = new Blob([xmlContent], { type: 'text/xml' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'proteinInfo.xml';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // Initialize the XML preview
+        updateXML();
+    </script>
+</body>
+</html>
