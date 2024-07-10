@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CASTp Pocket Visualization</title>
+    <!-- Import Google Icon Font -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compiled and minified CSS of MaterializeCSS-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+    <!-- Import jQuery before materialize.js -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <!-- Compiled and minified JavaScript of MaterializeCSS-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+    <!-- 3Dmol.js -->
+    <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <!-- My CSS -->
+    <style>
+        body { margin: 0; }
+        #container_3dmol { width: 100%; height: 80vh; }
+        .controls { margin-top: 20px; }
+    </style>
+</head>
+<body ng-app="castpApp">
+    <div class="container" ng-controller="mainCtrl">
+        <!-- Visualization Container -->
+        <div id="container_3dmol">Loading...</div>
+
+        <!-- Controls and File Upload Inputs -->
+        <div class="controls">
+            <div class="row">
+                <div class="file-field input-field col s12 m6">
+                    <div class="btn">
+                        <span>Select PDB and sphere files to load</span>
+                        <input type="file" id="fileInput" multiple accept=".pdb,.json">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main AngularJS Application Script -->
+    <script>
+        var castpApp = angular.module('castpApp', []);
+
+        castpApp.controller('mainCtrl', function ($scope, $window) {
+            $scope.visconfigopt = {
+                colorStyles: [
+                    { id: 0, des: "Choose the style" },
+                    { id: 1, des: "Red", spec: { show: true, color: "#e41a1c", opacity: 0.8 } },
+                    { id: 2, des: "None", spec: { show: false } },
+                ],
+                reprStyles: [
+                    { id: 0, des: "Choose the style" },
+                    { id: 1, des: "Cartoon", spec: { "cartoon": {} } },
+                    { id: 2, des: "Sphere", spec: { "cartoon": {}, "sphere": {} } },
+                ]
+            };
+
+            var pdbviewer_config = { backgroundColor: "white", defaultcolors: $window.$3Dmol.elementColors.rasmol };
+            var pdbviewer_container = angular.element(document.querySelector('#container_3dmol'));
+            $scope.pdbviewer = $window.$3Dmol.createViewer(pdbviewer_container[0], pdbviewer_config);
+            $scope.pdbviewer.defaultStyle = { cartoon: {} };
+
+            var pdbData, sphereData;
+
+            document.getElementById('fileInput').addEventListener('change', function () {
+                var fileInput = this.files;
+                var pdbFile, sphereFile;
+
+                for (var i = 0; i < fileInput.length; i++) {
+                    if (fileInput[i].name.endsWith('.pdb')) {
+                        pdbFile = fileInput[i];
+                    } else if (fileInput[i].name.endsWith('.sphere.json')) {
+                        sphereFile = fileInput[i];
+                    }
+                }
+
+                if (pdbFile && sphereFile) {
+                    var pdbReader = new FileReader();
+                    var sphereReader = new FileReader();
+
+                    pdbReader.onload = function (e) {
+                        pdbData = e.target.result;
+                        console.log("PDB Data Loaded", pdbData);
+                        if (sphereData) {
+                            visualizeData();
+                        }
+                    };
+
+                    sphereReader.onload = function (e) {
+                        try {
+                            sphereData = JSON.parse(e.target.result);
+                            console.log("Sphere Data Loaded", sphereData);
+                            if (pdbData) {
+                                visualizeData();
+                            }
+                        } catch (err) {
+                            console.error("Failed to parse Sphere Data", err);
+                        }
+                    };
+
+                    pdbReader.readAsText(pdbFile);
+                    sphereReader.readAsText(sphereFile);
+                } else {
+                    alert('Please select both PDB and Sphere files.');
+                }
+            });
+
+            function visualizeData() {
+                console.log("Visualizing Data");
+                console.log("PDB Data: ", pdbData);
+                console.log("Sphere Data: ", sphereData);
+
+                if (!Array.isArray(sphereData)) {
+                    console.error("Sphere Data is not in the expected array format");
+                    return;
+                }
+
+                $scope.pdbviewer.clear();
+                $scope.pdbviewer.addModel(pdbData, "pdb");
+                $scope.pdbviewer.setStyle({}, $scope.pdbviewer.defaultStyle);
+                $scope.pdbviewer.zoomTo();
+                $scope.pdbviewer.render();
+
+                for (var i = 0; i < sphereData.length; i++) {
+                    var spec = JSON.parse(JSON.stringify($scope.visconfigopt.colorStyles[1].spec)); // Use red color
+                    updateVolumeStyle(sphereData[i], spec);
+                }
+
+                $scope.pdbviewer.render();
+            }
+
+            var updateVolumeStyle = function (spheres, spec) {
+                if (!spec.show) {
+                    return null;
+                }
+                var shape = $scope.pdbviewer.addShape(spec);
+                for (var i = 0; i < spheres.length; i++) {
+                    shape.addSphere(spheres[i]);
+                }
+                return shape;
+            };
+        });
+    </script>
+</body>
+</html>
