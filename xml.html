@@ -123,6 +123,7 @@
             const proteinName = document.getElementById('proteinName').value;
             const geneName = document.getElementById('geneName').value;
             let geneSeq = document.getElementById('geneSeq').value.replace(/\s+/g, '').toUpperCase();
+            const geneSeqFormatted = `\n${geneSeq.match(/.{1,80}/g).join('\n')}\n`;
             const activeSite = document.getElementById('activeSite').value;
             const activeSiteText = document.getElementById('activeSiteText').value;
             const proteinFunction = document.getElementById('proteinFunction').value;
@@ -132,7 +133,7 @@
             const xmlContent = `<proteinInfo>
     <proteinName>${proteinName}</proteinName>
     <geneName>${geneName}</geneName>
-    <geneSeq>${geneSeq}</geneSeq>
+    <geneSeq>${geneSeqFormatted}</geneSeq>
     <activeSite>${activeSite}</activeSite>
     <activeSiteText>${activeSiteText}</activeSiteText>
     <proteinFunction>${proteinFunction}</proteinFunction>
