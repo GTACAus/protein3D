@@ -91,7 +91,7 @@
             background-color: #004d40;
         }
         .toggle-button {
-            background-color: #00796b;
+            background-color: red;
             color: white;
             text-align: center;
             padding: 10px;
@@ -101,7 +101,20 @@
             border-radius: 5px;
         }
         .toggle-button:hover {
-            background-color: #004d40;
+            background-color: darkred;
+        }
+        .load-cldn8-button {
+            background-color: teal;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+        .load-cldn8-button:hover {
+            background-color: darkcyan;
         }
     </style>
 </head>
@@ -167,6 +180,8 @@
 
         <!-- Toggle Color Mapping Button -->
         <button class="toggle-button" onclick="toggleColorMapping()">Toggle Color Mapping</button>
+        <!-- Load CLDN8 Button -->
+        <button class="load-cldn8-button" onclick="loadCLDN8()">Load CLDN8</button>
     </div>
 
     <!-- Main AngularJS Application Script -->
@@ -177,7 +192,7 @@
             $scope.visconfigopt = {
                 colorStyles: [
                     { id: 0, des: "Choose the style" },
-                    { id: 1, des: "Red", spec: { show: true, color: "#e41a1c", opacity: 0.75 } },
+                    { id: 1, des: "Red", spec: { show: true, color: "#e41a1c", opacity: 0.8 } },
                     { id: 2, des: "None", spec: { show: false } },
                 ],
                 reprStyles: [
@@ -414,6 +429,65 @@
                 if (pdbData && sphereData) {
                     visualizeData();
                 }
+            };
+
+            $window.loadCLDN8 = function () {
+                fetch('protein.zip')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.arrayBuffer();
+                    })
+                    .then(data => {
+                        JSZip.loadAsync(data).then(function(zipContent) {
+                            zipContent.forEach(function(relativePath, zipEntry) {
+                                if (zipEntry.name.endsWith('.pdb')) {
+                                    zipEntry.async('text').then(function(content) {
+                                        pdbData = content;
+                                        console.log("PDB Data Loaded from CLDN8 ZIP", pdbData);
+                                        if (sphereData && (!friData || friData)) {
+                                            visualizeData();
+                                        }
+                                    });
+                                } else if (zipEntry.name.endsWith('.sphere.json')) {
+                                    zipEntry.async('text').then(function(content) {
+                                        try {
+                                            sphereData = JSON.parse(content);
+                                            console.log("Sphere Data Loaded from CLDN8 ZIP", sphereData);
+                                            if (pdbData && (!friData || friData)) {
+                                                visualizeData();
+                                            }
+                                        } catch (err) {
+                                            console.error("Failed to parse Sphere Data from CLDN8 ZIP", err);
+                                        }
+                                    });
+                                } else if (zipEntry.name.endsWith('.FRI.json')) {
+                                    zipEntry.async('text').then(function(content) {
+                                        try {
+                                            friData = JSON.parse(content);
+                                            console.log("FRI Data Loaded from CLDN8 ZIP", friData);
+                                            const goTermNames = extractGoTermNames(friData);
+                                            if (goTermNames.length > 0) {
+                                                displayGoTermNames(goTermNames);
+                                            } else {
+                                                document.getElementById('output').innerText = "No 'go_term_name' found.";
+                                            }
+                                            if (pdbData && sphereData) {
+                                                visualizeData();
+                                            }
+                                        } catch (err) {
+                                            console.error("Failed to parse FRI Data from CLDN8 ZIP", err);
+                                            document.getElementById('output').innerText = "Error parsing FRI JSON: " + err.message;
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('There has been a problem with your fetch operation:', error);
+                    });
             };
         });
 
