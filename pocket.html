@@ -26,8 +26,12 @@
             margin: 0;
             height: 100vh;
             overflow: hidden;
+            display: flex;
         }
         .sidebar {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
             position: absolute;
             top: 0;
             left: 0;
@@ -116,6 +120,13 @@
         .load-cldn8-button:hover {
             background-color: darkcyan;
         }
+        .sidebar-image {
+            flex-shrink: 0;
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            object-fit: contain;
+        }
     </style>
 </head>
 <body ng-app="castpApp">
@@ -140,6 +151,7 @@
             <span>Download Protein File</span><br>
             <button onclick="downloadProteinFile()">Download Protein File</button>
         </div>
+        <img src="duncan.png" alt="Duncan Image" class="sidebar-image">
     </div>
     <div class="content" ng-controller="mainCtrl">
         <!-- Visualization Container -->
@@ -149,13 +161,13 @@
         <div class="controls">
             <div class="row">
                 <div class="file-field input-field col s12 m6">
- 			<div class="btn">
+                    <div class="btn">
                         <span>Select PDB, Sphere, and FRI files to load</span>
                         <input type="file" id="fileInput" multiple accept=".pdb,.json">
                     </div>
                     <div class="file-path-wrapper">
                         <input class="file-path validate" type="text">
-                    </div> 								
+                    </div>
                 </div>
             </div>
         </div>
@@ -163,16 +175,16 @@
         <!-- Load Protein Button -->
         <div class="controls">
             <div class="row">
-		<div class="file-field input-field col s12 m6">
-            		<div class="btn">
-                		<span>Load Protein File</span>
-                		<input type="file" id="zipInput" accept=".zip">
+                <div class="file-field input-field col s12 m6">
+                    <div class="btn">
+                        <span>Load Protein File</span>
+                        <input type="file" id="zipInput" accept=".zip">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                    </div>
+                </div>
             </div>
-            <div class="file-path-wrapper">
-                <input class="file-path validate" type="text">
-            </div>
-        </div>
-</div>
         </div>
 
         <!-- Output for GO Term Names -->
