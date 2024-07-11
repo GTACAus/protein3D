@@ -217,6 +217,7 @@
             <button onclick="loadDataXMLCLDN8()">Load CLDN8</button>
             <button onclick="loadDataXMLMC1R()">Load MC1R</button>
             <button onclick="reloadPage()">Reload page for new data</button>
+            <button onclick="redirectToXML()">Make XML</button>
         </div>
         <br><br>
         
@@ -443,6 +444,9 @@
             const sequence = parseSequenceFromPDB(pdbText);
             const title = parseTitleFromPDB(pdbText);
             return { sequence, title };
+        }
+        function redirectToXML() {
+        window.location.href = 'xml.html';
         }
         function reloadPage() {
         location.reload();
