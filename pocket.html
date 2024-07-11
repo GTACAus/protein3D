@@ -90,6 +90,19 @@
         .load-protein-button:hover {
             background-color: #004d40;
         }
+        .toggle-button {
+            background-color: #00796b;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+        .toggle-button:hover {
+            background-color: #004d40;
+        }
     </style>
 </head>
 <body ng-app="castpApp">
@@ -151,6 +164,9 @@
 
         <!-- Output for GO Term Names -->
         <div id="output"></div>
+
+        <!-- Toggle Color Mapping Button -->
+        <button class="toggle-button" onclick="toggleColorMapping()">Toggle Color Mapping</button>
     </div>
 
     <!-- Main AngularJS Application Script -->
@@ -161,7 +177,7 @@
             $scope.visconfigopt = {
                 colorStyles: [
                     { id: 0, des: "Choose the style" },
-                    { id: 1, des: "Red", spec: { show: true, color: "#e41a1c", opacity: 0.8 } },
+                    { id: 1, des: "Red", spec: { show: true, color: "#e41a1c", opacity: 0.75 } },
                     { id: 2, des: "None", spec: { show: false } },
                 ],
                 reprStyles: [
@@ -177,6 +193,7 @@
             $scope.pdbviewer.defaultStyle = { cartoon: {} };
 
             var pdbData, sphereData, friData;
+            var useCustomColor = false;
 
             document.getElementById('fileInput').addEventListener('change', function () {
                 var fileInput = this.files;
@@ -347,7 +364,7 @@
 
                 $scope.pdbviewer.clear();
                 $scope.pdbviewer.addModel(pdbData, "pdb");
-                $scope.pdbviewer.setStyle({}, $scope.pdbviewer.defaultStyle);
+                $scope.pdbviewer.setStyle({}, useCustomColor ? spacefillStyle : $scope.pdbviewer.defaultStyle);
                 $scope.pdbviewer.zoomTo();
                 $scope.pdbviewer.render();
 
@@ -368,6 +385,35 @@
                     shape.addSphere(spheres[i]);
                 }
                 return shape;
+            };
+
+            const spacefillStyle = {
+                sphere: {
+                    colorfunc: function (atom) {
+                        const hydrophobic = new Set(['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'PRO', 'GLY']);
+                        const hydrophilic = new Set(['ARG', 'LYS', 'ASP', 'GLU', 'ASN', 'GLN']);
+                        const positive = new Set(['ARG', 'LYS']);
+                        const negative = new Set(['ASP', 'GLU']);
+                        if (positive.has(atom.resn)) return 'blue';
+                        else if (negative.has(atom.resn)) return 'red';
+                        else if (hydrophobic.has(atom.resn)) return 'yellow';
+                        else if (hydrophilic.has(atom.resn)) return 'lightgrey';
+                        return 'grey';
+                    }
+                }
+            };
+
+            $scope.originalStyles = [
+                { cartoon: {} },
+                { stick: {} },
+                spacefillStyle
+            ];
+
+            $window.toggleColorMapping = function () {
+                useCustomColor = !useCustomColor;
+                if (pdbData && sphereData) {
+                    visualizeData();
+                }
             };
         });
 
