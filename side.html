@@ -492,7 +492,9 @@
                 if (pdbData && sphereData) {
                     visualizeData();
                 }
-                setTimeout(reloadLigands, 500); // Reload ligands after a short delay
+                setTimeout(() => {
+                    reloadLigands();
+                }, 1000); // Reload ligands after a 1000ms delay
             };
 
             $window.loadCLDN8 = function () {
@@ -592,7 +594,7 @@
                                 })
                                 .catch(error => {
                                     console.error('There has been a problem with your fetch operation for ligands:', error);
-                                }), 3000); // 3000 milliseconds delay
+                                }), 1000); // 1000 milliseconds delay
 
                         });
                     })
