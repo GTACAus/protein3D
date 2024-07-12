@@ -489,11 +489,10 @@
 
             $window.toggleColorMapping = function () {
                 useCustomColor = !useCustomColor;
-                clearLigands(); // Clear ligands when toggling color mapping
                 if (pdbData && sphereData) {
                     visualizeData();
                 }
-                setTimeout(reloadLigands, 1000); // Reload ligands after a delay
+                setTimeout(reloadLigands, 500); // Reload ligands after a short delay
             };
 
             $window.loadCLDN8 = function () {
@@ -593,7 +592,7 @@
                                 })
                                 .catch(error => {
                                     console.error('There has been a problem with your fetch operation for ligands:', error);
-                                }), 1000); // 1000 milliseconds delay
+                                }), 3000); // 3000 milliseconds delay
 
                         });
                     })
