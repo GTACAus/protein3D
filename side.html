@@ -382,7 +382,7 @@
                                 model.setStyle({}, { cartoon: { color: modelColors[index] } }); // Use cartoon style with color
                             }
                             ligandModels.push(model);
-                            ligandVisibility[index] = false;
+                            ligandVisibility[index] = true;
                         });
                         ligandViewer.zoomTo();
                         ligandViewer.render();
@@ -626,6 +626,7 @@
                                                 }
                                                 ligandModels.push(model);
                                                 ligandVisibility[index] = true;
+                                                ligandVisibility[i] = false;
                                             });
                                             ligandViewer.zoomTo();
                                             ligandViewer.render();
