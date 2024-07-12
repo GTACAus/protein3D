@@ -355,35 +355,39 @@
             document.getElementById('zipPDB').addEventListener('change', function(event) {
                 let file = event.target.files[0];
                 if (file) {
-                    JSZip.loadAsync(file).then(function(zip) {
-                        let promises = modelNames.map(name => {
-                            let zipEntry = zip.file(name);
-                            if (zipEntry) {
-                                return zipEntry.async('text').then(function(content) {
-                                    return {content: content, name: name};
-                                });
-                            } else {
-                                return null;
-                            }
-                        }).filter(p => p !== null);
-
-                        Promise.all(promises).then(function(files) {
-                            files.forEach((file, index) => {
-                                let model = ligandViewer.addModel(file.content, 'pdb');
-                                if (useCustomColor) {
-                                    model.setStyle({}, spacefillStyle); // Use spacefill style
-                                } else {
-                                    model.setStyle({}, { cartoon: { color: modelColors[index] } }); // Use cartoon style with color
-                                }
-                                ligandModels.push(model);
-                                ligandVisibility[index] = true;
-                            });
-                            ligandViewer.zoomTo();
-                            ligandViewer.render();
-                        });
-                    });
+                    loadLigandsFromFile(file);
                 }
             });
+
+            function loadLigandsFromFile(file) {
+                JSZip.loadAsync(file).then(function(zip) {
+                    let promises = modelNames.map(name => {
+                        let zipEntry = zip.file(name);
+                        if (zipEntry) {
+                            return zipEntry.async('text').then(function(content) {
+                                return {content: content, name: name};
+                            });
+                        } else {
+                            return null;
+                        }
+                    }).filter(p => p !== null);
+
+                    Promise.all(promises).then(function(files) {
+                        files.forEach((file, index) => {
+                            let model = ligandViewer.addModel(file.content, 'pdb');
+                            if (useCustomColor) {
+                                model.setStyle({}, spacefillStyle); // Use spacefill style
+                            } else {
+                                model.setStyle({}, { cartoon: { color: modelColors[index] } }); // Use cartoon style with color
+                            }
+                            ligandModels.push(model);
+                            ligandVisibility[index] = true;
+                        });
+                        ligandViewer.zoomTo();
+                        ligandViewer.render();
+                    });
+                });
+            }
 
             function extractGoTermNames(data) {
                 let goTermNames = [];
@@ -606,42 +610,7 @@
                 const fileInput = document.getElementById('zipPDB');
                 const file = fileInput.files[0];
                 if (file) {
-                    // Clear existing ligand models
-                    ligandModels.forEach(model => {
-                        ligandViewer.removeModel(model);
-                    });
-                    ligandModels = [];
-
-                    JSZip.loadAsync(file).then(function(zip) {
-                        let promises = modelNames.map(name => {
-                            let zipEntry = zip.file(name);
-                            if (zipEntry) {
-                                return zipEntry.async('text').then(function(content) {
-                                    return { content: content, name: name };
-                                });
-                            } else {
-                                return null;
-                            }
-                        }).filter(p => p !== null);
-
-                        Promise.all(promises).then(function(files) {
-                            files.forEach((file, index) => {
-                                let model = ligandViewer.addModel(file.content, 'pdb');
-                                if (ligandVisibility[index]) {
-                                    if (useCustomColor) {
-                                        model.setStyle({}, spacefillStyle); // Use spacefill style
-                                    } else {
-                                        model.setStyle({}, { cartoon: { color: modelColors[index] } }); // Use cartoon style with color
-                                    }
-                                } else {
-                                    model.setStyle({}, { cartoon: { hidden: true } });
-                                }
-                                ligandModels.push(model);
-                            });
-                            ligandViewer.zoomTo();
-                            ligandViewer.render();
-                        });
-                    });
+                    loadLigandsFromFile(file);
                 }
             };
         });
