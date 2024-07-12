@@ -373,6 +373,7 @@
                     }).filter(p => p !== null);
 
                     Promise.all(promises).then(function(files) {
+                        ligandModels = [];
                         files.forEach((file, index) => {
                             let model = ligandViewer.addModel(file.content, 'pdb');
                             if (useCustomColor) {
@@ -385,7 +386,11 @@
                         });
                         ligandViewer.zoomTo();
                         ligandViewer.render();
+                    }).catch(function(error) {
+                        console.error("Error loading ligand files from ZIP:", error);
                     });
+                }).catch(function(error) {
+                    console.error("Error processing ZIP file:", error);
                 });
             }
 
@@ -566,6 +571,7 @@
                                         }).filter(p => p !== null);
 
                                         Promise.all(promises).then(function(files) {
+                                            ligandModels = [];
                                             files.forEach((file, index) => {
                                                 let model = ligandViewer.addModel(file.content, 'pdb');
                                                 if (useCustomColor) {
@@ -578,7 +584,11 @@
                                             });
                                             ligandViewer.zoomTo();
                                             ligandViewer.render();
+                                        }).catch(function(error) {
+                                            console.error("Error loading ligand files from ZIP:", error);
                                         });
+                                    }).catch(function(error) {
+                                        console.error("Error processing ZIP file for ligands:", error);
                                     });
                                 })
                                 .catch(error => {
