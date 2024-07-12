@@ -29,6 +29,10 @@
         width: 80%;
         max-width: 600px;
         box-sizing: border-box;
+        height: 100vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
     }
     .card h2 {
         margin-top: 0;
@@ -56,6 +60,8 @@
         border-radius: 4px;
         white-space: pre-wrap;
         word-wrap: break-word;
+        overflow: auto;
+        flex-grow: 1;
     }
     #viewer {
         width: 100%;
