@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Protein Pockets and Functions</title>
+    <!-- Import Google Icon Font -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compiled and minified CSS of MaterializeCSS-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+    <!-- Import jQuery before materialize.js -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <!-- Compiled and minified JavaScript of MaterializeCSS-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+    <!-- 3Dmol.js -->
+    <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <!-- JSZip -->
+    <script src="https://cdn.jsdelivr.net/npm/jszip/dist/jszip.min.js"></script>
+    <!-- FileSaver.js -->
+    <script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
+    <!-- My CSS -->
+    <style>
+        body {
+            position: relative;
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height: 100%;
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-right: 1px solid #dee2e6;
+            box-sizing: border-box;
+        }
+        .content {
+            position: absolute;
+            top: 0;
+            left: 300px;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        #container_3dmol {
+            flex-grow: 1;
+            width: 100%;
+        }
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+        .controls .file-field {
+            margin-right: 10px;
+            flex: 1;
+        }
+        .controls .btn {
+            padding: 0 5px;
+            font-size: 10px;
+            line-height: 20px;
+        }
+        .instructions a {
+            text-decoration: underline;
+            color: #007bff;
+        }
+        #output {
+            margin-top: 1px;
+            padding: 15px;
+        }
+        .upload-section {
+            margin-bottom: 2px;
+        }
+        .upload-section span {
+            font-weight: bold;
+        }
+        .upload-section button {
+            margin-top: 2px;
+        }
+        .toggle-button, .load-cldn8-button {
+            background-color: teal;
+            color: white;
+            text-align: center;
+            padding: 5px;
+            cursor: pointer;
+            margin: 2px;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        .toggle-button:hover, .load-cldn8-button:hover {
+            background-color: darkcyan;
+        }
+        .sidebar-image {
+            flex-shrink: 0;
+            width: 100%;
+            height: auto;
+            max-width: 100%;
+            object-fit: contain;
+        }
+        .ligand-buttons {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        .ligand-buttons button {
+            flex: 1;
+            margin: 2px;
+            font-size: 12px;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body ng-app="castpApp">
+    <div class="sidebar">
+        <p class="instructions">
+            Pockets are empty concavities on a protein surface into which liquid, molecules and peptides can gain access.<br><br>
+            Start with your PDB file and then generate pocket predictions and functional predictions.<br>
+            Use <a href="http://sts.bioe.uic.edu/castp/calculation.html" target="_blank">this tool</a> to generate spheres.json files for pocket visualisations.<br>
+            Use <a href="https://beta.deepfri.flatironinstitute.org/workspace/VSJPCB/upload" target="_blank">this tool</a> to generate FRI.json files for functional predictions.
+        </p>
+        <div class="upload-section">
+            <span>Upload CastP File</span><br>
+            <input type="file" id="castpUpload" accept=".zip">
+            <button onclick="processCastP()">Upload CastP</button>
+        </div>
+        <div class="upload-section">
+            <span>Upload DeepFRI File</span><br>
+            <input type="file" id="deepfriUpload" accept=".json">
+            <button onclick="processDeepFRI()">Upload DeepFRI</button>
+        </div>
+        <div class="upload-section">
+            <span>Download Protein File</span><br>
+            <button onclick="downloadProteinFile()">Download Protein File</button>
+        </div>
+        <img src="Duncan.png" alt="Duncan Image" class="sidebar-image">
+    </div>
+    <div class="content" ng-controller="mainCtrl">
+        <!-- Visualization Container -->
+        <div id="container_3dmol">Loading...</div>
+
+        <!-- Output for GO Term Names -->
+        <div id="output"></div>
+
+        <!-- Controls and File Upload Inputs -->
+        <div class="controls">
+            <div class="file-field input-field col s12 m3">
+                <div class="btn">
+                    <span>Select PDB, Sphere, and FRI files to load</span>
+                    <input type="file" id="fileInput" multiple accept=".pdb,.json">
+                </div>
+            </div>
+
+            <!-- Load Protein Button -->
+            <div class="file-field input-field col s12 m3">
+                <div class="btn">
+                    <span>Load Protein File</span>
+                    <input type="file" id="zipInput" accept=".zip">
+                </div>
+            </div>
+
+            <!-- Ligand Upload -->
+            <div class="file-field input-field col s12 m3">
+                <div class="btn">
+                    <span>Upload Ligands</span>
+                    <input type="file" id="zipPDB" accept=".zip">
+                </div>
+            </div>
+        </div>
+
+        <!-- Ligand Visibility Buttons -->
+        <div class="ligand-buttons">
+            <button class="toggle-button" onclick="showModel(1)">1</button>
+            <button class="toggle-button" onclick="showModel(2)">2</button>
+            <button class="toggle-button" onclick="showModel(3)">3</button>
+            <button class="toggle-button" onclick="showModel(4)">4</button>
+            <button class="toggle-button" onclick="showModel(5)">5</button>
+            <button class="toggle-button" onclick="clearLigands()">Clear Ligands</button>
+        </div>
+
+        <!-- Toggle Color Mapping Button -->
+        <button class="toggle-button" onclick="toggleColorMapping()">Toggle Color Mapping</button>
+        <!-- Load CLDN8 Button -->
+        <button class="load-cldn8-button" onclick="loadCLDN8()">Load Salivary Amylase</button>
+    </div>
+
+    <!-- Main AngularJS Application Script -->
+    <script>
+        var castpApp = angular.module('castpApp', []);
+
+        castpApp.controller('mainCtrl', function ($scope, $window) {
+            $scope.visconfigopt = {
+                colorStyles: [
+                    { id: 0, des: "Choose the style" },
+                    { id: 1, des: "Red", spec: { show: true, color: "#e41a1c", opacity: 0.8 } },
+                    { id: 2, des: "None", spec: { show: false } },
+                ],
+                reprStyles: [
+                    { id: 0, des: "Choose the style" },
+                    { id: 1, des: "Cartoon", spec: { "cartoon": {} } },
+                    { id: 2, des: "Sphere", spec: { "cartoon": {}, "sphere": {} } },
+                ]
+            };
+
+            var pdbviewer_config = { backgroundColor: "white", defaultcolors: $window.$3Dmol.elementColors.rasmol };
+            var pdbviewer_container = angular.element(document.querySelector('#container_3dmol'));
+            $scope.pdbviewer = $window.$3Dmol.createViewer(pdbviewer_container[0], pdbviewer_config);
+            $scope.pdbviewer.defaultStyle = { cartoon: {} };
+
+            var pdbData, sphereData, friData;
+            var useCustomColor = false;
+
+            var ligandViewer = $scope.pdbviewer;
+            var ligandModels = [];
+            var modelColors = ["red", "orange", "green", "blue", "violet"];
+            var modelNames = ["ligand_model1.pdb", "ligand_model2.pdb", "ligand_model3.pdb", "ligand_model4.pdb", "ligand_model5.pdb"];
+
+            document.getElementById('fileInput').addEventListener('change', function () {
+                var fileInput = this.files;
+                var pdbFile, sphereFile, friFile;
+
+                for (var i = 0; i < fileInput.length; i++) {
+                    if (fileInput[i].name.endsWith('.pdb')) {
+                        pdbFile = fileInput[i];
+                    } else if (fileInput[i].name.endsWith('.sphere.json')) {
+                        sphereFile = fileInput[i];
+                    } else if (fileInput[i].name.endsWith('.FRI.json')) {
+                        friFile = fileInput[i];
+                    }
+                }
+
+                if (pdbFile && sphereFile) {
+                    var pdbReader = new FileReader();
+                    var sphereReader = new FileReader();
+                    var friReader = new FileReader();
+
+                    pdbReader.onload = function (e) {
+                        pdbData = e.target.result;
+                        console.log("PDB Data Loaded", pdbData);
+                        if (sphereData && (!friFile || friData)) {
+                            visualizeData();
+                        }
+                    };
+
+                    sphereReader.onload = function (e) {
+                        try {
+                            sphereData = JSON.parse(e.target.result);
+                            console.log("Sphere Data Loaded", sphereData);
+                            if (pdbData && (!friFile || friData)) {
+                                visualizeData();
+                            }
+                        } catch (err) {
+                            console.error("Failed to parse Sphere Data", err);
+                        }
+                    };
+
+                    friReader.onload = function (e) {
+                        try {
+                            friData = JSON.parse(e.target.result);
+                            console.log("FRI Data Loaded", friData);
+                            const goTermNames = extractGoTermNames(friData);
+                            if (goTermNames.length > 0) {
+                                displayGoTermNames(goTermNames);
+                            } else {
+                                document.getElementById('output').innerText = "No 'go_term_name' found.";
+                            }
+                            if (pdbData && sphereData) {
+                                visualizeData();
+                            }
+                        } catch (err) {
+                            console.error("Failed to parse FRI Data", err);
+                            document.getElementById('output').innerText = "Error parsing FRI JSON: " + err.message;
+                        }
+                    };
+
+                    pdbReader.readAsText(pdbFile);
+                    sphereReader.readAsText(sphereFile);
+                    if (friFile) {
+                        friReader.readAsText(friFile);
+                    }
+                } else {
+                    alert('Please select both PDB and Sphere files.');
+                }
+            });
+
+            document.getElementById('zipInput').addEventListener('change', function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        JSZip.loadAsync(e.target.result).then(function(zipContent) {
+                            zipContent.forEach(function(relativePath, zipEntry) {
+                                if (zipEntry.name.endsWith('.pdb')) {
+                                    zipEntry.async('text').then(function(content) {
+                                        pdbData = content;
+                                        console.log("PDB Data Loaded from ZIP", pdbData);
+                                        if (sphereData && (!friData || friData)) {
+                                            visualizeData();
+                                        }
+                                    });
+                                } else if (zipEntry.name.endsWith('.sphere.json')) {
+                                    zipEntry.async('text').then(function(content) {
+                                        try {
+                                            sphereData = JSON.parse(content);
+                                            console.log("Sphere Data Loaded from ZIP", sphereData);
+                                            if (pdbData && (!friData || friData)) {
+                                                visualizeData();
+                                            }
+                                        } catch (err) {
+                                            console.error("Failed to parse Sphere Data from ZIP", err);
+                                        }
+                                    });
+                                } else if (zipEntry.name.endsWith('.FRI.json')) {
+                                    zipEntry.async('text').then(function(content) {
+                                        try {
+                                            friData = JSON.parse(content);
+                                            console.log("FRI Data Loaded from ZIP", friData);
+                                            const goTermNames = extractGoTermNames(friData);
+                                            if (goTermNames.length > 0) {
+                                                displayGoTermNames(goTermNames);
+                                            } else {
+                                                document.getElementById('output').innerText = "No 'go_term_name' found.";
+                                            }
+                                            if (pdbData && sphereData) {
+                                                visualizeData();
+                                            }
+                                        } catch (err) {
+                                            console.error("Failed to parse FRI Data from ZIP", err);
+                                            document.getElementById('output').innerText = "Error parsing FRI JSON: " + err.message;
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                    };
+                    reader.readAsArrayBuffer(file);
+                } else {
+                    alert('Please upload a zip file.');
+                }
+            });
+
+            document.getElementById('zipPDB').addEventListener('change', function(event) {
+                let file = event.target.files[0];
+                if (file) {
+                    JSZip.loadAsync(file).then(function(zip) {
+                        let promises = modelNames.map(name => {
+                            let zipEntry = zip.file(name);
+                            if (zipEntry) {
+                                return zipEntry.async('text').then(function(content) {
+                                    return {content: content, name: name};
+                                });
+                            } else {
+                                return null;
+                            }
+                        }).filter(p => p !== null);
+
+                        Promise.all(promises).then(function(files) {
+                            files.forEach((file, index) => {
+                                let model = ligandViewer.addModel(file.content, 'pdb');
+                                model.setStyle({}, {cartoon: {color: modelColors[index]}});
+                                ligandModels.push(model);
+                            });
+                            ligandViewer.zoomTo();
+                            ligandViewer.render();
+                        });
+                    });
+                }
+            });
+
+            function extractGoTermNames(data) {
+                let goTermNames = [];
+                if (data.data && data.data.A && data.data.A.gcn_mf && Array.isArray(data.data.A.gcn_mf.predictions)) {
+                    data.data.A.gcn_mf.predictions.forEach(prediction => {
+                        console.log("Prediction:", prediction);
+                        if (prediction.go_term_name) {
+                            goTermNames.push(prediction.go_term_name);
+                        } else {
+                            console.log("No 'go_term_name' in prediction:", prediction);
+                        }
+                    });
+                } else {
+                    console.log("No 'predictions' array found in the expected path.");
+                }
+                return goTermNames;
+            }
+
+            function displayGoTermNames(goTermNames) {
+                const outputDiv = document.getElementById('output');
+                outputDiv.innerHTML = "<b>Predicted Molecular Functions:</b>";
+                const ul = document.createElement('ul');
+                goTermNames.forEach(name => {
+                    const li = document.createElement('li');
+                    li.textContent = capitalizeFirstLetter(name);
+                    ul.appendChild(li);
+                });
+                outputDiv.appendChild(ul);
+            }
+
+            function capitalizeFirstLetter(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+
+            function visualizeData() {
+                console.log("Visualizing Data");
+                console.log("PDB Data: ", pdbData);
+                console.log("Sphere Data: ", sphereData);
+
+                if (!Array.isArray(sphereData)) {
+                    console.error("Sphere Data is not in the expected array format");
+                    return;
+                }
+
+                $scope.pdbviewer.clear();
+                $scope.pdbviewer.addModel(pdbData, "pdb");
+                $scope.pdbviewer.setStyle({}, useCustomColor ? spacefillStyle : $scope.pdbviewer.defaultStyle);
+                $scope.pdbviewer.zoomTo();
+                $scope.pdbviewer.render();
+
+                for (var i = 0; i < sphereData.length; i++) {
+                    var spec = JSON.parse(JSON.stringify($scope.visconfigopt.colorStyles[1].spec)); // Use red color
+                    updateVolumeStyle(sphereData[i], spec);
+                }
+
+                // Ensure ligand models remain visible
+                ligandModels.forEach((model, index) => {
+                    model.setStyle({}, {cartoon: {color: modelColors[index]}});
+                });
+
+                $scope.pdbviewer.render();
+            }
+
+            var updateVolumeStyle = function (spheres, spec) {
+                if (!spec.show) {
+                    return null;
+                }
+                var shape = $scope.pdbviewer.addShape(spec);
+                for (var i = 0; i < spheres.length; i++) {
+                    shape.addSphere(spheres[i]);
+                }
+                return shape;
+            };
+
+            const spacefillStyle = {
+                sphere: {
+                    colorfunc: function (atom) {
+                        const hydrophobic = new Set(['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'PRO', 'GLY']);
+                        const hydrophilic = new Set(['ARG', 'LYS', 'ASP', 'GLU', 'ASN', 'GLN']);
+                        const positive = new Set(['ARG', 'LYS']);
+                        const negative = new Set(['ASP', 'GLU']);
+                        if (positive.has(atom.resn)) return 'blue';
+                        else if (negative.has(atom.resn)) return 'red';
+                        else if (hydrophobic.has(atom.resn)) return 'yellow';
+                        else if (hydrophilic.has(atom.resn)) return 'lightgrey';
+                        return 'grey';
+                    }
+                }
+            };
+
+            $scope.originalStyles = [
+                { cartoon: {} },
+                { stick: {} },
+                spacefillStyle
+            ];
+
+            $window.toggleColorMapping = function () {
+                useCustomColor = !useCustomColor;
+                if (pdbData && sphereData) {
+                    visualizeData();
+                }
+                reloadLigands(); // Add this line to reload ligands when color mapping is toggled
+            };
+
+            $window.loadCLDN8 = function () {
+                fetch('protein.zip')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.arrayBuffer();
+                    })
+                    .then(data => {
+                        JSZip.loadAsync(data).then(function(zipContent) {
+                            zipContent.forEach(function(relativePath, zipEntry) {
+                                if (zipEntry.name.endsWith('.pdb')) {
+                                    zipEntry.async('text').then(function(content) {
+                                        pdbData = content;
+                                        console.log("PDB Data Loaded from CLDN8 ZIP", pdbData);
+                                        if (sphereData && (!friData || friData)) {
+                                            visualizeData();
+                                        }
+                                    });
+                                } else if (zipEntry.name.endsWith('.sphere.json')) {
+                                    zipEntry.async('text').then(function(content) {
+                                        try {
+                                            sphereData = JSON.parse(content);
+                                            console.log("Sphere Data Loaded from CLDN8 ZIP", sphereData);
+                                            if (pdbData && (!friData || friData)) {
+                                                visualizeData();
+                                            }
+                                        } catch (err) {
+                                            console.error("Failed to parse Sphere Data from CLDN8 ZIP", err);
+                                        }
+                                    });
+                                } else if (zipEntry.name.endsWith('.FRI.json')) {
+                                    zipEntry.async('text').then(function(content) {
+                                        try {
+                                            friData = JSON.parse(content);
+                                            console.log("FRI Data Loaded from CLDN8 ZIP", friData);
+                                            const goTermNames = extractGoTermNames(friData);
+                                            if (goTermNames.length > 0) {
+                                                displayGoTermNames(goTermNames);
+                                            } else {
+                                                document.getElementById('output').innerText = "No 'go_term_name' found.";
+                                            }
+                                            if (pdbData && sphereData) {
+                                                visualizeData();
+                                            }
+                                        } catch (err) {
+                                            console.error("Failed to parse FRI Data from CLDN8 ZIP", err);
+                                            document.getElementById('output').innerText = "Error parsing FRI JSON: " + err.message;
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('There has been a problem with your fetch operation:', error);
+                    });
+            };
+
+            $window.showModel = function (index) {
+                ligandModels.forEach((model, i) => {
+                    if (i === index - 1) {
+                        model.setStyle({}, {cartoon: {color: modelColors[i]}});  // Show the model
+                    } else {
+                        model.setStyle({}, {cartoon: {hidden: true}});  // Hide the model
+                    }
+                });
+                ligandViewer.zoomTo();
+                ligandViewer.render();
+            };
+
+            $window.clearLigands = function() {
+                ligandModels.forEach((model, i) => {
+                    model.setStyle({}, {cartoon: {hidden: true}});
+                });
+                ligandViewer.render();
+            };
+
+            $window.reloadLigands = function() {
+                const fileInput = document.getElementById('zipPDB');
+                const file = fileInput.files[0];
+                if (file) {
+                    // Clear existing ligand models
+                    ligandModels.forEach(model => {
+                        ligandViewer.removeModel(model);
+                    });
+                    ligandModels = [];
+
+                    JSZip.loadAsync(file).then(function(zip) {
+                        let promises = modelNames.map(name => {
+                            let zipEntry = zip.file(name);
+                            if (zipEntry) {
+                                return zipEntry.async('text').then(function(content) {
+                                    return {content: content, name: name};
+                                });
+                            } else {
+                                return null;
+                            }
+                        }).filter(p => p !== null);
+
+                        Promise.all(promises).then(function(files) {
+                            files.forEach((file, index) => {
+                                let model = ligandViewer.addModel(file.content, 'pdb');
+                                model.setStyle({}, {cartoon: {color: modelColors[index]}});
+                                ligandModels.push(model);
+                            });
+                            ligandViewer.zoomTo();
+                            ligandViewer.render();
+                        });
+                    });
+                } else {
+                    alert('Please upload a zip file containing ligand PDB files.');
+                }
+            };
+        });
+
+        const zip = new JSZip();
+
+        function processCastP() {
+            const fileInput = document.getElementById('castpUpload');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please upload a file.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                JSZip.loadAsync(e.target.result).then(function(zipContent) {
+                    zipContent.forEach(function(relativePath, zipEntry) {
+                        if (zipEntry.name.endsWith('.sphere.json')) {
+                            zipEntry.async('blob').then(function(content) {
+                                zip.file('protein.sphere.json', content);
+                            });
+                        } else if (zipEntry.name.endsWith('.pdb')) {
+                            zipEntry.async('blob').then(function(content) {
+                                zip.file('protein.pdb', content);
+                            });
+                        }
+                    });
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function processDeepFRI() {
+            const fileInput = document.getElementById('deepfriUpload');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please upload a file.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                zip.file('protein.FRI.json', content);
+            };
+            reader.readAsText(file);
+        }
+
+        function downloadProteinFile() {
+            zip.generateAsync({ type: 'blob' }).then(function(content) {
+                saveAs(content, 'protein.zip');
+            });
+        }
+    </script>
+</body>
+</html>
