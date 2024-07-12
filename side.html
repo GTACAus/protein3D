@@ -488,95 +488,37 @@
             };
 
             $window.loadCLDN8 = function () {
-                 fetch('proteinLIG.zip')
-        .then(response => response.blob())
-        .then(blob => {
-            return JSZip.loadAsync(blob);
-        })
-        .then(function(zip) {
-            let promises = modelNames.map(name => {
-                let zipEntry = zip.file(name);
-                if (zipEntry) {
-                    return zipEntry.async('text').then(function(content) {
-                        return {content: content, name: name};
-                    });
-                } else {
-                    return null;
-                }
-            }).filter(p => p !== null);
+                fetch('proteinLIG.zip')
+                    .then(response => response.blob())
+                    .then(blob => JSZip.loadAsync(blob))
+                    .then(function(zip) {
+                        let promises = modelNames.map(name => {
+                            let zipEntry = zip.file(name);
+                            if (zipEntry) {
+                                return zipEntry.async('text').then(function(content) {
+                                    return { content: content, name: name };
+                                });
+                            } else {
+                                return null;
+                            }
+                        }).filter(p => p !== null);
 
-            Promise.all(promises).then(function(files) {
-                files.forEach((file, index) => {
-                    let model = ligandViewer.addModel(file.content, 'pdb');
-                    if (useCustomColor) {
-                        model.setStyle({}, spacefillStyle); // Use spacefill style
-                    } else {
-                        model.setStyle({}, { cartoon: { color: modelColors[index] } }); // Use cartoon style with color
-                    }
-                    ligandModels.push(model);
-                    ligandVisibility[index] = true;
-                });
-                ligandViewer.zoomTo();
-                ligandViewer.render();
-            });
-        });
-});
-		fetch('protein.zip')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.arrayBuffer();
-                    })
-                    .then(data => {
-                        JSZip.loadAsync(data).then(function(zipContent) {
-                            zipContent.forEach(function(relativePath, zipEntry) {
-                                if (zipEntry.name.endsWith('.pdb')) {
-                                    zipEntry.async('text').then(function(content) {
-                                        pdbData = content;
-                                        console.log("PDB Data Loaded from CLDN8 ZIP", pdbData);
-                                        if (sphereData && (!friData || friData)) {
-                                            visualizeData();
-                                        }
-                                    });
-                                } else if (zipEntry.name.endsWith('.sphere.json')) {
-                                    zipEntry.async('text').then(function(content) {
-                                        try {
-                                            sphereData = JSON.parse(content);
-                                            console.log("Sphere Data Loaded from CLDN8 ZIP", sphereData);
-                                            if (pdbData && (!friData || friData)) {
-                                                visualizeData();
-                                            }
-                                        } catch (err) {
-                                            console.error("Failed to parse Sphere Data from CLDN8 ZIP", err);
-                                        }
-                                    });
-                                } else if (zipEntry.name.endsWith('.FRI.json')) {
-                                    zipEntry.async('text').then(function(content) {
-                                        try {
-                                            friData = JSON.parse(content);
-                                            console.log("FRI Data Loaded from CLDN8 ZIP", friData);
-                                            const goTermNames = extractGoTermNames(friData);
-                                            if (goTermNames.length > 0) {
-                                                displayGoTermNames(goTermNames);
-                                            } else {
-                                                document.getElementById('output').innerText = "No 'go_term_name' found.";
-                                            }
-                                            if (pdbData && sphereData) {
-                                                visualizeData();
-                                            }
-                                        } catch (err) {
-                                            console.error("Failed to parse FRI Data from CLDN8 ZIP", err);
-                                            document.getElementById('output').innerText = "Error parsing FRI JSON: " + err.message;
-                                        }
-                                    });
+                        Promise.all(promises).then(function(files) {
+                            files.forEach((file, index) => {
+                                let model = ligandViewer.addModel(file.content, 'pdb');
+                                if (useCustomColor) {
+                                    model.setStyle({}, spacefillStyle); // Use spacefill style
+                                } else {
+                                    model.setStyle({}, { cartoon: { color: modelColors[index] } }); // Use cartoon style with color
                                 }
+                                ligandModels.push(model);
+                                ligandVisibility[index] = true;
                             });
+                            ligandViewer.zoomTo();
+                            ligandViewer.render();
                         });
                     })
-                    .catch(error => {
-                        console.error('There has been a problem with your fetch operation:', error);
-                    });
+                    .catch(error => console.error('Error loading proteinLIG.zip:', error));
             };
 
             $window.showModel = function (index) {
@@ -619,7 +561,7 @@
                             let zipEntry = zip.file(name);
                             if (zipEntry) {
                                 return zipEntry.async('text').then(function(content) {
-                                    return {content: content, name: name};
+                                    return { content: content, name: name };
                                 });
                             } else {
                                 return null;
@@ -644,7 +586,7 @@
                             ligandViewer.render();
                         });
                     });
-                } 
+                }
             };
         });
 
