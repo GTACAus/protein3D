@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zip File Processor</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f2f2f2;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #202124;
+        }
+        input[type="file"] {
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #357AE8;
+        }
+    </style>
+</head>
+<body>
+    <h1>GRAMM File Processor</h1>
+	<p>Just take your GRAMM output zip and run it through this process and it will be ready for viewing</p>
+    <input type="file" id="zipInput" accept=".zip">
+    <button onclick="processZip()">Process Zip File</button>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.6.0/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script>
+        async function processZip() {
+            const zipInput = document.getElementById('zipInput').files[0];
+            if (!zipInput) {
+                alert('Please select a zip file first.');
+                return;
+            }
+
+            const zip = new JSZip();
+            const newZip = new JSZip();
+            const targetFiles = [
+                'GRAMMresults/ligand_model1.pdb',
+                'GRAMMresults/ligand_model2.pdb',
+                'GRAMMresults/ligand_model3.pdb',
+                'GRAMMresults/ligand_model4.pdb',
+                'GRAMMresults/ligand_model5.pdb'
+            ];
+
+            try {
+                const zipData = await zip.loadAsync(zipInput);
+
+                // Log all files in the zip to the console
+                console.log('Files in the zip:');
+                zip.forEach((relativePath, file) => {
+                    console.log(relativePath);
+                });
+
+                for (const filePath of targetFiles) {
+                    const file = zip.file(filePath);
+                    if (file) {
+                        const fileData = await file.async('blob');
+                        const fileName = filePath.split('/').pop(); // Extract the file name
+                        newZip.file(fileName, fileData);
+                    } else {
+                        console.warn(`File ${filePath} not found in the zip.`);
+                    }
+                }
+
+                const newZipBlob = await newZip.generateAsync({ type: 'blob' });
+                saveAs(newZipBlob, 'proteinLIG.zip');
+                alert('New zip file created successfully!');
+            } catch (error) {
+                console.error('Error processing zip file:', error);
+                alert('Error processing zip file. Please check the console for details.');
+            }
+        }
+    </script>
+</body>
+</html>
