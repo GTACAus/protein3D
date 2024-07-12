@@ -493,7 +493,7 @@
                 if (pdbData && sphereData) {
                     visualizeData();
                 }
-                reloadLigands(); // Reload ligands when color mapping is toggled
+                setTimeout(reloadLigands, 3000); // Reload ligands after a delay
             };
 
             $window.loadCLDN8 = function () {
@@ -549,8 +549,8 @@
                                 }
                             });
 
-                            // Load ligands from proteinLIG.zip
-                            fetch('proteinLIG.zip')
+                            // Delay before fetching and loading ligands
+                            setTimeout(() => fetch('proteinLIG.zip')
                                 .then(response => {
                                     if (!response.ok) {
                                         throw new Error('Network response was not ok');
@@ -593,7 +593,7 @@
                                 })
                                 .catch(error => {
                                     console.error('There has been a problem with your fetch operation for ligands:', error);
-                                });
+                                }), 3000); // 3000 milliseconds delay
 
                         });
                     })
