@@ -668,7 +668,6 @@
             };
             reader.readAsText(file);
         }
-
         function downloadProteinFile() {
             zip.generateAsync({ type: 'blob' }).then(function(content) {
                 saveAs(content, 'protein.zip');
