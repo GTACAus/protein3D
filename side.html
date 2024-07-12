@@ -90,7 +90,7 @@
         .upload-section button {
             margin-top: 2px;
         }
-        .toggle-button, .load-cldn8-button, .load-lig-button, .reset-viewer-button {
+        .toggle-button, .load-cldn8-button {
             background-color: teal;
             color: white;
             text-align: center;
@@ -101,7 +101,7 @@
             border-radius: 5px;
             font-size: 12px;
         }
-        .toggle-button:hover, .load-cldn8-button:hover, .load-lig-button:hover, .reset-viewer-button:hover {
+        .toggle-button:hover, .load-cldn8-button:hover {
             background-color: darkcyan;
         }
         .sidebar-image {
@@ -129,7 +129,9 @@
             Pockets are empty concavities on a protein surface into which liquid, molecules and peptides can gain access.<br><br>
             Start with your PDB file and then generate pocket predictions and functional predictions.<br>
             Use <a href="http://sts.bioe.uic.edu/castp/calculation.html" target="_blank">this tool</a> to generate spheres.json files for pocket visualisations.<br>
-            Use <a href="https://beta.deepfri.flatironinstitute.org/workspace/VSJPCB/upload" target="_blank">this tool</a> to generate FRI.json files for functional predictions.
+            Use <a href="https://beta.deepfri.flatironinstitute.org/workspace/VSJPCB/upload" target="_blank">this tool</a> to generate FRI.json files for functional predictions.<br><br>
+            Navigate to <a href="https://colab.research.google.com/drive/1ISODmMSm4aGhZogJgAlyrZyWIrvonlQa#scrollTo=tVAE0BrnZoRR&forceEdit=true&sandboxMode=true" target="_blank">this page</a> to design a peptide that will bind your protein.<br><br>
+            Navigate to <a href="https://gramm.compbio.ku.edu/gramm" target="_blank">this page</a> to see how your design will dock with your protein.
         </p>
         <div class="upload-section">
             <span>Upload CastP File</span><br>
@@ -194,10 +196,6 @@
         <button class="toggle-button" onclick="toggleColorMapping()">Toggle Color Mapping</button>
         <!-- Load CLDN8 Button -->
         <button class="load-cldn8-button" onclick="loadCLDN8()">Load Salivary Amylase</button>
-        <!-- Load ProteinLIG Button -->
-        <button class="load-lig-button" onclick="loadProteinLIG()">Load Protein Ligands</button>
-        <!-- Reset Viewer Button -->
-        <button class="reset-viewer-button" onclick="resetViewer()">Reset Viewer</button>
     </div>
 
     <!-- Main AngularJS Application Script -->
@@ -550,41 +548,6 @@
                     });
             };
 
-            $window.loadProteinLIG = function () {
-                fetch('proteinLIG.zip')
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.arrayBuffer();
-                    })
-                    .then(data => {
-                        JSZip.loadAsync(data).then(function(zipContent) {
-                            clearLigands();
-                            ligandModels = [];
-                            zipContent.forEach(function(relativePath, zipEntry) {
-                                if (zipEntry.name.endsWith('.pdb')) {
-                                    zipEntry.async('text').then(function(content) {
-                                        let model = ligandViewer.addModel(content, 'pdb');
-                                        if (useCustomColor) {
-                                            model.setStyle({}, spacefillStyle); // Use spacefill style
-                                        } else {
-                                            model.setStyle({}, { cartoon: { color: modelColors[ligandModels.length] } }); // Use cartoon style with color
-                                        }
-                                        ligandModels.push(model);
-                                        ligandVisibility[ligandModels.length - 1] = true;
-                                        ligandViewer.zoomTo();
-                                        ligandViewer.render();
-                                    });
-                                }
-                            });
-                        });
-                    })
-                    .catch(error => {
-                        console.error('There has been a problem with your fetch operation:', error);
-                    });
-            };
-
             $window.showModel = function (index) {
                 ligandVisibility[index - 1] = true;
                 ligandModels.forEach((model, i) => {
@@ -651,17 +614,6 @@
                         });
                     });
                 } 
-            };
-
-            $window.resetViewer = function() {
-                $scope.pdbviewer.clear();
-                ligandModels = [];
-                ligandVisibility = [false, false, false, false, false];
-                pdbData = null;
-                sphereData = null;
-                friData = null;
-                document.getElementById('output').innerHTML = '';
-                $scope.pdbviewer.render();
             };
         });
 
