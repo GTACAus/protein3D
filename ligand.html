@@ -90,7 +90,7 @@
         .upload-section button {
             margin-top: 2px;
         }
-        .toggle-button, .load-cldn8-button {
+        .toggle-button, .load-cldn8-button, .ligand-button {
             background-color: teal;
             color: white;
             text-align: center;
@@ -101,7 +101,7 @@
             border-radius: 5px;
             font-size: 12px;
         }
-        .toggle-button:hover, .load-cldn8-button:hover {
+        .toggle-button:hover, .load-cldn8-button:hover, .ligand-button:hover {
             background-color: darkcyan;
         }
         .sidebar-image {
@@ -120,6 +120,10 @@
             margin: 2px;
             font-size: 12px;
             padding: 5px;
+        }
+        .button-row {
+            display: flex;
+            justify-content: space-between;
         }
     </style>
 </head>
@@ -194,8 +198,11 @@
 
         <!-- Toggle Color Mapping Button -->
         <button class="toggle-button" onclick="toggleColorMapping()">Toggle Color Mapping</button>
-        <!-- Load CLDN8 Button -->
-        <button class="load-cldn8-button" onclick="loadCLDN8()">Load Demo - <i>Salivary Amylase</i></button>
+        <!-- Load CLDN8 Button and Demo Ligand Dataset Button -->
+        <div class="button-row">
+            <button class="load-cldn8-button" onclick="loadCLDN8()">Load Demo - <i>Salivary Amylase</i></button>
+            <button class="ligand-button" onclick="downloadLigandDataset()">Demo ligand dataset</button>
+        </div>
     </div>
 
     <!-- Main AngularJS Application Script -->
@@ -666,6 +673,15 @@
             zip.generateAsync({ type: 'blob' }).then(function(content) {
                 saveAs(content, 'protein.zip');
             });
+        }
+
+        function downloadLigandDataset() {
+            const link = document.createElement('a');
+            link.href = 'proteinLIG.zip';
+            link.download = 'proteinLIG.zip';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
     </script>
 </body>
