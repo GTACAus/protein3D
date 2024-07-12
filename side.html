@@ -628,17 +628,18 @@
             };
 
             $window.reloadLigands = function() {
-                const fileInput = document.getElementById('zipPDB');
-                const file = fileInput.files[0];
-                if (file) {
-                    // Clear existing ligand models
-                    ligandModels.forEach(model => {
-                        ligandViewer.removeModel(model);
-                    });
-                    ligandModels = [];
-
-                    loadLigandsFromZip(file);
-                } 
+                ligandModels.forEach((model, i) => {
+                    if (ligandVisibility[i]) {
+                        if (useCustomColor) {
+                            model.setStyle({}, spacefillStyle); // Use spacefill style
+                        } else {
+                            model.setStyle({}, { cartoon: { color: modelColors[i] } }); // Use cartoon style with color
+                        }
+                    } else {
+                        model.setStyle({}, { cartoon: { hidden: true } }); // Hide the model
+                    }
+                });
+                ligandViewer.render();
             };
         });
 
