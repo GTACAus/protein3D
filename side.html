@@ -355,44 +355,35 @@
             document.getElementById('zipPDB').addEventListener('change', function(event) {
                 let file = event.target.files[0];
                 if (file) {
-                    loadLigandsFromZip(file);
+                    JSZip.loadAsync(file).then(function(zip) {
+                        let promises = modelNames.map(name => {
+                            let zipEntry = zip.file(name);
+                            if (zipEntry) {
+                                return zipEntry.async('text').then(function(content) {
+                                    return {content: content, name: name};
+                                });
+                            } else {
+                                return null;
+                            }
+                        }).filter(p => p !== null);
+
+                        Promise.all(promises).then(function(files) {
+                            files.forEach((file, index) => {
+                                let model = ligandViewer.addModel(file.content, 'pdb');
+                                if (useCustomColor) {
+                                    model.setStyle({}, spacefillStyle); // Use spacefill style
+                                } else {
+                                    model.setStyle({}, { cartoon: { color: modelColors[index] } }); // Use cartoon style with color
+                                }
+                                ligandModels.push(model);
+                                ligandVisibility[index] = true;
+                            });
+                            ligandViewer.zoomTo();
+                            ligandViewer.render();
+                        });
+                    });
                 }
             });
-
-            function loadLigandsFromZip(file) {
-                JSZip.loadAsync(file).then(function(zip) {
-                    let promises = modelNames.map(name => {
-                        let zipEntry = zip.file(name);
-                        if (zipEntry) {
-                            return zipEntry.async('text').then(function(content) {
-                                return {content: content, name: name};
-                            });
-                        } else {
-                            return null;
-                        }
-                    }).filter(p => p !== null);
-
-                    Promise.all(promises).then(function(files) {
-                        ligandModels = [];
-                        files.forEach((file, index) => {
-                            let model = ligandViewer.addModel(file.content, 'pdb');
-                            if (useCustomColor) {
-                                model.setStyle({}, spacefillStyle); // Use spacefill style
-                            } else {
-                                model.setStyle({}, { cartoon: { color: modelColors[index] } }); // Use cartoon style with color
-                            }
-                            ligandModels.push(model);
-                            ligandVisibility[index] = false;
-                        });
-                        ligandViewer.zoomTo();
-                        ligandViewer.render();
-                    }).catch(function(error) {
-                        console.error("Error loading ligand files from ZIP:", error);
-                    });
-                }).catch(function(error) {
-                    console.error("Error processing ZIP file:", error);
-                });
-            }
 
             function extractGoTermNames(data) {
                 let goTermNames = [];
@@ -489,60 +480,48 @@
 
             $window.toggleColorMapping = function () {
                 useCustomColor = !useCustomColor;
+                clearLigands(); // Clear ligands when toggling color mapping
                 if (pdbData && sphereData) {
                     visualizeData();
                 }
-                setTimeout(() => {
-                    reloadLigands();
-                }, 1000); // Reload ligands after a 1000ms delay
-            setTimeout(() => fetch('proteinLIG.zip')
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error('Network response was not ok');
-                                    }
-                                    return response.arrayBuffer();
-                                })
-                                .then(data => {
-                                    JSZip.loadAsync(data).then(function(zipContent) {
-                                        let promises = modelNames.map(name => {
-                                            let zipEntry = zipContent.file(name);
-                                            if (zipEntry) {
-                                                return zipEntry.async('text').then(function(content) {
-                                                    return { content: content, name: name };
-                                                });
-                                            } else {
-                                                return null;
-                                            }
-                                        }).filter(p => p !== null);
-
-                                        Promise.all(promises).then(function(files) {
-                                            ligandModels = [];
-                                            files.forEach((file, index) => {
-                                                let model = ligandViewer.addModel(file.content, 'pdb');
-                                                if (useCustomColor) {
-                                                    model.setStyle({}, spacefillStyle); // Use spacefill style
-                                                } else {
-                                                    model.setStyle({}, { cartoon: { color: modelColors[index] } }); // Use cartoon style with color
-                                                }
-                                                ligandModels.push(model);
-                                                ligandVisibility[index] = false;
-                                            });
-                                            ligandViewer.zoomTo();
-                                            ligandViewer.render();
-                                        }).catch(function(error) {
-                                            console.error("Error loading ligand files from ZIP:", error);
-                                        });
-                                    }).catch(function(error) {
-                                        console.error("Error processing ZIP file for ligands:", error);
-                                    });
-                                })
-                                .catch(error => {
-                                    console.error('There has been a problem with your fetch operation for ligands:', error);
-                                }), 1000); // 1000 milliseconds delay
+                reloadLigands(); // Reload ligands when color mapping is toggled
             };
 
             $window.loadCLDN8 = function () {
-                fetch('protein.zip')
+                 fetch('proteinLIG.zip')
+        .then(response => response.blob())
+        .then(blob => {
+            return JSZip.loadAsync(blob);
+        })
+        .then(function(zip) {
+            let promises = modelNames.map(name => {
+                let zipEntry = zip.file(name);
+                if (zipEntry) {
+                    return zipEntry.async('text').then(function(content) {
+                        return {content: content, name: name};
+                    });
+                } else {
+                    return null;
+                }
+            }).filter(p => p !== null);
+
+            Promise.all(promises).then(function(files) {
+                files.forEach((file, index) => {
+                    let model = ligandViewer.addModel(file.content, 'pdb');
+                    if (useCustomColor) {
+                        model.setStyle({}, spacefillStyle); // Use spacefill style
+                    } else {
+                        model.setStyle({}, { cartoon: { color: modelColors[index] } }); // Use cartoon style with color
+                    }
+                    ligandModels.push(model);
+                    ligandVisibility[index] = true;
+                });
+                ligandViewer.zoomTo();
+                ligandViewer.render();
+            });
+        });
+});
+		fetch('protein.zip')
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Network response was not ok');
@@ -593,53 +572,6 @@
                                     });
                                 }
                             });
-
-                            // Delay before fetching and loading ligands
-                            setTimeout(() => fetch('proteinLIG.zip')
-                                .then(response => {
-                                    if (!response.ok) {
-                                        throw new Error('Network response was not ok');
-                                    }
-                                    return response.arrayBuffer();
-                                })
-                                .then(data => {
-                                    JSZip.loadAsync(data).then(function(zipContent) {
-                                        let promises = modelNames.map(name => {
-                                            let zipEntry = zipContent.file(name);
-                                            if (zipEntry) {
-                                                return zipEntry.async('text').then(function(content) {
-                                                    return { content: content, name: name };
-                                                });
-                                            } else {
-                                                return null;
-                                            }
-                                        }).filter(p => p !== null);
-
-                                        Promise.all(promises).then(function(files) {
-                                            ligandModels = [];
-                                            files.forEach((file, index) => {
-                                                let model = ligandViewer.addModel(file.content, 'pdb');
-                                                if (useCustomColor) {
-                                                    model.setStyle({}, spacefillStyle); // Use spacefill style
-                                                } else {
-                                                    model.setStyle({}, { cartoon: { color: modelColors[index] } }); // Use cartoon style with color
-                                                }
-                                                ligandModels.push(model);
-                                                ligandVisibility[index] = false;
-                                            });
-                                            ligandViewer.zoomTo();
-                                            ligandViewer.render();
-                                        }).catch(function(error) {
-                                            console.error("Error loading ligand files from ZIP:", error);
-                                        });
-                                    }).catch(function(error) {
-                                        console.error("Error processing ZIP file for ligands:", error);
-                                    });
-                                })
-                                .catch(error => {
-                                    console.error('There has been a problem with your fetch operation for ligands:', error);
-                                }), 1000); // 1000 milliseconds delay
-
                         });
                     })
                     .catch(error => {
@@ -673,18 +605,46 @@
             };
 
             $window.reloadLigands = function() {
-                ligandModels.forEach((model, i) => {
-                    if (ligandVisibility[i]) {
-                        if (useCustomColor) {
-                            model.setStyle({}, spacefillStyle); // Use spacefill style
-                        } else {
-                            model.setStyle({}, { cartoon: { color: modelColors[i] } }); // Use cartoon style with color
-                        }
-                    } else {
-                        model.setStyle({}, { cartoon: { hidden: false } }); // Hide the model
-                    }
-                });
-                ligandViewer.render();
+                const fileInput = document.getElementById('zipPDB');
+                const file = fileInput.files[0];
+                if (file) {
+                    // Clear existing ligand models
+                    ligandModels.forEach(model => {
+                        ligandViewer.removeModel(model);
+                    });
+                    ligandModels = [];
+
+                    JSZip.loadAsync(file).then(function(zip) {
+                        let promises = modelNames.map(name => {
+                            let zipEntry = zip.file(name);
+                            if (zipEntry) {
+                                return zipEntry.async('text').then(function(content) {
+                                    return {content: content, name: name};
+                                });
+                            } else {
+                                return null;
+                            }
+                        }).filter(p => p !== null);
+
+                        Promise.all(promises).then(function(files) {
+                            files.forEach((file, index) => {
+                                let model = ligandViewer.addModel(file.content, 'pdb');
+                                if (ligandVisibility[index]) {
+                                    if (useCustomColor) {
+                                        model.setStyle({}, spacefillStyle); // Use spacefill style
+                                    } else {
+                                        model.setStyle({}, { cartoon: { color: modelColors[index] } }); // Use cartoon style with color
+                                    }
+                                } else {
+                                    model.setStyle({}, { cartoon: { hidden: true } });
+                                }
+                                ligandModels.push(model);
+                            });
+                            ligandViewer.zoomTo();
+                            ligandViewer.render();
+                        });
+                    });
+                } 
             };
         });
 
