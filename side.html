@@ -2,544 +2,696 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amino acids: Structures, Properties and Sequence</title>
-    <script src="https://unpkg.com/ngl@2.0.0-dev.32/dist/ngl.js"></script>
-    <script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+    <title>Protein Pockets and Functions</title>
+    <!-- Import Google Icon Font -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Compiled and minified CSS of MaterializeCSS-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css">
+    <!-- Import jQuery before materialize.js -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <!-- Compiled and minified JavaScript of MaterializeCSS-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+    <!-- 3Dmol.js -->
+    <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+    <!-- JSZip -->
+    <script src="https://cdn.jsdelivr.net/npm/jszip/dist/jszip.min.js"></script>
+    <!-- FileSaver.js -->
+    <script src="https://cdn.jsdelivr.net/npm/file-saver/dist/FileSaver.min.js"></script>
+    <!-- My CSS -->
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
+            position: relative;
             margin: 0;
-            padding: 0;
+            height: 100vh;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            align-items: center;
+        }
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 100%;
+            height: auto;
             background-color: #f8f9fa;
+            padding: 15px;
+            box-sizing: border-box;
         }
-        .header {
+        .content {
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            margin: 20px 0;
+            flex-grow: 1;
+            padding: 0;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        #container_3dmol {
+            flex-grow: 1;
             width: 100%;
-            max-width: 1200px;
-            text-align: center;
         }
-        .title {
-            font-size: 24px;
-            margin: 10px 0;
-            color: #202124;
-        }
-        .navigation {
-            display: flex;
-            flex-direction: column;
-            margin: 10px 0;
-        }
-        .navigation button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            background-color: #4285f4;
-            color: white;
-            border-radius: 4px;
-            margin: 5px 0;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s;
-        }
-        .navigation button:hover {
-            background-color: #357ae8;
-        }
-        .legend-container {
-            width: 100%;
-            max-width: 1200px;
-            display: flex;
-            justify-content: center;
-            padding: 0 10px;
-        }
-        .legend {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-around;
-            margin-bottom: 20px;
-            width: 100%;
-            padding: 10px 0;
-            background-color: white;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
-            text-align: center;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            color: #5f6368;
-            justify-content: center;
-            margin: 5px 0;
-        }
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
-            border: 1px solid #ccc;
-        }
-        .viewer-container {
+        .controls {
             display: flex;
             flex-wrap: wrap;
-            justify-content: center;
-            width: 100%;
-            max-width: 1200px;
-        }
-        .viewer-box {
-            width: 100%;
-            max-width: 300px;
-            margin: 10px;
             padding: 10px;
             box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: white;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
         }
-        .viewer {
-            width: 100%;
-            height: 300px;
-            border: 1px solid #ccc;
-            margin-bottom: 10px;
-            border-radius: 4px;
+        .controls .file-field {
+            margin-right: 10px;
+            flex: 1;
         }
-        .reload-button {
-            padding: 10px 20px;
-            font-size: 14px;
-            border: none;
-            background-color: #4285f4;
+        .controls .btn {
+            padding: 0 5px;
+            font-size: 10px;
+            line-height: 20px;
+        }
+        .instructions a {
+            text-decoration: underline;
+            color: #007bff;
+        }
+        #output {
+            margin-top: 1px;
+            padding: 15px;
+        }
+        .upload-section {
+            margin-bottom: 2px;
+        }
+        .upload-section span {
+            font-weight: bold;
+        }
+        .upload-section button {
+            margin-top: 2px;
+        }
+        .toggle-button, .load-cldn8-button, .ligand-button {
+            background-color: teal;
             color: white;
-            border-radius: 4px;
+            text-align: center;
+            padding: 5px;
             cursor: pointer;
-            transition: background-color 0.3s;
-            margin-top: 10px;
+            margin: 2px;
+            border: none;
+            border-radius: 5px;
+            font-size: 12px;
         }
-        .reload-button:hover {
-            background-color: #357ae8;
+        .toggle-button:hover, .load-cldn8-button:hover, .ligand-button:hover {
+            background-color: darkcyan;
         }
-        .reload-image {
+        .sidebar-image {
+            flex-shrink: 0;
             width: 100%;
-            margin-bottom: 10px;
+            height: auto;
+            max-width: 100%;
+            object-fit: contain;
         }
-        .circle {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: yellow;
-            border: 1px solid black;
+        .ligand-buttons {
             display: flex;
-            justify-content: center;
-            align-items: center;
-            margin-left: 10px;
+            flex-wrap: wrap;
         }
-        .reload-text {
+        .ligand-buttons button {
+            flex: 1;
+            margin: 2px;
+            font-size: 12px;
+            padding: 5px;
+        }
+        .button-row {
             display: flex;
-            align-items: center;
-            font-size: 14px;
-            margin-top: 10px;
+            justify-content: space-between;
         }
-        .card {
-            background-color: #fff;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            margin: 20px;
-            padding: 20px;
-            width: 90%;
-            max-width: 1200px;
-            box-sizing: border-box;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .card h2 {
-            margin-top: 0;
-        }
-        .card textarea {
-            width: calc(100% - 20px);
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            box-sizing: border-box;
-        }
-        #viewer {
-            width: 100%;
-            height: 400px;
-            margin-top: 20px;
-            position: relative;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        /* Media Queries for Responsive Design */
         @media (min-width: 768px) {
-            .header {
-                flex-direction: row;
-                justify-content: space-between;
+            .sidebar {
+                width: 300px;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                border-right: 1px solid #dee2e6;
             }
-            .navigation {
-                flex-direction: row;
-                margin: 0;
-            }
-            .navigation button {
-                margin: 0 5px;
-            }
-            .legend {
-                flex-direction: row;
-                text-align: left;
-            }
-            .legend-item {
-                justify-content: flex-start;
-                margin: 0 10px;
-            }
-            .reload-button {
-                margin-top: 0;
-            }
-        }
-
-        @media (min-width: 1024px) {
-            .viewer-box {
-                width: 30%;
-            }
-            .card {
-                width: 80%;
+            .content {
+                position: absolute;
+                top: 0;
+                left: 300px;
+                right: 0;
+                bottom: 0;
             }
         }
     </style>
 </head>
-<body>
-    <div class="header">
-        <h1 class="title">Amino acids: Structures, Properties and Sequence</h1>
-        <div class="navigation">
-            <button id="prev-button" onclick="showPrevBatch()">Previous</button>
-            <button id="next-button" onclick="showNextBatch()">Next 5 Amino Acids</button>
+<body ng-app="castpApp">
+    <div class="sidebar">
+        <p class="instructions">
+            Pockets are empty concavities on a protein surface into which liquid, molecules and peptides can gain access.<br>
+            Start with your <a href="https://www.rcsb.org/" target="_blank">PDB file</a> and then generate pocket predictions and functional predictions.<br>
+            Use <a href="http://sts.bioe.uic.edu/castp/calculation.html" target="_blank">this tool</a> to generate spheres.json files for pocket visualisations.<br>
+            Use <a href="https://beta.deepfri.flatironinstitute.org/workspace/VSJPCB/upload" target="_blank">this tool</a> to generate FRI.json files for functional predictions.<br>
+            Navigate to <a href="https://colab.research.google.com/drive/1ISODmMSm4aGhZogJgAlyrZyWIrvonlQa#forceEdit=true&sandboxMode=true" target="_blank">this page</a> to design a peptide that will bind your protein.<br>
+            Navigate to <a href="https://gramm.compbio.ku.edu/gramm" target="_blank">this page</a> to see how your design will dock with your protein. <a href="https://gtacaus.github.io/protein3D/GRAM.html" target="_blank">Convert</a> to view.
+        </p>
+        <div class="upload-section">
+            <span>Upload CastP File</span><br>
+            <input type="file" id="castpUpload" accept=".zip">
+            <button onclick="processCastP()">Upload CastP</button>
+        </div>
+        <div class="upload-section">
+            <span>Upload DeepFRI File</span><br>
+            <input type="file" id="deepfriUpload" accept=".json">
+            <button onclick="processDeepFRI()">Upload DeepFRI</button>
+        </div>
+        <div class="upload-section">
+            <span>Download Protein File</span><br>
+            <button onclick="downloadProteinFile()">Download Protein File</button>
+        </div>
+        <img src="Duncan.png" alt="Duncan Image" class="sidebar-image">
+    </div>
+    <div class="content" ng-controller="mainCtrl">
+        <!-- Visualization Container -->
+        <div id="container_3dmol">Loading...</div>
+
+        <!-- Output for GO Term Names -->
+        <div id="output"></div>
+
+        <!-- Controls and File Upload Inputs -->
+        <div class="controls row">
+            <div class="file-field input-field col s12 m4">
+                <div class="btn">
+                    <span>Select PDB, Sphere, and FRI files to load</span>
+                    <input type="file" id="fileInput" multiple accept=".pdb,.json">
+                </div>
+            </div>
+
+            <!-- Load Protein Button -->
+            <div class="file-field input-field col s12 m4">
+                <div class="btn">
+                    <span>Load Protein File</span>
+                    <input type="file" id="zipInput" accept=".zip">
+                </div>
+            </div>
+
+            <!-- Ligand Upload -->
+            <div class="file-field input-field col s12 m4">
+                <div class="btn">
+                    <span>Upload Ligands</span>
+                    <input type="file" id="zipPDB" accept=".zip">
+                </div>
+            </div>
+        </div>
+
+        <!-- Ligand Visibility Buttons -->
+        <div class="ligand-buttons">
+            <button class="toggle-button" onclick="showModel(1)">1</button>
+            <button class="toggle-button" onclick="showModel(2)">2</button>
+            <button class="toggle-button" onclick="showModel(3)">3</button>
+            <button class="toggle-button" onclick="showModel(4)">4</button>
+            <button class="toggle-button" onclick="showModel(5)">5</button>
+            <button class="toggle-button" onclick="clearLigands()">Clear Ligands</button>
+        </div>
+
+        <!-- Toggle Color Mapping Button -->
+        <button class="toggle-button" onclick="toggleColorMapping()">Toggle Color Mapping</button>
+        <!-- Load CLDN8 Button and Demo Ligand Dataset Button -->
+        <div class="button-row">
+            <button class="load-cldn8-button" onclick="loadCLDN8()">Load Demo - <i>Salivary Amylase</i></button>
+            <button class="ligand-button" onclick="downloadLigandDataset()">Demo ligand dataset</button>
         </div>
     </div>
 
-    <div class="legend-container">
-        <div class="legend">
-            <b>Amino acid properties</b>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #ffcccc;"></div>
-                <span>Positive Charge</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #ccccff;"></div>
-                <span>Negative Charge</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: white; border: 1px solid #000;"></div>
-                <span>Hydrophilic</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #ffffcc;"></div>
-                <span>Hydrophobic</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color" style="background-color: #d9d9d9;"></div>
-                <span>Neutral Charge</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="viewer-container" id="viewer-container"></div>
-
-    <div class="card">
-        <h2>Create a Peptide - Type in an Amino Acid Sequence</h2>
-        <textarea id="sequenceInput" rows="2" cols="50">MGGDEVMAFAS</textarea>
-        <div>
-            <label for="representationSelect">Select Representation:</label>
-            <select id="representationSelect">
-                <option value="atomic">Atomic structure</option>
-                <option value="spacefill">Coloured by amino acid characteristics</option>
-                <option value="cartoon">Secondary structures</option>
-            </select>
-        </div>
-        <div id="viewer"></div>
-    </div>
-
+    <!-- Main AngularJS Application Script -->
     <script>
-        const aminoAcids = [
-            {id: 'ALA', name: 'Alanine', oneLetter: 'A', url: 'https://files.rcsb.org/ligands/view/ALA.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
-            {id: 'ARG', name: 'Arginine', oneLetter: 'R', url: 'https://files.rcsb.org/ligands/view/ARG.cif', charge: 'positive', hydrophobicity: 'hydrophilic'},
-            {id: 'ASN', name: 'Asparagine', oneLetter: 'N', url: 'https://files.rcsb.org/ligands/view/ASN.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
-            {id: 'ASP', name: 'Aspartic Acid', oneLetter: 'D', url: 'https://files.rcsb.org/ligands/view/ASP.cif', charge: 'negative', hydrophobicity: 'hydrophilic'},
-            {id: 'CYS', name: 'Cysteine', oneLetter: 'C', url: 'https://files.rcsb.org/ligands/view/CYS.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
-            {id: 'GLU', name: 'Glutamic Acid', oneLetter: 'E', url: 'https://files.rcsb.org/ligands/view/GLU.cif', charge: 'negative', hydrophobicity: 'hydrophilic'},
-            {id: 'GLN', name: 'Glutamine', oneLetter: 'Q', url: 'https://files.rcsb.org/ligands/view/GLN.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
-            {id: 'GLY', name: 'Glycine', oneLetter: 'G', url: 'https://files.rcsb.org/ligands/view/GLY.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
-            {id: 'HIS', name: 'Histidine', oneLetter: 'H', url: 'https://files.rcsb.org/ligands/view/HIS.cif', charge: 'positive', hydrophobicity: 'hydrophilic'},
-            {id: 'ILE', name: 'Isoleucine', oneLetter: 'I', url: 'https://files.rcsb.org/ligands/view/ILE.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
-            {id: 'LEU', name: 'Leucine', oneLetter: 'L', url: 'https://files.rcsb.org/ligands/view/LEU.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
-            {id: 'LYS', name: 'Lysine', oneLetter: 'K', url: 'https://files.rcsb.org/ligands/view/LYS.cif', charge: 'positive', hydrophobicity: 'hydrophilic'},
-            {id: 'MET', name: 'Methionine', oneLetter: 'M', url: 'https://files.rcsb.org/ligands/view/MET.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
-            {id: 'PHE', name: 'Phenylalanine', oneLetter: 'F', url: 'https://files.rcsb.org/ligands/view/PHE.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
-            {id: 'PRO', name: 'Proline', oneLetter: 'P', url: 'https://files.rcsb.org/ligands/view/PRO.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
-            {id: 'SER', name: 'Serine', oneLetter: 'S', url: 'https://files.rcsb.org/ligands/view/SER.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
-            {id: 'THR', name: 'Threonine', oneLetter: 'T', url: 'https://files.rcsb.org/ligands/view/THR.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
-            {id: 'TRP', name: 'Tryptophan', oneLetter: 'W', url: 'https://files.rcsb.org/ligands/view/TRP.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
-            {id: 'TYR', name: 'Tyrosine', oneLetter: 'Y', url: 'https://files.rcsb.org/ligands/view/TYR.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
-            {id: 'VAL', name: 'Valine', oneLetter: 'V', url: 'https://files.rcsb.org/ligands/view/VAL.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'}
-        ];
+        var castpApp = angular.module('castpApp', []);
 
-        let currentIndex = 0;
-        const batchSize = 5;
-        let viewerCheckInterval;
+        castpApp.controller('mainCtrl', function ($scope, $window) {
+            $scope.visconfigopt = {
+                colorStyles: [
+                    { id: 0, des: "Choose the style" },
+                    { id: 1, des: "Red", spec: { show: true, color: "#e41a1c", opacity: 0.8 } },
+                    { id: 2, des: "None", spec: { show: false } },
+                ],
+                reprStyles: [
+                    { id: 0, des: "Choose the style" },
+                    { id: 1, des: "Cartoon", spec: { "cartoon": {} } },
+                    { id: 2, des: "Sphere", spec: { "cartoon": {}, "sphere": {} } },
+                ]
+            };
 
-        function getColor(charge, hydrophobicity) {
-            if (charge === 'positive') return '#ffcccc'; // Pastel red
-            if (charge === 'negative') return '#ccccff'; // Pastel blue
-            if (hydrophobicity === 'hydrophilic') return 'white'; // White
-            if (hydrophobicity === 'hydrophobic') return '#ffffcc'; // Pastel yellow
-            return '#d9d9d9'; // Light gray
-        }
+            var pdbviewer_config = { backgroundColor: "white", defaultcolors: $window.$3Dmol.elementColors.rasmol };
+            var pdbviewer_container = angular.element(document.querySelector('#container_3dmol'));
+            $scope.pdbviewer = $window.$3Dmol.createViewer(pdbviewer_container[0], pdbviewer_config);
+            $scope.pdbviewer.defaultStyle = { cartoon: {} };
 
-        function disableScroll() {
-            window.addEventListener('wheel', preventDefault, { passive: false });
-        }
+            var pdbData, sphereData, friData;
+            var useCustomColor = false;
+            var currentStyle = $scope.pdbviewer.defaultStyle; // Track the current style
+            var ligandViewer = $scope.pdbviewer;
+            var ligandModels = [];
+            var ligandVisibility = [false, false, false, false, false];
+            var modelColors = ["red", "orange", "green", "blue", "violet"];
+            var modelNames = ["ligand_model1.pdb", "ligand_model2.pdb", "ligand_model3.pdb", "ligand_model4.pdb", "ligand_model5.pdb"];
 
-        function enableScroll() {
-            window.removeEventListener('wheel', preventDefault, { passive: false });
-        }
+            document.getElementById('fileInput').addEventListener('change', function () {
+                var fileInput = this.files;
+                var pdbFile, sphereFile, friFile;
 
-        function preventDefault(e) {
-            e.preventDefault();
-        }
+                for (var i = 0; i < fileInput.length; i++) {
+                    if (fileInput[i].name.endsWith('.pdb')) {
+                        pdbFile = fileInput[i];
+                    } else if (fileInput[i].name.endsWith('.sphere.json')) {
+                        sphereFile = fileInput[i];
+                    } else if (fileInput[i].name.endsWith('.FRI.json')) {
+                        friFile = fileInput[i];
+                    }
+                }
 
-        function showBatch(startIndex) {
-            const container = document.getElementById('viewer-container');
-            container.innerHTML = '';
+                if (pdbFile && sphereFile) {
+                    var pdbReader = new FileReader();
+                    var sphereReader = new FileReader();
+                    var friReader = new FileReader();
 
-            const batch = aminoAcids.slice(startIndex, startIndex + batchSize);
+                    pdbReader.onload = function (e) {
+                        pdbData = e.target.result;
+                        console.log("PDB Data Loaded", pdbData);
+                        if (sphereData && (!friFile || friData)) {
+                            visualizeData();
+                        }
+                    };
 
-            batch.forEach(amino => {
-                const viewerBox = document.createElement('div');
-                viewerBox.className = 'viewer-box';
-                viewerBox.style.backgroundColor = getColor(amino.charge, amino.hydrophobicity);
+                    sphereReader.onload = function (e) {
+                        try {
+                            sphereData = JSON.parse(e.target.result);
+                            console.log("Sphere Data Loaded", sphereData);
+                            if (pdbData && (!friFile || friData)) {
+                                visualizeData();
+                            }
+                        } catch (err) {
+                            console.error("Failed to parse Sphere Data", err);
+                        }
+                    };
 
-                const info = document.createElement('div');
-                info.innerHTML = `<strong>${amino.name}</strong><br>Three-letter code: ${amino.id}<br>One-letter code: ${amino.oneLetter}`;
-                viewerBox.appendChild(info);
+                    friReader.onload = function (e) {
+                        try {
+                            friData = JSON.parse(e.target.result);
+                            console.log("FRI Data Loaded", friData);
+                            const goTermNames = extractGoTermNames(friData);
+                            if (goTermNames.length > 0) {
+                                displayGoTermNames(goTermNames);
+                            } else {
+                                document.getElementById('output').innerText = "No 'go_term_name' found.";
+                            }
+                            if (pdbData && sphereData) {
+                                visualizeData();
+                            }
+                        } catch (err) {
+                            console.error("Failed to parse FRI Data", err);
+                            document.getElementById('output').innerText = "Error parsing FRI JSON: " + err.message;
+                        }
+                    };
 
-                const viewerDiv = document.createElement('div');
-                viewerDiv.id = `viewer-${amino.id}`;
-                viewerDiv.className = 'viewer';
-                viewerDiv.onmouseenter = disableScroll;
-                viewerDiv.onmouseleave = enableScroll;
-                viewerBox.appendChild(viewerDiv);
-
-                container.appendChild(viewerBox);
-
-                loadViewer(amino.url, viewerDiv.id);
+                    pdbReader.readAsText(pdbFile);
+                    sphereReader.readAsText(sphereFile);
+                    if (friFile) {
+                        friReader.readAsText(friFile);
+                    }
+                } else {
+                    alert('Please select both PDB and Sphere files.');
+                }
             });
 
-            // Add reload box with image and button in the 6th grid box if it exists
-            const reloadBox = document.createElement('div');
-            reloadBox.className = 'viewer-box';
-            reloadBox.style.backgroundColor = 'lightgrey';
-
-            const reloadImage = document.createElement('img');
-            reloadImage.src = 'https://s3-us-west-2.amazonaws.com/courses-images/wp-content/uploads/sites/110/2016/05/02212734/Figure_03_04_01.jpg';
-            reloadImage.alt = 'Amino Acid Structure';
-            reloadImage.className = 'reload-image';
-            reloadBox.appendChild(reloadImage);
-
-            const reloadButton = document.createElement('button');
-            reloadButton.innerText = 'Reload Viewers';
-            reloadButton.className = 'reload-button';
-            reloadButton.onclick = () => showBatch(currentIndex);
-
-            reloadBox.appendChild(reloadButton);
-
-            const reloadText = document.createElement('div');
-            reloadText.className = 'reload-text';
-            reloadText.innerHTML = 'Some amino acids contain';
-            const circle = document.createElement('div');
-            circle.className = 'circle';
-            circle.innerText = 'S';
-            reloadText.appendChild(circle);
-            reloadBox.appendChild(reloadText);
-
-            container.appendChild(reloadBox);
-
-            // Wait half a second, then load the amino acid sequence viewer
-            setTimeout(foldSequence, 500);
-        }
-
-        function loadViewer(url, viewerId) {
-            const stage = new NGL.Stage(viewerId, { disableControls: true });
-            stage.loadFile(url, { defaultRepresentation: true }).then(comp => {
-                comp.addRepresentation('ball+stick', {
-                    sele: 'N or C',
-                    opacity: 0.4  // 60% transparent
-                });
-                comp.addRepresentation('ball+stick', {
-                    sele: 'not (N or C)',
-                    opacity: 1.0
-                });
-                stage.autoView();
-            }).catch(error => {
-                console.error(`Error loading viewer ${viewerId}:`, error);
-                setTimeout(() => loadViewer(url, viewerId), 1000);
+            document.getElementById('zipInput').addEventListener('change', function () {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        JSZip.loadAsync(e.target.result).then(function(zipContent) {
+                            zipContent.forEach(function(relativePath, zipEntry) {
+                                if (zipEntry.name.endsWith('.pdb')) {
+                                    zipEntry.async('text').then(function(content) {
+                                        pdbData = content;
+                                        console.log("PDB Data Loaded from ZIP", pdbData);
+                                        if (sphereData && (!friData || friData)) {
+                                            visualizeData();
+                                        }
+                                    });
+                                } else if (zipEntry.name.endsWith('.sphere.json')) {
+                                    zipEntry.async('text').then(function(content) {
+                                        try {
+                                            sphereData = JSON.parse(content);
+                                            console.log("Sphere Data Loaded from ZIP", sphereData);
+                                            if (pdbData && (!friData || friData)) {
+                                                visualizeData();
+                                            }
+                                        } catch (err) {
+                                            console.error("Failed to parse Sphere Data from ZIP", err);
+                                        }
+                                    });
+                                } else if (zipEntry.name.endsWith('.FRI.json')) {
+                                    zipEntry.async('text').then(function(content) {
+                                        try {
+                                            friData = JSON.parse(content);
+                                            console.log("FRI Data Loaded from ZIP", friData);
+                                            const goTermNames = extractGoTermNames(friData);
+                                            if (goTermNames.length > 0) {
+                                                displayGoTermNames(goTermNames);
+                                            } else {
+                                                document.getElementById('output').innerText = "No 'go_term_name' found.";
+                                            }
+                                            if (pdbData && sphereData) {
+                                                visualizeData();
+                                            }
+                                        } catch (err) {
+                                            console.error("Failed to parse FRI Data from ZIP", err);
+                                            document.getElementById('output').innerText = "Error parsing FRI JSON: " + err.message;
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                    };
+                    reader.readAsArrayBuffer(file);
+                } else {
+                    alert('Please upload a zip file.');
+                }
             });
-        }
 
-        function checkViewerStatus() {
-            const viewerElement = document.getElementById('viewer');
-            const stageCanvas = viewerElement.querySelector('canvas');
-            if (!viewerElement || !stageCanvas || stageCanvas.width === 0 || stageCanvas.height === 0) {
-                console.warn('Viewer appears to have crashed. Reloading...');
-                foldSequence();
+            document.getElementById('zipPDB').addEventListener('change', function(event) {
+                let file = event.target.files[0];
+                if (file) {
+                    JSZip.loadAsync(file).then(function(zip) {
+                        let promises = modelNames.map(name => {
+                            let zipEntry = zip.file(name);
+                            if (zipEntry) {
+                                return zipEntry.async('text').then(function(content) {
+                                    return {content: content, name: name};
+                                });
+                            } else {
+                                return null;
+                            }
+                        }).filter(p => p !== null);
+
+                        Promise.all(promises).then(function(files) {
+                            files.forEach((file, index) => {
+                                let model = ligandViewer.addModel(file.content, 'pdb');
+                                if (useCustomColor) {
+                                    model.setStyle({}, spacefillStyle); // Use spacefill style
+                                } else {
+                                    model.setStyle({}, { cartoon: { color: modelColors[index] } }); // Use cartoon style with color
+                                }
+                                ligandModels.push(model);
+                                ligandVisibility[index] = true;
+                            });
+                            ligandViewer.zoomTo();
+                            ligandViewer.render();
+                        });
+                    });
+                }
+            });
+
+            function extractGoTermNames(data) {
+                let goTermNames = [];
+                if (data.data && data.data.A && data.data.A.gcn_mf && Array.isArray(data.data.A.gcn_mf.predictions)) {
+                    data.data.A.gcn_mf.predictions.forEach(prediction => {
+                        console.log("Prediction:", prediction);
+                        if (prediction.go_term_name) {
+                            goTermNames.push(prediction.go_term_name);
+                        } else {
+                            console.log("No 'go_term_name' in prediction:", prediction);
+                        }
+                    });
+                } else {
+                    console.log("No 'predictions' array found in the expected path.");
+                }
+                return goTermNames;
             }
-        }
 
-        function showNextBatch() {
-            if (currentIndex + batchSize < aminoAcids.length) {
-                currentIndex += batchSize;
-                showBatch(currentIndex);
+            function displayGoTermNames(goTermNames) {
+                const outputDiv = document.getElementById('output');
+                outputDiv.innerHTML = "<b>Predicted Molecular Functions:</b>";
+                const ul = document.createElement('ul');
+                goTermNames.forEach(name => {
+                    const li = document.createElement('li');
+                    li.textContent = capitalizeFirstLetter(name);
+                    ul.appendChild(li);
+                });
+                outputDiv.appendChild(ul);
             }
-        }
 
-        function showPrevBatch() {
-            if (currentIndex - batchSize >= 0) {
-                currentIndex -= batchSize;
-                showBatch(currentIndex);
+            function capitalizeFirstLetter(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
             }
-        }
 
-        function foldSequence() {
-            const sequence = document.getElementById('sequenceInput').value;
-            const url = 'https://api.esmatlas.com/foldSequence/v1/pdb/';
-            const params = `${encodeURIComponent(sequence)}`;
+            function visualizeData() {
+                console.log("Visualizing Data");
+                console.log("PDB Data: ", pdbData);
+                console.log("Sphere Data: ", sphereData);
 
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', url, true);
-            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+                if (!Array.isArray(sphereData)) {
+                    console.error("Sphere Data is not in the expected array format");
+                    return;
+                }
 
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        display3DStructure(xhr.responseText);
-                    } else {
-                        console.error(`Error: ${xhr.status} - ${xhr.statusText}\n${xhr.responseText}`);
-                        setTimeout(() => foldSequence(), 1000);
+                $scope.pdbviewer.clear();
+                $scope.pdbviewer.addModel(pdbData, "pdb");
+                $scope.pdbviewer.setStyle({}, useCustomColor ? spacefillStyle : $scope.pdbviewer.defaultStyle);
+                currentStyle = useCustomColor ? spacefillStyle : $scope.pdbviewer.defaultStyle; // Track the current style
+                $scope.pdbviewer.zoomTo();
+                $scope.pdbviewer.render();
+
+                for (var i = 0; i < sphereData.length; i++) {
+                    var spec = JSON.parse(JSON.stringify($scope.visconfigopt.colorStyles[1].spec)); // Use red color
+                    updateVolumeStyle(sphereData[i], spec);
+                }
+
+                // Ensure ligand models remain visible
+                reloadLigands(); // Add this line to reload ligands when visualizing data
+                $scope.pdbviewer.render();
+            }
+
+            var updateVolumeStyle = function (spheres, spec) {
+                if (!spec.show) {
+                    return null;
+                }
+                var shape = $scope.pdbviewer.addShape(spec);
+                for (var i = 0; i < spheres.length; i++) {
+                    shape.addSphere(spheres[i]);
+                }
+                return shape;
+            };
+
+            const spacefillStyle = {
+                sphere: {
+                    colorfunc: function (atom) {
+                        const hydrophobic = new Set(['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'PRO', 'GLY']);
+                        const hydrophilic = new Set(['ARG', 'LYS', 'ASP', 'GLU', 'ASN', 'GLN']);
+                        const positive = new Set(['ARG', 'LYS']);
+                        const negative = new Set(['ASP', 'GLU']);
+                        if (positive.has(atom.resn)) return 'blue';
+                        else if (negative.has(atom.resn)) return 'red';
+                        else if (hydrophobic.has(atom.resn)) return 'yellow';
+                        else if (hydrophilic.has(atom.resn)) return 'lightgrey';
+                        return 'grey';
                     }
                 }
             };
 
-            xhr.onerror = function() {
-                console.error('Request failed');
-                setTimeout(() => foldSequence(), 1000);
+            $scope.originalStyles = [
+                { cartoon: {} },
+                { stick: {} },
+                spacefillStyle
+            ];
+
+            $window.toggleColorMapping = function () {
+                useCustomColor = !useCustomColor;
+                clearLigands(); // Clear ligands when toggling color mapping
+                if (pdbData && sphereData) {
+                    visualizeData();
+                }
+                reloadLigands(); // Reload ligands when color mapping is toggled
             };
 
-            console.log('Sending request with params:', params);
-            xhr.send(params);
-        }
-
-        function display3DStructure(pdbData) {
-            const viewerElement = document.getElementById('viewer');
-            viewerElement.innerHTML = ''; // Clear the viewer to reload it properly
-
-            const viewer = $3Dmol.createViewer(viewerElement, {
-                defaultcolors: $3Dmol.rasmolElementColors
-            });
-
-            viewer.addModel(pdbData, "pdb");
-
-            // Function to set representation based on user selection
-            function setRepresentation(representation) {
-                viewer.setStyle({}, {stick: {radius: 0.2}, sphere: {scale: 0.3}}); // Default representation
-
-                if (representation === 'spacefill') {
-                    viewer.setStyle({}, {
-                        sphere: {
-                            scale: 1.0, // Adjusted scale for spacefill representation
-                            colorscheme: {
-                                prop: 'resn',
-                                map: colorMap
-                            }
+            $window.loadCLDN8 = function () {
+                fetch('protein.zip')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
                         }
+                        return response.arrayBuffer();
+                    })
+                    .then(data => {
+                        JSZip.loadAsync(data).then(function(zipContent) {
+                            zipContent.forEach(function(relativePath, zipEntry) {
+                                if (zipEntry.name.endsWith('.pdb')) {
+                                    zipEntry.async('text').then(function(content) {
+                                        pdbData = content;
+                                        console.log("PDB Data Loaded from CLDN8 ZIP", pdbData);
+                                        if (sphereData && (!friData || friData)) {
+                                            visualizeData();
+                                        }
+                                    });
+                                } else if (zipEntry.name.endsWith('.sphere.json')) {
+                                    zipEntry.async('text').then(function(content) {
+                                        try {
+                                            sphereData = JSON.parse(content);
+                                            console.log("Sphere Data Loaded from CLDN8 ZIP", sphereData);
+                                            if (pdbData && (!friData || friData)) {
+                                                visualizeData();
+                                            }
+                                        } catch (err) {
+                                            console.error("Failed to parse Sphere Data from CLDN8 ZIP", err);
+                                        }
+                                    });
+                                } else if (zipEntry.name.endsWith('.FRI.json')) {
+                                    zipEntry.async('text').then(function(content) {
+                                        try {
+                                            friData = JSON.parse(content);
+                                            console.log("FRI Data Loaded from CLDN8 ZIP", friData);
+                                            const goTermNames = extractGoTermNames(friData);
+                                            if (goTermNames.length > 0) {
+                                                displayGoTermNames(goTermNames);
+                                            } else {
+                                                document.getElementById('output').innerText = "No 'go_term_name' found.";
+                                            }
+                                            if (pdbData && sphereData) {
+                                                visualizeData();
+                                            }
+                                        } catch (err) {
+                                            console.error("Failed to parse FRI Data from CLDN8 ZIP", err);
+                                            document.getElementById('output').innerText = "Error parsing FRI JSON: " + err.message;
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                    })
+                    .catch(error => {
+                        console.error('There has been a problem with your fetch operation:', error);
                     });
-                } else if (representation === 'atomic') {
-                    viewer.setStyle({}, {stick: {radius: 0.2}, sphere: {scale: 0.3}});
-                } else if (representation === 'cartoon') {
-                    viewer.setStyle({}, {
-                        cartoon: {
-                            color: 'sstruc' // Color by secondary structure
-                        }
-                    });
+            };
 
-                    viewer.setStyle({ cartoon: { colorfunc: function(atom) {
-                        if (atom.ss === 'h') {
-                            return 'cyan'; // Alpha helices
-                        } else if (atom.ss === 's') {
-                            return 'purple'; // Beta sheets
+            $window.showModel = function (index) {
+                ligandVisibility[index - 1] = true;
+                ligandModels.forEach((model, i) => {
+                    if (i === index - 1) {
+                        if (useCustomColor) {
+                            model.setStyle({}, spacefillStyle); // Use spacefill style
                         } else {
-                            return 'indigo'; // Random coils
+                            model.setStyle({}, { cartoon: { color: modelColors[i] } }); // Use cartoon style with color
                         }
-                    }}});
-                }
+                    } else {
+                        model.setStyle({}, { cartoon: { hidden: true } });  // Hide the model
+                    }
+                });
+                ligandViewer.zoomTo();
+                ligandViewer.render();
+            };
 
-                viewer.zoomTo();
-                viewer.render();
+            $window.clearLigands = function() {
+                ligandModels.forEach((model, i) => {
+                    model.setStyle({}, { cartoon: { hidden: true } });
+                    ligandVisibility[i] = false;
+                });
+                ligandViewer.render();
+            };
+
+            $window.reloadLigands = function() {
+                const fileInput = document.getElementById('zipPDB');
+                const file = fileInput.files[0];
+                if (file) {
+                    // Clear existing ligand models
+                    ligandModels.forEach(model => {
+                        ligandViewer.removeModel(model);
+                    });
+                    ligandModels = [];
+
+                    JSZip.loadAsync(file).then(function(zip) {
+                        let promises = modelNames.map(name => {
+                            let zipEntry = zip.file(name);
+                            if (zipEntry) {
+                                return zipEntry.async('text').then(function(content) {
+                                    return {content: content, name: name};
+                                });
+                            } else {
+                                return null;
+                            }
+                        }).filter(p => p !== null);
+
+                        Promise.all(promises).then(function(files) {
+                            files.forEach((file, index) => {
+                                let model = ligandViewer.addModel(file.content, 'pdb');
+                                if (ligandVisibility[index]) {
+                                    if (useCustomColor) {
+                                        model.setStyle({}, spacefillStyle); // Use spacefill style
+                                    } else {
+                                        model.setStyle({}, { cartoon: { color: modelColors[index] } }); // Use cartoon style with color
+                                    }
+                                } else {
+                                    model.setStyle({}, { cartoon: { hidden: true } });
+                                }
+                                ligandModels.push(model);
+                            });
+                            ligandViewer.zoomTo();
+                            ligandViewer.render();
+                        });
+                    });
+                } 
+            };
+        });
+
+        const zip = new JSZip();
+
+        function processCastP() {
+            const fileInput = document.getElementById('castpUpload');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please upload a file.');
+                return;
             }
 
-            // Initial display based on default selection
-            const representationSelect = document.getElementById('representationSelect');
-            let currentRepresentation = representationSelect.value;
-            setRepresentation(currentRepresentation);
-
-            // Event listener for changing representation
-            representationSelect.addEventListener('change', function() {
-                currentRepresentation = representationSelect.value;
-                setRepresentation(currentRepresentation);
-            });
-
-            viewer.zoomTo();
-            viewer.render();
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                JSZip.loadAsync(e.target.result).then(function(zipContent) {
+                    zipContent.forEach(function(relativePath, zipEntry) {
+                        if (zipEntry.name.endsWith('.sphere.json')) {
+                            zipEntry.async('blob').then(function(content) {
+                                zip.file('protein.sphere.json', content);
+                            });
+                        } else if (zipEntry.name.endsWith('.pdb')) {
+                            zipEntry.async('blob').then(function(content) {
+                                zip.file('protein.pdb', content);
+                            });
+                        }
+                    });
+                });
+            };
+            reader.readAsArrayBuffer(file);
         }
 
-        // Define the color map
-        const colorMap = {
-            'ALA': 'yellow',
-            'VAL': 'yellow',
-            'ILE': 'yellow',
-            'LEU': 'yellow',
-            'MET': 'yellow',
-            'PHE': 'yellow',
-            'TRP': 'yellow',
-            'PRO': 'yellow',
-            'GLY': 'yellow',
-            'ARG': 'blue',
-            'LYS': 'blue',
-            'ASP': 'red',
-            'GLU': 'red',
-            'ASN': 'lightgrey',
-            'GLN': 'lightgrey',
-            'SER': 'lightgrey',
-            'THR': 'lightgrey',
-            'CYS': 'grey',
-            'HIS': 'grey',
-            'TYR': 'grey'
-        };
+        function processDeepFRI() {
+            const fileInput = document.getElementById('deepfriUpload');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert('Please upload a file.');
+                return;
+            }
 
-        document.getElementById('sequenceInput').addEventListener('input', foldSequence);
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                zip.file('protein.FRI.json', content);
+            };
+            reader.readAsText(file);
+        }
+        function downloadProteinFile() {
+            zip.generateAsync({ type: 'blob' }).then(function(content) {
+                saveAs(content, 'protein.zip');
+            });
+        }
 
-        // Show the first batch on initial load
-        showBatch(currentIndex);
-
-        // Periodically check the status of the viewer
-        viewerCheckInterval = setInterval(checkViewerStatus, 5000); // Check every 5 seconds
+        function downloadLigandDataset() {
+            const link = document.createElement('a');
+            link.href = 'proteinLIG.zip';
+            link.download = 'proteinLIG.zip';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     </script>
 </body>
 </html>
