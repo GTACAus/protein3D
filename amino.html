@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -213,6 +214,13 @@
     <div class="card">
         <h2>Create a Peptide - Type in an amino acid sequence</h2>
         <textarea id="sequenceInput" rows="2" cols="50">MGGDEVMAFAS</textarea>
+	<div>
+        <label for="representationSelect">Select Representation:</label>
+        <select id="representationSelect">
+            <option value="spacefill">Space-fill</option>
+            <option value="atomic">Atomic Structure</option>
+        </select>
+    </div>
         <div id="viewer"></div>
     </div>
 
@@ -395,16 +403,44 @@
         }
 
         function display3DStructure(pdbData) {
-            const viewerElement = document.getElementById('viewer');
-            viewerElement.innerHTML = ''; // Clear the viewer to reload it properly
-            const viewer = $3Dmol.createViewer(viewerElement, {
-                defaultcolors: $3Dmol.rasmolElementColors
-            });
-            viewer.addModel(pdbData, "pdb");
+    const viewerElement = document.getElementById('viewer');
+    viewerElement.innerHTML = ''; // Clear the viewer to reload it properly
+
+    const viewer = $3Dmol.createViewer(viewerElement, {
+        defaultcolors: $3Dmol.rasmolElementColors
+    });
+
+    viewer.addModel(pdbData, "pdb");
+
+    // Function to set representation based on user selection
+    function setRepresentation(representation) {
+        viewer.setStyle({}, {stick: {radius: 0.2}, sphere: {scale: 0.3}}); // Default representation
+
+        if (representation === 'spacefill') {
+            viewer.setStyle({}, {sphere: {}});
+        } else if (representation === 'atomic') {
             viewer.setStyle({}, {stick: {radius: 0.2}, sphere: {scale: 0.3}});
-            viewer.zoomTo();
-            viewer.render();
         }
+
+        viewer.zoomTo();
+        viewer.render();
+    }
+
+    // Initial display based on default selection
+    const representationSelect = document.getElementById('representationSelect');
+    let currentRepresentation = representationSelect.value;
+    setRepresentation(currentRepresentation);
+
+    // Event listener for changing representation
+    representationSelect.addEventListener('change', function() {
+        currentRepresentation = representationSelect.value;
+        setRepresentation(currentRepresentation);
+    });
+
+    viewer.zoomTo();
+    viewer.render();
+}
+
 
         document.getElementById('sequenceInput').addEventListener('input', foldSequence);
 
