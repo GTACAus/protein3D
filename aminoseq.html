@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESM Atlas API Interaction</title>
+<script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+    h1 {
+        margin-top: 20px;
+    }
+    .card {
+        background-color: #fff;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border-radius: 8px;
+        margin: 20px;
+        padding: 20px;
+        width: 80%;
+        max-width: 600px;
+        box-sizing: border-box;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    .card h2 {
+        margin-top: 0;
+    }
+    .card textarea, .card button {
+        width: calc(100% - 20px);
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        box-sizing: border-box;
+    }
+    .card button {
+        background-color: #4285f4;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+    }
+    .card button:hover {
+        background-color: #357ae8;
+    }
+    .small-card {
+        height: auto;
+    }
+    #viewer {
+        width: 100%;
+        height: 400px;
+        margin-top: 20px;
+        position: relative;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+</style>
+</head>
+<body>
+<h1>Amino Acid Translation</h1>
+
+<div class="card small-card">
+    <h2>Fold Sequence</h2>
+    <textarea id="sequenceInput" rows="4" cols="50">MGGDEVMAFAS</textarea><br>
+    <button onclick="foldSequence()">Fold Sequence</button>
+</div>
+
+<div class="card">
+    <h2>Amino acid sequence as molecules</h2>
+    <div id="viewer"></div>
+</div>
+
+<script>
+    function foldSequence() {
+        const sequence = document.getElementById('sequenceInput').value;
+        const url = 'https://api.esmatlas.com/foldSequence/v1/pdb/';
+        const params = `${encodeURIComponent(sequence)}`;
+        
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', url, true);
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    display3DStructure(xhr.responseText);
+                } else {
+                    console.error(`Error: ${xhr.status} - ${xhr.statusText}\n${xhr.responseText}`);
+                }
+            }
+        };
+
+        xhr.onerror = function() {
+            console.error('Request failed');
+        };
+
+        console.log('Sending request with params:', params);
+        xhr.send(params);
+    }
+
+    function display3DStructure(pdbData) {
+        const viewer = $3Dmol.createViewer("viewer", {
+            defaultcolors: $3Dmol.rasmolElementColors
+        });
+        viewer.addModel(pdbData, "pdb");
+        viewer.setStyle({}, {stick: {radius: 0.2}, sphere: {scale: 0.3}});
+        viewer.zoomTo();
+        viewer.render();
+    }
+</script>
+
+</body>
+</html>
