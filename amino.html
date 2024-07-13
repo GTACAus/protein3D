@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -417,7 +416,15 @@
         viewer.setStyle({}, {stick: {radius: 0.2}, sphere: {scale: 0.3}}); // Default representation
 
         if (representation === 'spacefill') {
-            viewer.setStyle({}, {sphere: {}});
+            viewer.setStyle({}, {
+                sphere: {
+                    scale: 1.0, // Adjusted scale for spacefill representation
+                    colorscheme: {
+                        prop: 'resn',
+                        map: colorMap
+                    }
+                }
+            });
         } else if (representation === 'atomic') {
             viewer.setStyle({}, {stick: {radius: 0.2}, sphere: {scale: 0.3}});
         }
@@ -441,6 +448,29 @@
     viewer.render();
 }
 
+        // Define the color map
+        const colorMap = {
+            'ALA': 'yellow',
+            'VAL': 'yellow',
+            'ILE': 'yellow',
+            'LEU': 'yellow',
+            'MET': 'yellow',
+            'PHE': 'yellow',
+            'TRP': 'yellow',
+            'PRO': 'yellow',
+            'GLY': 'yellow',
+            'ARG': 'blue',
+            'LYS': 'blue',
+            'ASP': 'red',
+            'GLU': 'red',
+            'ASN': 'lightgrey',
+            'GLN': 'lightgrey',
+            'SER': 'lightgrey',
+            'THR': 'lightgrey',
+            'CYS': 'grey',
+            'HIS': 'grey',
+            'TYR': 'grey'
+        };
 
         document.getElementById('sequenceInput').addEventListener('input', foldSequence);
 
