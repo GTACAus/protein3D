@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amino acids: structures and properties</title>
+    <title>Amino acids: Structures, Properties and Sequence</title>
     <script src="https://unpkg.com/ngl@2.0.0-dev.32/dist/ngl.js"></script>
     <script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
     <style>
@@ -175,10 +175,10 @@
 </head>
 <body>
     <div class="header">
-        <h1 class="title">Amino acids: structures and properties</h1>
+        <h1 class="title">Amino acids: Structures, Properties and Sequence</h1>
         <div class="navigation">
             <button id="prev-button" onclick="showPrevBatch()">Previous</button>
-            <button id="next-button" onclick="showNextBatch()">Next</button>
+            <button id="next-button" onclick="showNextBatch()">Next 5 Amino Acids</button>
         </div>
     </div>
 
@@ -211,13 +211,13 @@
     <div class="viewer-container" id="viewer-container"></div>
 
     <div class="card">
-        <h2>Create a Peptide - Type in an amino acid sequence</h2>
+        <h2>Create a Peptide - Type in an Amino Acid Sequence</h2>
         <textarea id="sequenceInput" rows="2" cols="50">MGGDEVMAFAS</textarea>
 	<div>
         <label for="representationSelect">Select Representation:</label>
         <select id="representationSelect">
             <option value="atomic">Atomic Structure</option>
-	    <option value="spacefill">Space-fill</option>
+	    <option value="spacefill">Coloured by amino acid characteristics</option>
         </select>
     </div>
         <div id="viewer"></div>
