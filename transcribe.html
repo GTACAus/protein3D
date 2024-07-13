@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DNA to RNA Transcription</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+
+        .container {
+            text-align: left;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .dna-sequence, .rna-sequence, .template-sequence {
+            margin: 20px 0;
+            font-size: 20px;
+        }
+
+        .base {
+            font-weight: bold;
+        }
+
+        .rna-sequence {
+            color: green;
+            font-size: 19.2px;
+        }
+
+        #transcription-slider {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 3px;
+            background: #ddd;
+            outline: none;
+            opacity: 0.5;
+            transition: opacity .2s;
+            position: relative;
+        }
+
+        #transcription-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 50px;
+            height: 50px;
+            background: #4CAF50;
+            cursor: pointer;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        #transcription-slider::-webkit-slider-thumb::after {
+            content: 'RNA Polymerase';
+            position: absolute;
+            top: -40px;
+            left: -25px;
+            width: 100px;
+            text-align: center;
+            font-size: 12px;
+            color: #000;
+        }
+
+        #transcription-slider::-moz-range-thumb {
+            width: 50px;
+            height: 50px;
+            background: #4CAF50;
+            cursor: pointer;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        #transcription-slider::-moz-range-thumb::after {
+            content: 'RNA Polymerase';
+            position: absolute;
+            top: -40px;
+            left: -25px;
+            width: 100px;
+            text-align: center;
+            font-size: 12px;
+            color: #000;
+        }
+
+        #rna-label {
+            display: none;
+            font-weight: bold;
+            margin-top: 10px;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <b>Coding strand</b>
+        <div class="dna-sequence" id="dna-sequence"></div>
+        <input type="range" id="transcription-slider" min="0" max="100" value="0">
+        <div id="rna-container">
+            <div id="rna-label"><b>Messenger RNA</b></div>
+            <div class="rna-sequence">
+                <span id="rna-output"></span>
+            </div>
+        </div>
+        <div class="template-sequence" id="template-sequence"></div>
+        <b>Template strand</b>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const dnaSequence = "ATGGCGTACGATGCCGATCGATCGATCGTAGCTAGCTAGCTGACT";
+            const templateSequence = "TACCGCATGCTACGGCTAGCTAGCTAGCATCGATCGATCGACTGA";
+            const rnaSequence = dnaSequence.replace(/T/g, 'U');
+            const dnaOutput = document.getElementById('dna-sequence');
+            const rnaOutput = document.getElementById('rna-output');
+            const templateOutput = document.getElementById('template-sequence');
+            const slider = document.getElementById('transcription-slider');
+            const rnaLabel = document.getElementById('rna-label');
+
+            slider.addEventListener('input', () => {
+                const value = slider.value;
+                const progress = Math.floor((value / 100) * dnaSequence.length);
+                rnaOutput.textContent = rnaSequence.substring(0, progress);
+                rnaLabel.style.display = progress > 0 ? 'block' : 'none';
+            });
+
+            // Initialize DNA and template sequence display
+            dnaOutput.innerHTML = dnaSequence.split('').map(base => `<span class="base">${base}</span>`).join('');
+            templateOutput.innerHTML = templateSequence.split('').map(base => `<span class="base">${base}</span>`).join('');
+        });
+    </script>
+</body>
+</html>
