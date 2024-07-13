@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Amino acids: Structures and Properties</title>
+    <title>Amino acids: structures and properties</title>
     <script src="https://unpkg.com/ngl@2.0.0-dev.32/dist/ngl.js"></script>
+    <script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
     <style>
         body {
             font-family: 'Roboto', sans-serif;
@@ -137,11 +138,44 @@
             right: 10px;
             font-size: 14px;
         }
+        .card {
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            margin: 20px;
+            padding: 20px;
+            width: 80%;
+            max-width: 1200px;
+            box-sizing: border-box;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card h2 {
+            margin-top: 0;
+        }
+        .card textarea {
+            width: calc(100% - 20px);
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        #viewer {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1 class="title">Amino acids: Structures and Properties</h1>
+        <h1 class="title">Amino acids: structures and properties</h1>
         <div class="navigation">
             <button id="prev-button" onclick="showPrevBatch()">Previous</button>
             <button id="next-button" onclick="showNextBatch()">Next</button>
@@ -176,6 +210,12 @@
 
     <div class="viewer-container" id="viewer-container"></div>
 
+    <div class="card">
+        <h2>Create a Peptide - Type in an amino acid sequence</h2>
+        <textarea id="sequenceInput" rows="2" cols="50">MGGDEVMAFAS</textarea>
+        <div id="viewer"></div>
+    </div>
+
     <script>
         const aminoAcids = [
             {id: 'ALA', name: 'Alanine', oneLetter: 'A', url: 'https://files.rcsb.org/ligands/view/ALA.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
@@ -202,6 +242,7 @@
 
         let currentIndex = 0;
         const batchSize = 5;
+        let viewerCheckInterval;
 
         function getColor(charge, hydrophobicity) {
             if (charge === 'positive') return '#ffcccc'; // Pastel red
@@ -247,22 +288,7 @@
 
                 container.appendChild(viewerBox);
 
-                const stage = new NGL.Stage(viewerDiv.id, { disableControls: true });
-                stage.loadFile(amino.url, { defaultRepresentation: true }).then(comp => {
-                    comp.addRepresentation('ball+stick', {
-                        sele: 'N or C',
-                        opacity: 0.4  // 60% transparent
-                    });
-                    comp.addRepresentation('ball+stick', {
-                        sele: 'not (N or C)',
-                        opacity: 1.0
-                    });
-                    stage.autoView();
-                }).catch(error => {
-                    setTimeout(() => {
-                        showBatch(currentIndex);
-                    }, 1000);
-                });
+                loadViewer(amino.url, viewerDiv.id);
             });
 
             // Add reload box with image and button in the 6th grid box if it exists
@@ -293,6 +319,36 @@
             reloadBox.appendChild(reloadText);
 
             container.appendChild(reloadBox);
+
+            // Wait half a second, then load the amino acid sequence viewer
+            setTimeout(foldSequence, 500);
+        }
+
+        function loadViewer(url, viewerId) {
+            const stage = new NGL.Stage(viewerId, { disableControls: true });
+            stage.loadFile(url, { defaultRepresentation: true }).then(comp => {
+                comp.addRepresentation('ball+stick', {
+                    sele: 'N or C',
+                    opacity: 0.4  // 60% transparent
+                });
+                comp.addRepresentation('ball+stick', {
+                    sele: 'not (N or C)',
+                    opacity: 1.0
+                });
+                stage.autoView();
+            }).catch(error => {
+                console.error(`Error loading viewer ${viewerId}:`, error);
+                setTimeout(() => loadViewer(url, viewerId), 1000);
+            });
+        }
+
+        function checkViewerStatus() {
+            const viewerElement = document.getElementById('viewer');
+            const stageCanvas = viewerElement.querySelector('canvas');
+            if (!viewerElement || !stageCanvas || stageCanvas.width === 0 || stageCanvas.height === 0) {
+                console.warn('Viewer appears to have crashed. Reloading...');
+                foldSequence();
+            }
         }
 
         function showNextBatch() {
@@ -309,8 +365,54 @@
             }
         }
 
+        function foldSequence() {
+            const sequence = document.getElementById('sequenceInput').value;
+            const url = 'https://api.esmatlas.com/foldSequence/v1/pdb/';
+            const params = `${encodeURIComponent(sequence)}`;
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        display3DStructure(xhr.responseText);
+                    } else {
+                        console.error(`Error: ${xhr.status} - ${xhr.statusText}\n${xhr.responseText}`);
+                        setTimeout(() => foldSequence(), 1000);
+                    }
+                }
+            };
+
+            xhr.onerror = function() {
+                console.error('Request failed');
+                setTimeout(() => foldSequence(), 1000);
+            };
+
+            console.log('Sending request with params:', params);
+            xhr.send(params);
+        }
+
+        function display3DStructure(pdbData) {
+            const viewerElement = document.getElementById('viewer');
+            viewerElement.innerHTML = ''; // Clear the viewer to reload it properly
+            const viewer = $3Dmol.createViewer(viewerElement, {
+                defaultcolors: $3Dmol.rasmolElementColors
+            });
+            viewer.addModel(pdbData, "pdb");
+            viewer.setStyle({}, {stick: {radius: 0.2}, sphere: {scale: 0.3}});
+            viewer.zoomTo();
+            viewer.render();
+        }
+
+        document.getElementById('sequenceInput').addEventListener('input', foldSequence);
+
         // Show the first batch on initial load
         showBatch(currentIndex);
+
+        // Periodically check the status of the viewer
+        viewerCheckInterval = setInterval(checkViewerStatus, 5000); // Check every 5 seconds
     </script>
 </body>
 </html>
