@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amino acids: Structures and Properties</title>
+    <script src="https://unpkg.com/ngl@2.0.0-dev.32/dist/ngl.js"></script>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f8f9fa;
+        }
+        .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .title {
+            font-size: 24px;
+            margin-right: 20px;
+            color: #202124;
+        }
+        .navigation {
+            display: flex;
+        }
+        .navigation button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #4285f4;
+            color: white;
+            border-radius: 4px;
+            margin: 0 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+        .navigation button:hover {
+            background-color: #357ae8;
+        }
+        .legend-container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: center;
+        }
+        .legend {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            width: 100%;
+            padding: 10px 0;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            color: #5f6368;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+        }
+        .viewer-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .viewer-box {
+            width: 30%;
+            margin: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .viewer {
+            width: 100%;
+            height: 300px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .reload-button {
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
+            background-color: #4285f4;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .reload-button:hover {
+            background-color: #357ae8;
+        }
+        .reload-image {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: yellow;
+            border: 1px solid black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: 10px;
+        }
+        .reload-text {
+            display: flex;
+            align-items: center;
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 class="title">Amino acids: Structures and Properties</h1>
+        <div class="navigation">
+            <button id="prev-button" onclick="showPrevBatch()">Previous</button>
+            <button id="next-button" onclick="showNextBatch()">Next</button>
+        </div>
+    </div>
+
+    <div class="legend-container">
+        <div class="legend">
+            <b>Amino acid properties</b>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #ffcccc;"></div>
+                <span>Positive Charge</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #ccccff;"></div>
+                <span>Negative Charge</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: white; border: 1px solid #000;"></div>
+                <span>Hydrophilic</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #ffffcc;"></div>
+                <span>Hydrophobic</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #d9d9d9;"></div>
+                <span>Neutral Charge</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="viewer-container" id="viewer-container"></div>
+
+    <script>
+        const aminoAcids = [
+            {id: 'ALA', name: 'Alanine', oneLetter: 'A', url: 'https://files.rcsb.org/ligands/view/ALA.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
+            {id: 'ARG', name: 'Arginine', oneLetter: 'R', url: 'https://files.rcsb.org/ligands/view/ARG.cif', charge: 'positive', hydrophobicity: 'hydrophilic'},
+            {id: 'ASN', name: 'Asparagine', oneLetter: 'N', url: 'https://files.rcsb.org/ligands/view/ASN.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
+            {id: 'ASP', name: 'Aspartic Acid', oneLetter: 'D', url: 'https://files.rcsb.org/ligands/view/ASP.cif', charge: 'negative', hydrophobicity: 'hydrophilic'},
+            {id: 'CYS', name: 'Cysteine', oneLetter: 'C', url: 'https://files.rcsb.org/ligands/view/CYS.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
+            {id: 'GLU', name: 'Glutamic Acid', oneLetter: 'E', url: 'https://files.rcsb.org/ligands/view/GLU.cif', charge: 'negative', hydrophobicity: 'hydrophilic'},
+            {id: 'GLN', name: 'Glutamine', oneLetter: 'Q', url: 'https://files.rcsb.org/ligands/view/GLN.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
+            {id: 'GLY', name: 'Glycine', oneLetter: 'G', url: 'https://files.rcsb.org/ligands/view/GLY.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
+            {id: 'HIS', name: 'Histidine', oneLetter: 'H', url: 'https://files.rcsb.org/ligands/view/HIS.cif', charge: 'positive', hydrophobicity: 'hydrophilic'},
+            {id: 'ILE', name: 'Isoleucine', oneLetter: 'I', url: 'https://files.rcsb.org/ligands/view/ILE.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
+            {id: 'LEU', name: 'Leucine', oneLetter: 'L', url: 'https://files.rcsb.org/ligands/view/LEU.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
+            {id: 'LYS', name: 'Lysine', oneLetter: 'K', url: 'https://files.rcsb.org/ligands/view/LYS.cif', charge: 'positive', hydrophobicity: 'hydrophilic'},
+            {id: 'MET', name: 'Methionine', oneLetter: 'M', url: 'https://files.rcsb.org/ligands/view/MET.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
+            {id: 'PHE', name: 'Phenylalanine', oneLetter: 'F', url: 'https://files.rcsb.org/ligands/view/PHE.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
+            {id: 'PRO', name: 'Proline', oneLetter: 'P', url: 'https://files.rcsb.org/ligands/view/PRO.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
+            {id: 'SER', name: 'Serine', oneLetter: 'S', url: 'https://files.rcsb.org/ligands/view/SER.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
+            {id: 'THR', name: 'Threonine', oneLetter: 'T', url: 'https://files.rcsb.org/ligands/view/THR.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
+            {id: 'TRP', name: 'Tryptophan', oneLetter: 'W', url: 'https://files.rcsb.org/ligands/view/TRP.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
+            {id: 'TYR', name: 'Tyrosine', oneLetter: 'Y', url: 'https://files.rcsb.org/ligands/view/TYR.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
+            {id: 'VAL', name: 'Valine', oneLetter: 'V', url: 'https://files.rcsb.org/ligands/view/VAL.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'}
+        ];
+
+        let currentIndex = 0;
+        const batchSize = 5;
+
+        function getColor(charge, hydrophobicity) {
+            if (charge === 'positive') return '#ffcccc'; // Pastel red
+            if (charge === 'negative') return '#ccccff'; // Pastel blue
+            if (hydrophobicity === 'hydrophilic') return 'white'; // White
+            if (hydrophobicity === 'hydrophobic') return '#ffffcc'; // Pastel yellow
+            return '#d9d9d9'; // Light gray
+        }
+
+        function disableScroll() {
+            window.addEventListener('wheel', preventDefault, { passive: false });
+        }
+
+        function enableScroll() {
+            window.removeEventListener('wheel', preventDefault, { passive: false });
+        }
+
+        function preventDefault(e) {
+            e.preventDefault();
+        }
+
+        function showBatch(startIndex) {
+            const container = document.getElementById('viewer-container');
+            container.innerHTML = '';
+
+            const batch = aminoAcids.slice(startIndex, startIndex + batchSize);
+
+            batch.forEach(amino => {
+                const viewerBox = document.createElement('div');
+                viewerBox.className = 'viewer-box';
+                viewerBox.style.backgroundColor = getColor(amino.charge, amino.hydrophobicity);
+
+                const info = document.createElement('div');
+                info.innerHTML = `<strong>${amino.name}</strong><br>Three-letter code: ${amino.id}<br>One-letter code: ${amino.oneLetter}`;
+                viewerBox.appendChild(info);
+
+                const viewerDiv = document.createElement('div');
+                viewerDiv.id = `viewer-${amino.id}`;
+                viewerDiv.className = 'viewer';
+                viewerDiv.onmouseenter = disableScroll;
+                viewerDiv.onmouseleave = enableScroll;
+                viewerBox.appendChild(viewerDiv);
+
+                container.appendChild(viewerBox);
+
+                const stage = new NGL.Stage(viewerDiv.id, { disableControls: true });
+                stage.loadFile(amino.url, { defaultRepresentation: true }).then(comp => {
+                    comp.addRepresentation('ball+stick', {
+                        sele: 'N or C',
+                        opacity: 0.4  // 60% transparent
+                    });
+                    comp.addRepresentation('ball+stick', {
+                        sele: 'not (N or C)',
+                        opacity: 1.0
+                    });
+                    stage.autoView();
+                }).catch(error => {
+                    setTimeout(() => {
+                        showBatch(currentIndex);
+                    }, 1000);
+                });
+            });
+
+            // Add reload box with image and button in the 6th grid box if it exists
+            const reloadBox = document.createElement('div');
+            reloadBox.className = 'viewer-box';
+            reloadBox.style.backgroundColor = 'lightgrey';
+
+            const reloadImage = document.createElement('img');
+            reloadImage.src = 'https://s3-us-west-2.amazonaws.com/courses-images/wp-content/uploads/sites/110/2016/05/02212734/Figure_03_04_01.jpg';
+            reloadImage.alt = 'Amino Acid Structure';
+            reloadImage.className = 'reload-image';
+            reloadBox.appendChild(reloadImage);
+
+            const reloadButton = document.createElement('button');
+            reloadButton.innerText = 'Reload Viewers';
+            reloadButton.className = 'reload-button';
+            reloadButton.onclick = () => showBatch(currentIndex);
+
+            reloadBox.appendChild(reloadButton);
+
+            const reloadText = document.createElement('div');
+            reloadText.className = 'reload-text';
+            reloadText.innerHTML = 'Some amino acids contain';
+            const circle = document.createElement('div');
+            circle.className = 'circle';
+            circle.innerText = 'S';
+            reloadText.appendChild(circle);
+            reloadBox.appendChild(reloadText);
+
+            container.appendChild(reloadBox);
+        }
+
+        function showNextBatch() {
+            if (currentIndex + batchSize < aminoAcids.length) {
+                currentIndex += batchSize;
+                showBatch(currentIndex);
+            }
+        }
+
+        function showPrevBatch() {
+            if (currentIndex - batchSize >= 0) {
+                currentIndex -= batchSize;
+                showBatch(currentIndex);
+            }
+        }
+
+        // Show the first batch on initial load
+        showBatch(currentIndex);
+    </script>
+</body>
+</html>
