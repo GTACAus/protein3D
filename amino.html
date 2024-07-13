@@ -429,7 +429,21 @@
                 } else if (representation === 'atomic') {
                     viewer.setStyle({}, {stick: {radius: 0.2}, sphere: {scale: 0.3}});
                 } else if (representation === 'cartoon') {
-                    viewer.setStyle({}, {cartoon: {}});
+                    viewer.setStyle({}, {
+                        cartoon: {
+                            color: 'sstruc' // Color by secondary structure
+                        }
+                    });
+
+                    viewer.setStyle({ cartoon: { colorfunc: function(atom) {
+                        if (atom.ss === 'h') {
+                            return 'cyan'; // Alpha helices
+                        } else if (atom.ss === 's') {
+                            return 'purple'; // Beta sheets
+                        } else {
+                            return 'indigo'; // Random coils
+                        }
+                    }}});
                 }
 
                 viewer.zoomTo();
