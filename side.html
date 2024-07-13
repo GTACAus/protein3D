@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=yes">
     <title>Protein Pockets and Functions</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Import Google Icon Font -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Compiled and minified CSS of MaterializeCSS-->
@@ -24,26 +24,28 @@
     <style>
         body {
             margin: 0;
-            height: 100vh;
             display: flex;
             flex-direction: column;
-            font-family: Arial, sans-serif;
+            height: 100vh;
+        }
+        .container {
+            display: flex;
+            flex-grow: 1;
         }
         .sidebar {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            flex: 0 0 300px;
             background-color: #f8f9fa;
             padding: 15px;
+            border-right: 1px solid #dee2e6;
             box-sizing: border-box;
-            width: 100%;
+            overflow-y: auto;
         }
         .content {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            padding: 0;
             box-sizing: border-box;
+            overflow-y: auto;
         }
         #container_3dmol {
             flex-grow: 1;
@@ -116,96 +118,98 @@
             display: flex;
             justify-content: space-between;
         }
-        @media (min-width: 768px) {
-            body {
-                flex-direction: row;
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
             }
             .sidebar {
-                width: 300px;
-                height: 100%;
-                border-right: 1px solid #dee2e6;
+                flex: 0 0 auto;
+                border-right: none;
+                border-bottom: 1px solid #dee2e6;
             }
             .content {
-                margin-left: 300px;
+                flex: 1 1 auto;
             }
         }
     </style>
 </head>
 <body ng-app="castpApp">
-    <div class="sidebar">
-        <p class="instructions">
-            Pockets are empty concavities on a protein surface into which liquid, molecules and peptides can gain access.<br>
-            Start with your <a href="https://www.rcsb.org/" target="_blank">PDB file</a> and then generate pocket predictions and functional predictions.<br>
-            Use <a href="http://sts.bioe.uic.edu/castp/calculation.html" target="_blank">this tool</a> to generate spheres.json files for pocket visualisations.<br>
-            Use <a href="https://beta.deepfri.flatironinstitute.org/workspace/VSJPCB/upload" target="_blank">this tool</a> to generate FRI.json files for functional predictions.<br>
-            Navigate to <a href="https://colab.research.google.com/drive/1ISODmMSm4aGhZogJgAlyrZyWIrvonlQa#forceEdit=true&sandboxMode=true" target="_blank">this page</a> to design a peptide that will bind your protein.<br>
-            Navigate to <a href="https://gramm.compbio.ku.edu/gramm" target="_blank">this page</a> to see how your design will dock with your protein. <a href="https://gtacaus.github.io/protein3D/GRAM.html" target="_blank">Convert</a> to view.
-        </p>
-        <div class="upload-section">
-            <span>Upload CastP File</span><br>
-            <input type="file" id="castpUpload" accept=".zip">
-            <button onclick="processCastP()">Upload CastP</button>
+    <div class="container">
+        <div class="sidebar">
+            <p class="instructions">
+                Pockets are empty concavities on a protein surface into which liquid, molecules and peptides can gain access.<br>
+                Start with your <a href="https://www.rcsb.org/" target="_blank">PDB file</a> and then generate pocket predictions and functional predictions.<br>
+                Use <a href="http://sts.bioe.uic.edu/castp/calculation.html" target="_blank">this tool</a> to generate spheres.json files for pocket visualisations.<br>
+                Use <a href="https://beta.deepfri.flatironinstitute.org/workspace/VSJPCB/upload" target="_blank">this tool</a> to generate FRI.json files for functional predictions.<br>
+                Navigate to <a href="https://colab.research.google.com/drive/1ISODmMSm4aGhZogJgAlyrZyWIrvonlQa#forceEdit=true&sandboxMode=true" target="_blank">this page</a> to design a peptide that will bind your protein.<br>
+                Navigate to <a href="https://gramm.compbio.ku.edu/gramm" target="_blank">this page</a> to see how your design will dock with your protein. <a href="https://gtacaus.github.io/protein3D/GRAM.html" target="_blank">Convert</a> to view.
+            </p>
+            <div class="upload-section">
+                <span>Upload CastP File</span><br>
+                <input type="file" id="castpUpload" accept=".zip">
+                <button onclick="processCastP()">Upload CastP</button>
+            </div>
+            <div class="upload-section">
+                <span>Upload DeepFRI File</span><br>
+                <input type="file" id="deepfriUpload" accept=".json">
+                <button onclick="processDeepFRI()">Upload DeepFRI</button>
+            </div>
+            <div class="upload-section">
+                <span>Download Protein File</span><br>
+                <button onclick="downloadProteinFile()">Download Protein File</button>
+            </div>
+            <img src="Duncan.png" alt="Duncan Image" class="sidebar-image">
         </div>
-        <div class="upload-section">
-            <span>Upload DeepFRI File</span><br>
-            <input type="file" id="deepfriUpload" accept=".json">
-            <button onclick="processDeepFRI()">Upload DeepFRI</button>
-        </div>
-        <div class="upload-section">
-            <span>Download Protein File</span><br>
-            <button onclick="downloadProteinFile()">Download Protein File</button>
-        </div>
-        <img src="Duncan.png" alt="Duncan Image" class="sidebar-image">
-    </div>
-    <div class="content" ng-controller="mainCtrl">
-        <!-- Visualization Container -->
-        <div id="container_3dmol">Loading...</div>
+        <div class="content" ng-controller="mainCtrl">
+            <!-- Visualization Container -->
+            <div id="container_3dmol">Loading...</div>
 
-        <!-- Output for GO Term Names -->
-        <div id="output"></div>
+            <!-- Output for GO Term Names -->
+            <div id="output"></div>
 
-        <!-- Controls and File Upload Inputs -->
-        <div class="controls row">
-            <div class="file-field input-field col s12 m4">
-                <div class="btn">
-                    <span>Select PDB, Sphere, and FRI files to load</span>
-                    <input type="file" id="fileInput" multiple accept=".pdb,.json">
+            <!-- Controls and File Upload Inputs -->
+            <div class="controls row">
+                <div class="file-field input-field col s12 m4">
+                    <div class="btn">
+                        <span>Select PDB, Sphere, and FRI files to load</span>
+                        <input type="file" id="fileInput" multiple accept=".pdb,.json">
+                    </div>
+                </div>
+
+                <!-- Load Protein Button -->
+                <div class="file-field input-field col s12 m4">
+                    <div class="btn">
+                        <span>Load Protein File</span>
+                        <input type="file" id="zipInput" accept=".zip">
+                    </div>
+                </div>
+
+                <!-- Ligand Upload -->
+                <div class="file-field input-field col s12 m4">
+                    <div class="btn">
+                        <span>Upload Ligands</span>
+                        <input type="file" id="zipPDB" accept=".zip">
+                    </div>
                 </div>
             </div>
 
-            <!-- Load Protein Button -->
-            <div class="file-field input-field col s12 m4">
-                <div class="btn">
-                    <span>Load Protein File</span>
-                    <input type="file" id="zipInput" accept=".zip">
-                </div>
+            <!-- Ligand Visibility Buttons -->
+            <div class="ligand-buttons">
+                <button class="toggle-button" onclick="showModel(1)">1</button>
+                <button class="toggle-button" onclick="showModel(2)">2</button>
+                <button class="toggle-button" onclick="showModel(3)">3</button>
+                <button class="toggle-button" onclick="showModel(4)">4</button>
+                <button class="toggle-button" onclick="showModel(5)">5</button>
+                <button class="toggle-button" onclick="clearLigands()">Clear Ligands</button>
             </div>
 
-            <!-- Ligand Upload -->
-            <div class="file-field input-field col s12 m4">
-                <div class="btn">
-                    <span>Upload Ligands</span>
-                    <input type="file" id="zipPDB" accept=".zip">
-                </div>
+            <!-- Toggle Color Mapping Button -->
+            <button class="toggle-button" onclick="toggleColorMapping()">Toggle Color Mapping</button>
+            <!-- Load CLDN8 Button and Demo Ligand Dataset Button -->
+            <div class="button-row">
+                <button class="load-cldn8-button" onclick="loadCLDN8()">Load Demo - <i>Salivary Amylase</i></button>
+                <button class="ligand-button" onclick="downloadLigandDataset()">Demo ligand dataset</button>
             </div>
-        </div>
-
-        <!-- Ligand Visibility Buttons -->
-        <div class="ligand-buttons">
-            <button class="toggle-button" onclick="showModel(1)">1</button>
-            <button class="toggle-button" onclick="showModel(2)">2</button>
-            <button class="toggle-button" onclick="showModel(3)">3</button>
-            <button class="toggle-button" onclick="showModel(4)">4</button>
-            <button class="toggle-button" onclick="showModel(5)">5</button>
-            <button class="toggle-button" onclick="clearLigands()">Clear Ligands</button>
-        </div>
-
-        <!-- Toggle Color Mapping Button -->
-        <button class="toggle-button" onclick="toggleColorMapping()">Toggle Color Mapping</button>
-        <!-- Load CLDN8 Button and Demo Ligand Dataset Button -->
-        <div class="button-row">
-            <button class="load-cldn8-button" onclick="loadCLDN8()">Load Demo - <i>Salivary Amylase</i></button>
-            <button class="ligand-button" onclick="downloadLigandDataset()">Demo ligand dataset</button>
         </div>
     </div>
 
