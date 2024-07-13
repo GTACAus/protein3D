@@ -213,13 +213,14 @@
     <div class="card">
         <h2>Create a Peptide - Type in an Amino Acid Sequence</h2>
         <textarea id="sequenceInput" rows="2" cols="50">MGGDEVMAFAS</textarea>
-	<div>
-        <label for="representationSelect">Select Representation:</label>
-        <select id="representationSelect">
-            <option value="atomic">Atomic structure</option>
-	    <option value="spacefill">Coloured by amino acid characteristics</option>
-        </select>
-    </div>
+        <div>
+            <label for="representationSelect">Select Representation:</label>
+            <select id="representationSelect">
+                <option value="atomic">Atomic structure</option>
+                <option value="spacefill">Coloured by amino acid characteristics</option>
+                <option value="cartoon">Secondary structures</option>
+            </select>
+        </div>
         <div id="viewer"></div>
     </div>
 
@@ -402,51 +403,53 @@
         }
 
         function display3DStructure(pdbData) {
-    const viewerElement = document.getElementById('viewer');
-    viewerElement.innerHTML = ''; // Clear the viewer to reload it properly
+            const viewerElement = document.getElementById('viewer');
+            viewerElement.innerHTML = ''; // Clear the viewer to reload it properly
 
-    const viewer = $3Dmol.createViewer(viewerElement, {
-        defaultcolors: $3Dmol.rasmolElementColors
-    });
-
-    viewer.addModel(pdbData, "pdb");
-
-    // Function to set representation based on user selection
-    function setRepresentation(representation) {
-        viewer.setStyle({}, {stick: {radius: 0.2}, sphere: {scale: 0.3}}); // Default representation
-
-        if (representation === 'spacefill') {
-            viewer.setStyle({}, {
-                sphere: {
-                    scale: 1.0, // Adjusted scale for spacefill representation
-                    colorscheme: {
-                        prop: 'resn',
-                        map: colorMap
-                    }
-                }
+            const viewer = $3Dmol.createViewer(viewerElement, {
+                defaultcolors: $3Dmol.rasmolElementColors
             });
-        } else if (representation === 'atomic') {
-            viewer.setStyle({}, {stick: {radius: 0.2}, sphere: {scale: 0.3}});
+
+            viewer.addModel(pdbData, "pdb");
+
+            // Function to set representation based on user selection
+            function setRepresentation(representation) {
+                viewer.setStyle({}, {stick: {radius: 0.2}, sphere: {scale: 0.3}}); // Default representation
+
+                if (representation === 'spacefill') {
+                    viewer.setStyle({}, {
+                        sphere: {
+                            scale: 1.0, // Adjusted scale for spacefill representation
+                            colorscheme: {
+                                prop: 'resn',
+                                map: colorMap
+                            }
+                        }
+                    });
+                } else if (representation === 'atomic') {
+                    viewer.setStyle({}, {stick: {radius: 0.2}, sphere: {scale: 0.3}});
+                } else if (representation === 'cartoon') {
+                    viewer.setStyle({}, {cartoon: {}});
+                }
+
+                viewer.zoomTo();
+                viewer.render();
+            }
+
+            // Initial display based on default selection
+            const representationSelect = document.getElementById('representationSelect');
+            let currentRepresentation = representationSelect.value;
+            setRepresentation(currentRepresentation);
+
+            // Event listener for changing representation
+            representationSelect.addEventListener('change', function() {
+                currentRepresentation = representationSelect.value;
+                setRepresentation(currentRepresentation);
+            });
+
+            viewer.zoomTo();
+            viewer.render();
         }
-
-        viewer.zoomTo();
-        viewer.render();
-    }
-
-    // Initial display based on default selection
-    const representationSelect = document.getElementById('representationSelect');
-    let currentRepresentation = representationSelect.value;
-    setRepresentation(currentRepresentation);
-
-    // Event listener for changing representation
-    representationSelect.addEventListener('change', function() {
-        currentRepresentation = representationSelect.value;
-        setRepresentation(currentRepresentation);
-    });
-
-    viewer.zoomTo();
-    viewer.render();
-}
 
         // Define the color map
         const colorMap = {
