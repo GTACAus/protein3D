@@ -60,10 +60,11 @@
         }
         .legend {
             display: flex;
-            flex-direction: column;
-            justify-content: space-around;
+            flex-direction: row; /* Changed to row */
+            flex-wrap: wrap; /* Allow wrapping */
+            justify-content: space-around; /* Space evenly */
             margin-bottom: 20px;
-            width: 93%;
+            width: 100%;
             padding: 10px 0;
             background-color: white;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -74,8 +75,9 @@
             display: flex;
             align-items: center;
             color: #5f6368;
-            justify-content: center;
-            margin: 5px 0;
+            margin: 5px 10px; /* Adjust margin */
+            width: calc(33% - 20px); /* 3 items per row */
+            box-sizing: border-box; /* Ensure proper box-sizing */
         }
         .legend-color {
             width: 20px;
