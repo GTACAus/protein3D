@@ -472,8 +472,8 @@
                         const hydrophilic = new Set(['ARG', 'LYS', 'GLU', 'ASN', 'GLN']);
                         const positive = new Set(['ARG', 'LYS', 'HIS']);
                         const negative = new Set(['ASP', 'GLU']);
-                        if (positive.has(atom.resn)) return 'red';
-                        else if (negative.has(atom.resn)) return 'blue';
+                        if (positive.has(atom.resn)) return 'blue';
+                        else if (negative.has(atom.resn)) return 'red';
                         else if (hydrophobic.has(atom.resn)) return 'yellow';
                         else if (hydrophilic.has(atom.resn)) return 'lightgrey';
                         return 'grey';
