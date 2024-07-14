@@ -540,6 +540,19 @@
 
         // Periodically check the status of the viewer
         viewerCheckInterval = setInterval(checkViewerStatus, 5000); // Check every 5 seconds
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                // Your code to initialize/load the viewers
+                initializeViewers();
+            }, 2000); // 2000 milliseconds = 2 seconds
+
+            function initializeViewers() {
+                // Example function to load the viewers
+                // Replace this with your actual code to load viewers
+                console.log('Loading viewers...');
+                // Your viewer loading code here
+            }
+        });
     </script>
 </body>
 </html>
