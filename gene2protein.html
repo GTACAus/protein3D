@@ -309,8 +309,8 @@
     </div>
     <div class="container hidden" id="second-card">
         <h2>Translation</h2>
-	    <label for="textbox">Using the codon wheel, determine and write the corresponding amino acid sequence. Check your answer using the slider:</label><br>
-  	<textarea id="textbox" class="expandable-textbox" rows="1"></textarea><br>
+	    <label for="textbox2">Using the codon wheel, determine and write the corresponding amino acid sequence. Check your answer using the slider:</label><br>
+  	<textarea id="textbox2" class="expandable-textbox" rows="1"></textarea><br>
         <div id="second-rna-container">
             <input type="range" id="second-card-slider" min="0" max="100" value="0">
             <div class="amino-acid-sequence" id="second-amino-acid-output"></div>
@@ -564,7 +564,16 @@
             function scrollToElement(element) {
                 element.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
+	    const textbox2 = document.getElementById('textbox2');
 
+    		textbox2.addEventListener('input', function () {
+      		let originalText = this.value.replace(/\s{3}/g, ''); // Remove existing triple spaces
+     		 let spacedText = originalText.split('').join('   '); // Add three spaces between each letter
+      		this.value = spacedText; // Set the new value with spaces
+
+      		this.style.height = 'auto'; // Reset height to auto
+      		this.style.height = this.scrollHeight + 'px'; // Set height to scrollHeight
+    });
             // Initialize DNA and template sequence display
             dnaOutput.innerHTML = dnaSequence.split('').map(base => `<span class="base">${base}</span>`).join('');
             templateOutput.innerHTML = templateSequence.split('').map(base => `<span class="base">${base}</span>`).join('');
