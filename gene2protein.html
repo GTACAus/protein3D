@@ -453,10 +453,7 @@
                 if (value == 100) {
                     secondCard.classList.remove('hidden');
                     secondRnaOutput.innerHTML = formatCodons(rnaSequence);
-                    rnaContainer.classList.add('fade-out-down');
-                    rnaContainer.addEventListener('animationend', () => {
-                        rnaContainer.style.display = 'none';
-                    }, { once: true });
+                    
                 } else if (value == 0) {
                     resetTranscription();
                 } else {
