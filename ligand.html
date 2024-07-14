@@ -469,11 +469,11 @@
                 sphere: {
                     colorfunc: function (atom) {
                         const hydrophobic = new Set(['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'PRO', 'GLY']);
-                        const hydrophilic = new Set(['ARG', 'LYS', 'ASP', 'GLU', 'ASN', 'GLN']);
-                        const positive = new Set(['ARG', 'LYS']);
+                        const hydrophilic = new Set(['ARG', 'LYS', 'GLU', 'ASN', 'GLN']);
+                        const positive = new Set(['ARG', 'LYS', 'HIS']);
                         const negative = new Set(['ASP', 'GLU']);
-                        if (positive.has(atom.resn)) return 'blue';
-                        else if (negative.has(atom.resn)) return 'red';
+                        if (positive.has(atom.resn)) return 'red';
+                        else if (negative.has(atom.resn)) return 'blue';
                         else if (hydrophobic.has(atom.resn)) return 'yellow';
                         else if (hydrophilic.has(atom.resn)) return 'lightgrey';
                         return 'grey';
