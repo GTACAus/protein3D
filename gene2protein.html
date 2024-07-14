@@ -549,11 +549,11 @@
                 for (let i = 0; i < aminoAcids.length; i++) {
                     const aminoAcid = aminoAcids[i];
                     const property = aminoAcidProperties[aminoAcid] || 'hydrophilic';
-                    const textColor = (property === 'negative') ? 'white' : 'blue';
+                    const textColor = (property === 'positive') ? 'white' : 'blue';
                     const backgroundColor = property === 'hydrophobic' ? 'yellow' :
                         property === 'hydrophilic' ? 'white' :
-                        property === 'positive' ? 'red' :
-                        property === 'negative' ? 'blue' :
+                        property === 'positive' ? 'blue' :
+                        property === 'negative' ? 'red' :
                         property === 'neutral' ? 'grey' :
                         'grey';
                     formattedSequence += `<span style="display: inline-block; text-align: center; width: 4ch; color: ${textColor}; background-color: ${backgroundColor};">${aminoAcid}</span>`;
