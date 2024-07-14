@@ -442,7 +442,7 @@
                     rnaContainer.addEventListener('animationend', () => {
                         rnaContainer.style.display = 'none';
                     }, { once: true });
-                    setTimeout(scrollToElement(secondCard), 20000);
+                    scrollToElement(secondCard);
                 } else if (value == 0) {
                     resetTranscription();
                 } else {
