@@ -457,7 +457,6 @@
                     rnaContainer.addEventListener('animationend', () => {
                         rnaContainer.style.display = 'none';
                     }, { once: true });
-                    setTimeout(() => scrollToElement(secondCard), 2000);
                 } else if (value == 0) {
                     resetTranscription();
                 } else {
@@ -481,7 +480,7 @@
                     thirdAminoAcidOutput.style.visibility = 'hidden'; // Hide the amino acid sequence initially
                     allAminoAcidOutput.innerHTML = formatAminoAcids(codons, aminoAcids); // Show all amino acids above the slider
                     thirdCardSlider.style.display = 'block'; // Show the third card slider
-			setTimeout(() => scrollToElement(thirdCard), 2000);
+			
                 } else {
                     thirdCard.classList.add('hidden');
                     thirdCardSlider.style.display = 'none';
@@ -498,7 +497,7 @@
                 if (value == 100) {
                     fourthCard.classList.remove('hidden');
                     fourthCardSlider.value = 0;
-			setTimeout(() => scrollToElement(fourthCard), 2000);
+			
 		   setTimeout(reloadViewerInIframe, 2000); // Trigger reload of viewer 2 seconds after fourth card is revealed
                 
                 } else {
