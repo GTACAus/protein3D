@@ -455,16 +455,7 @@
             });
 
             viewer.addModel(pdbData, "pdb");
-            // Function to reload the viewers
-            function reloadViewers() {
-            showBatch(currentIndex);
-            }
 
-            // Event listener for messages from parent window
-            window.addEventListener('message', (event) => {
-            if (event.data === 'reloadViewer') {
-            reloadViewers();
-            }
             // Function to set representation based on user selection
             function setRepresentation(representation) {
                 viewer.setStyle({}, {stick: {radius: 0.2}, sphere: {scale: 0.3}}); // Default representation
@@ -541,6 +532,18 @@
             'HIS': 'grey',
             'TYR': 'grey'
         };
+
+        // Function to reload the viewers
+        function reloadViewers() {
+            showBatch(currentIndex);
+        }
+
+        // Event listener for messages from parent window
+        window.addEventListener('message', (event) => {
+            if (event.data === 'reloadViewer') {
+                reloadViewers();
+            }
+        });
 
         document.getElementById('sequenceInput').addEventListener('input', foldSequence);
 
