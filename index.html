@@ -4,32 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Protein Study Resources</title>
+    <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
-            align-items: center;
-            height: 100vh;
+            align-items: flex-start;
+            min-height: 100vh;
             background-color: #f0f0f0;
             margin: 0;
+            padding: 20px;
         }
 
         .container {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
+            width: 90%;
+            max-width: 1400px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .card {
             background-color: #fff;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin: 10px;
-            width: 90%;
-            max-width: 1400px;
+            overflow: hidden;
         }
 
         .text-content {
-            width: 45%;
+            width: 75%;
         }
 
         .text-content h2,
@@ -56,47 +65,103 @@
             text-decoration: underline;
         }
 
-        .gif-container {
-            width: 40%;
+        .viewer-container {
+            width: 100%;
+            height: 300px;
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
+        }
+
+        #viewer {
+            width: 100%;
+            height: 100%;
+        }
+
+        .gif-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
         .gif-container img {
             max-width: 100%;
+            max-height: 100%;
             border-radius: 10px;
+        }
+
+        .media-card {
+            width: 25%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="text-content">
-            <h2>Protein Study Resources</h2>
-            <h3>Activities</h3>
-            <ul class="activity-list">
-                <li><a href="https://gtacaus.github.io/protein3D/gene2protein.html">1 - Transcription, translation and peptide structure</a></li>
-                <li><a href="https://gtacaus.github.io/protein3D/protview.html">2 - Exploring the structure of proteins and investigating the impacts of gene mutations</a></li>
-                <li><a href="https://gtacaus.github.io/protein3D/ligand.html">3 - Generating binders to modify the activity of proteins</a></li>
-            </ul>
-            <h3>Appendix</h3>
-            <ul class="appendix-list">
-                <li><a href="https://gtacaus.github.io/protein3D/amino.html">a - Amino acid 3D models and AI peptide generation</a></li>
-                <li><a href="https://gtacaus.github.io/protein3D/esm.html">b - Meta's Evolutionary Scale Model for quick folding and PDB generation</a></li>
-                <li><a href="https://alphafoldserver.com">c - AlphaFold 3 Server</a></li>
-                <li><a href="https://gtacaus.github.io/protein3D/xml.html">d - XML generator for 3D protein viewer</a></li>
-                <li><a href="http://sts.bioe.uic.edu/castp/calculation.html">e - CastP: find functional pockets in proteins by looking at surface topography</a></li>
-                <li><a href="https://beta.deepfri.flatironinstitute.org/workspace/VSJPCB/upload">f - DeepFRI: identify functions of proteins based on MSA from protein databases</a></li>
-                <li><a href="https://colab.research.google.com/drive/1ISODmMSm4aGhZogJgAlyrZyWIrvonlQa#forceEdit=true&sandboxMode=true">g - RosettaFold Diffusion to design peptides that will bind to proteins</a></li>
-                <li><a href="https://gramm.compbio.ku.edu/gramm">h - GRAMM docking: predict how your designed peptides bind to your protein target</a></li>
-                <li><a href="https://gtacaus.github.io/protein3D/GRAM.html">i - GRAMM output modifier to work with binder activity</a></li>
-                <li><a href="https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb">j - Alphafold 2: Easy to use protein structure and complex prediction</a></li>
-                <li><a href="https://generatebiomedicines.com/chroma/blog">k - Generate Chroma: experimental protein folding using diffusion models (Image from Chroma)</a></li>
-            </ul>
+        <div class="card text-content">
+            <div>
+                <h2>Protein Study Resources</h2>
+                <h3>Activities</h3>
+                <ul class="activity-list">
+                    <li><a href="https://gtacaus.github.io/protein3D/gene2protein.html">1 - Transcription, translation and peptide structure</a></li>
+                    <li><a href="https://gtacaus.github.io/protein3D/protview.html">2 - Exploring the structure of proteins and investigating the impacts of gene mutations</a></li>
+                    <li><a href="https://gtacaus.github.io/protein3D/ligand.html">3 - Generating binders to modify the activity of proteins</a></li>
+                </ul>
+                <h3>Appendix</h3>
+                <ul class="appendix-list">
+                    <li><a href="https://gtacaus.github.io/protein3D/amino.html">a - Amino acid 3D models and AI peptide generation</a></li>
+                    <li><a href="https://gtacaus.github.io/protein3D/esm.html">b - Meta's Evolutionary Scale Model for quick folding and PDB generation</a></li>
+                    <li><a href="https://alphafoldserver.com">c - AlphaFold 3 Server</a></li>
+                    <li><a href="https://gtacaus.github.io/protein3D/xml.html">d - XML generator for 3D protein viewer</a></li>
+                    <li><a href="http://sts.bioe.uic.edu/castp/calculation.html">e - CastP: find functional pockets in proteins by looking at surface topography</a></li>
+                    <li><a href="https://beta.deepfri.flatironinstitute.org/workspace/VSJPCB/upload">f - DeepFRI: identify functions of proteins based on MSA from protein databases</a></li>
+                    <li><a href="https://colab.research.google.com/drive/1ISODmMSm4aGhZogJgAlyrZyWIrvonlQa#forceEdit=true&sandboxMode=true">g - RosettaFold Diffusion to design peptides that will bind to proteins</a></li>
+                    <li><a href="https://gramm.compbio.ku.edu/gramm">h - GRAMM docking: predict how your designed peptides bind to your protein target</a></li>
+                    <li><a href="https://gtacaus.github.io/protein3D/GRAM.html">i - GRAMM output modifier to work with binder activity</a></li>
+                    <li><a href="https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb">j - Alphafold 2: Easy to use protein structure and complex prediction</a></li>
+                    <li><a href="https://generatebiomedicines.com/chroma/blog">k - Generate Chroma: experimental protein folding using diffusion models (Image from Chroma)</a></li>
+                </ul>
+            </div>
         </div>
-        <div class="gif-container">
-            <img src="protmorph.gif" alt="Protein Morphing GIF">
+        <div class="card media-card">
+            <div class="viewer-container">
+                <div id="viewer"></div>
+            </div>
+            <div class="gif-container">
+                <img src="https://gtacaus.github.io/protein3D/protmorph.gif" alt="Protein Morph Animation">
+            </div>
         </div>
     </div>
+
+    <script>
+        const viewer = $3Dmol.createViewer("viewer", {
+            defaultcolors: $3Dmol.rasmolElementColors
+        });
+
+        fetch('https://files.rcsb.org/view/5xpb.pdb')
+            .then(response => response.text())
+            .then(data => {
+                viewer.addModel(data, "pdb");
+                viewer.setStyle({}, {cartoon: {color: 'spectrum'}});
+                viewer.zoomTo();
+                viewer.render();
+                
+                function rotate() {
+                    viewer.rotate(1, 'y');
+                    viewer.rotate(1, 'x');
+                    viewer.render();
+                    requestAnimationFrame(rotate);
+                }
+
+                rotate();
+            })
+            .catch(error => console.error('Error fetching the PDB file:', error));
+    </script>
 </body>
 </html>
