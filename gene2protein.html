@@ -567,8 +567,8 @@
 	    const textbox2 = document.getElementById('textbox2');
 
     		textbox2.addEventListener('input', function () {
-      		let originalText = this.value.replace(/\s{3}/g, ''); // Remove existing triple spaces
-     		 let spacedText = originalText.split('').join('     '); // Add three spaces between each letter
+      		let originalText = this.value.replace(/\s{4}/g, ''); // Remove existing triple spaces
+     		 let spacedText = originalText.split('').join('    '); // Add three spaces between each letter
       		this.value = spacedText; // Set the new value with spaces
 
       		this.style.height = 'auto'; // Reset height to auto
