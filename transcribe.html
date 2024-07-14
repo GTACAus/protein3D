@@ -107,12 +107,11 @@
 
         #second-card-slider::-webkit-slider-thumb {
             background: orange;
-	   
         }
 
         #third-card-slider::-webkit-slider-thumb {
             background: #FF5722;
-	   width: 20px;
+            width: 20px;
             height: 20px;
         }
 
@@ -197,10 +196,47 @@
         }
 
         .image-container img {
-            width: 100%;
-            max-width: 100%;
+            width: 50%;
+            max-width: 50%;
             height: auto;
             border-radius: 10px;
+        }
+
+        .amino-acid-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .amino-acid-table th, .amino-acid-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .amino-acid-table th {
+            background-color: #f2f2f2;
+            color: black;
+        }
+
+        .property-positive {
+            background-color: #ffcccc;
+        }
+
+        .property-negative {
+            background-color: #ccccff;
+        }
+
+        .property-hydrophilic {
+            background-color: white;
+        }
+
+        .property-hydrophobic {
+            background-color: #ffffcc;
+        }
+
+        .property-neutral {
+            background-color: #d9d9d9;
         }
     </style>
 </head>
@@ -238,8 +274,9 @@
     </div>
     <div class="container hidden" id="third-card">
         <h2>Amino Acid Properties</h2>
+        <div class="amino-acid-sequence" id="all-amino-acid-output"></div>
         <input type="range" id="third-card-slider" min="0" max="100" value="0">
-        <div class="amino-acid-sequence" id="third-amino-acid-output"></div>
+        <div class="amino-acid-sequence" id="third-amino-acid-output" style="visibility: hidden;"></div>
         <div class="legend-container">
             <div class="legend">
                 <b>Amino acid properties</b>
@@ -265,6 +302,36 @@
                 </div>
             </div>
         </div>
+        <table class="amino-acid-table">
+            <thead>
+                <tr>
+                    <th>Property</th>
+                    <th>Amino Acids</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="property-positive">
+                    <td>Positive Charge</td>
+                    <td>H, K, R</td>
+                </tr>
+                <tr class="property-negative">
+                    <td>Negative Charge</td>
+                    <td>D, E</td>
+                </tr>
+                <tr class="property-hydrophilic">
+                    <td>Hydrophilic</td>
+                    <td>N, Q, S, T, Y</td>
+                </tr>
+                <tr class="property-hydrophobic">
+                    <td>Hydrophobic</td>
+                    <td>A, C, F, I, L, M, V, W</td>
+                </tr>
+                <tr class="property-neutral">
+                    <td>Neutral</td>
+                    <td>G, P</td>
+                </tr>
+            </tbody>
+        </table>
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -285,6 +352,7 @@
             const thirdCard = document.getElementById('third-card');
             const thirdCardSlider = document.getElementById('third-card-slider');
             const thirdAminoAcidOutput = document.getElementById('third-amino-acid-output');
+            const allAminoAcidOutput = document.getElementById('all-amino-acid-output');
 
             const codonTable = {
                 'UUU': 'F', 'UUC': 'F', 'UUA': 'L', 'UUG': 'L',
@@ -326,6 +394,7 @@
                     rnaContainer.addEventListener('animationend', () => {
                         rnaContainer.style.display = 'none';
                     }, { once: true });
+                    scrollToElement(secondCard);
                 } else if (value == 0) {
                     resetTranscription();
                 } else {
@@ -345,8 +414,11 @@
                 if (value == 100) {
                     thirdCard.classList.remove('hidden');
                     thirdCardSlider.value = 0; // Reset third card slider value to 0
-                    thirdAminoAcidOutput.innerHTML = formatAminoAcidProperties(''); // Initialize with empty content
+                    thirdAminoAcidOutput.innerHTML = ''; // Clear amino acids at first
+                    thirdAminoAcidOutput.style.visibility = 'hidden'; // Hide the amino acid sequence initially
+                    allAminoAcidOutput.innerHTML = formatAminoAcids(codons, aminoAcids); // Show all amino acids above the slider
                     thirdCardSlider.style.display = 'block'; // Show the third card slider
+                    scrollToElement(thirdCard);
                 } else {
                     thirdCard.classList.add('hidden');
                     thirdCardSlider.style.display = 'none';
@@ -355,9 +427,10 @@
 
             thirdCardSlider.addEventListener('input', () => {
                 const value = thirdCardSlider.value;
-                const progress = Math.floor((value / 100) * (secondAminoAcidOutput.textContent.length));
-                const aminoAcidsToShow = secondAminoAcidOutput.textContent.substring(0, progress);
+                const progress = Math.floor((value / 100) * (allAminoAcidOutput.textContent.length));
+                const aminoAcidsToShow = allAminoAcidOutput.textContent.substring(0, progress);
                 thirdAminoAcidOutput.innerHTML = formatAminoAcidProperties(aminoAcidsToShow);
+                thirdAminoAcidOutput.style.visibility = progress > 0 ? 'visible' : 'hidden'; // Reveal the sequence as the slider moves
             });
 
             function resetTranscription() {
@@ -405,6 +478,10 @@
                     formattedSequence += `<span style="display: inline-block; text-align: center; width: 4ch; color: ${textColor}; background-color: ${backgroundColor};">${aminoAcid}</span>`;
                 }
                 return formattedSequence;
+            }
+
+            function scrollToElement(element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
 
             // Initialize DNA and template sequence display
