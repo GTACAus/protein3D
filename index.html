@@ -8,7 +8,7 @@
         body {
             font-family: Arial, sans-serif;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
             height: 100vh;
             background-color: #f0f0f0;
@@ -16,14 +16,25 @@
         }
 
         .container {
-            text-align: left;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
             background-color: #fff;
             padding: 20px;
             border-radius: 10px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             margin: 10px;
             width: 90%;
-            max-width: 800px;
+            max-width: 1400px;
+        }
+
+        .text-content {
+            width: 45%;
+        }
+
+        .text-content h2,
+        .text-content h3 {
+            margin: 10px 0;
         }
 
         .activity-list, .appendix-list {
@@ -44,31 +55,48 @@
         .activity-list a:hover, .appendix-list a:hover {
             text-decoration: underline;
         }
+
+        .gif-container {
+            width: 40%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .gif-container img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Protein Study Resources</h2>
-        <h3>Activities</h3>
-        <ul class="activity-list">
-            <li><a href="https://gtacaus.github.io/protein3D/gene2protein.html">1 - Transcription, translation and peptide structure</a></li>
-            <li><a href="https://gtacaus.github.io/protein3D/protview.html">2 - Exploring the structure of proteins and investigating the impacts of gene mutations</a></li>
-            <li><a href="https://gtacaus.github.io/protein3D/ligand.html">3 - Generating binders to modify the activity of proteins</a></li>
-        </ul>
-        <h3>Appendix</h3>
-        <ul class="appendix-list">
-            <li><a href="https://gtacaus.github.io/protein3D/amino.html">a - Amino acid 3D models and AI peptide generation</a></li>
-            <li><a href="https://gtacaus.github.io/protein3D/esm.html">b - Meta's Evolutionary Scale Model for quick folding and PDB generation</a></li>
-            <li><a href="https://alphafoldserver.com">c - AlphaFold 3 Server</a></li>
-            <li><a href="https://gtacaus.github.io/protein3D/xml.html">d - XML generator for 3D protein viewer</a></li>
-            <li><a href="http://sts.bioe.uic.edu/castp/calculation.html">e - CastP: find functional pockets in proteins by looking at surface topography</a></li>
-            <li><a href="https://beta.deepfri.flatironinstitute.org/workspace/VSJPCB/upload">f - DeepFRI: identify functions of proteins based on MSA from protein databases</a></li>
-            <li><a href="https://colab.research.google.com/drive/1ISODmMSm4aGhZogJgAlyrZyWIrvonlQa#forceEdit=true&sandboxMode=true">g - RosettaFold Diffusion to design peptides that will bind to proteins</a></li>
-            <li><a href="https://gramm.compbio.ku.edu/gramm">h - GRAMM docking: predict how your designed peptides bind to your protein target</a></li>
-            <li><a href="https://gtacaus.github.io/protein3D/GRAM.html">i - GRAMM output modifier to work with binder activity</a></li>
-	    <li><a href="https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb">j - Alphafold 2: Easy to use protein structure and complex prediction</a></li>
-	   <li><a href="https://generatebiomedicines.com/chroma/blog">k - Generate Chroma: experimental protein folding using diffusion models</a></li>	
-        </ul>
+        <div class="text-content">
+            <h2>Protein Study Resources</h2>
+            <h3>Activities</h3>
+            <ul class="activity-list">
+                <li><a href="https://gtacaus.github.io/protein3D/gene2protein.html">1 - Transcription, translation and peptide structure</a></li>
+                <li><a href="https://gtacaus.github.io/protein3D/protview.html">2 - Exploring the structure of proteins and investigating the impacts of gene mutations</a></li>
+                <li><a href="https://gtacaus.github.io/protein3D/ligand.html">3 - Generating binders to modify the activity of proteins</a></li>
+            </ul>
+            <h3>Appendix</h3>
+            <ul class="appendix-list">
+                <li><a href="https://gtacaus.github.io/protein3D/amino.html">a - Amino acid 3D models and AI peptide generation</a></li>
+                <li><a href="https://gtacaus.github.io/protein3D/esm.html">b - Meta's Evolutionary Scale Model for quick folding and PDB generation</a></li>
+                <li><a href="https://alphafoldserver.com">c - AlphaFold 3 Server</a></li>
+                <li><a href="https://gtacaus.github.io/protein3D/xml.html">d - XML generator for 3D protein viewer</a></li>
+                <li><a href="http://sts.bioe.uic.edu/castp/calculation.html">e - CastP: find functional pockets in proteins by looking at surface topography</a></li>
+                <li><a href="https://beta.deepfri.flatironinstitute.org/workspace/VSJPCB/upload">f - DeepFRI: identify functions of proteins based on MSA from protein databases</a></li>
+                <li><a href="https://colab.research.google.com/drive/1ISODmMSm4aGhZogJgAlyrZyWIrvonlQa#forceEdit=true&sandboxMode=true">g - RosettaFold Diffusion to design peptides that will bind to proteins</a></li>
+                <li><a href="https://gramm.compbio.ku.edu/gramm">h - GRAMM docking: predict how your designed peptides bind to your protein target</a></li>
+                <li><a href="https://gtacaus.github.io/protein3D/GRAM.html">i - GRAMM output modifier to work with binder activity</a></li>
+                <li><a href="https://colab.research.google.com/github/sokrypton/ColabFold/blob/main/AlphaFold2.ipynb">j - Alphafold 2: Easy to use protein structure and complex prediction</a></li>
+                <li><a href="https://generatebiomedicines.com/chroma/blog">k - Generate Chroma: experimental protein folding using diffusion models (Image from Chroma)</a></li>
+            </ul>
+        </div>
+        <div class="gif-container">
+            <img src="protmorph.gif" alt="Protein Morphing GIF">
+        </div>
     </div>
 </body>
 </html>
