@@ -54,7 +54,28 @@
             text-align: left;
         }
 
-        #transcription-slider, #second-slider, #second-card-slider {
+        .legend-container {
+            margin-top: 20px;
+        }
+
+        .legend {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 5px 0;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+        }
+
+        #transcription-slider, #second-slider, #second-card-slider, #third-card-slider {
             width: 80%;
             -webkit-appearance: none;
             appearance: none;
@@ -73,7 +94,7 @@
             margin-top: 20px;
         }
 
-        #transcription-slider::-webkit-slider-thumb, #second-card-slider::-webkit-slider-thumb {
+        #transcription-slider::-webkit-slider-thumb, #second-card-slider::-webkit-slider-thumb, #third-card-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
             width: 50px;
@@ -86,9 +107,16 @@
 
         #second-card-slider::-webkit-slider-thumb {
             background: orange;
+	   
         }
 
-        #transcription-slider::-webkit-slider-thumb::after, #second-card-slider::-webkit-slider-thumb::after {
+        #third-card-slider::-webkit-slider-thumb {
+            background: #FF5722;
+	   width: 20px;
+            height: 20px;
+        }
+
+        #transcription-slider::-webkit-slider-thumb::after, #second-card-slider::-webkit-slider-thumb::after, #third-card-slider::-webkit-slider-thumb::after {
             content: 'RNA Polymerase';
             position: absolute;
             top: -40px;
@@ -99,7 +127,7 @@
             color: #000;
         }
 
-        #transcription-slider::-moz-range-thumb, #second-card-slider::-moz-range-thumb {
+        #transcription-slider::-moz-range-thumb, #second-card-slider::-moz-range-thumb, #third-card-slider::-moz-range-thumb {
             width: 50px;
             height: 50px;
             background: #4CAF50;
@@ -112,7 +140,11 @@
             background: orange;
         }
 
-        #transcription-slider::-moz-range-thumb::after, #second-card-slider::-moz-range-thumb::after {
+        #third-card-slider::-moz-range-thumb {
+            background: #FF5722;
+        }
+
+        #transcription-slider::-moz-range-thumb::after, #second-card-slider::-moz-range-thumb::after, #third-card-slider::-moz-range-thumb::after {
             content: 'RNA Polymerase';
             position: absolute;
             top: -40px;
@@ -130,7 +162,7 @@
             color: green;
         }
 
-        #second-slider {
+        #second-slider, #third-card-slider {
             display: none;
         }
 
@@ -180,11 +212,40 @@
         <h2>Translation</h2>
         <div id="second-rna-container">
             <input type="range" id="second-card-slider" min="0" max="100" value="0">
-	   <div class="amino-acid-sequence" id="second-amino-acid-output"></div>
+            <div class="amino-acid-sequence" id="second-amino-acid-output"></div>
             <div class="rna-sequence">
                 <span id="second-rna-output"></span>
             </div>
-            
+        </div>
+    </div>
+    <div class="container hidden" id="third-card">
+        <h2>Amino Acid Properties</h2>
+        <input type="range" id="third-card-slider" min="0" max="100" value="0">
+        <div class="amino-acid-sequence" id="third-amino-acid-output"></div>
+        <div class="legend-container">
+            <div class="legend">
+                <b>Amino acid properties</b>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ffcccc;"></div>
+                    <span>Positive Charge</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ccccff;"></div>
+                    <span>Negative Charge</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: white; border: 1px solid #000;"></div>
+                    <span>Hydrophilic</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #ffffcc;"></div>
+                    <span>Hydrophobic</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background-color: #d9d9d9;"></div>
+                    <span>Neutral Charge</span>
+                </div>
+            </div>
         </div>
     </div>
     <script>
@@ -203,6 +264,9 @@
             const secondCardSlider = document.getElementById('second-card-slider');
             const secondRnaOutput = document.getElementById('second-rna-output');
             const secondAminoAcidOutput = document.getElementById('second-amino-acid-output');
+            const thirdCard = document.getElementById('third-card');
+            const thirdCardSlider = document.getElementById('third-card-slider');
+            const thirdAminoAcidOutput = document.getElementById('third-amino-acid-output');
 
             const codonTable = {
                 'UUU': 'F', 'UUC': 'F', 'UUA': 'L', 'UUG': 'L',
@@ -221,6 +285,14 @@
                 'GCU': 'A', 'GCC': 'A', 'GCA': 'A', 'GCG': 'A',
                 'GAU': 'D', 'GAC': 'D', 'GAA': 'E', 'GAG': 'E',
                 'GGU': 'G', 'GGC': 'G', 'GGA': 'G', 'GGG': 'G'
+            };
+
+            const aminoAcidProperties = {
+                'A': 'hydrophobic', 'C': 'hydrophobic', 'D': 'negative', 'E': 'negative',
+                'F': 'hydrophobic', 'G': 'neutral', 'H': 'positive', 'I': 'hydrophobic',
+                'K': 'positive', 'L': 'hydrophobic', 'M': 'hydrophobic', 'N': 'hydrophilic',
+                'P': 'neutral', 'Q': 'hydrophilic', 'R': 'positive', 'S': 'hydrophilic',
+                'T': 'hydrophilic', 'V': 'hydrophobic', 'W': 'hydrophobic', 'Y': 'hydrophilic'
             };
 
             slider.addEventListener('input', () => {
@@ -251,12 +323,30 @@
                 const codons = rnaSequence.substring(0, progress).match(/.{1,3}/g) || [];
                 const aminoAcids = codons.map(codon => codonTable[codon] || '').join('');
                 secondAminoAcidOutput.innerHTML = formatAminoAcids(codons, aminoAcids);
+
+                if (value == 100) {
+                    thirdCard.classList.remove('hidden');
+                    thirdCardSlider.value = 0; // Reset third card slider value to 0
+                    thirdAminoAcidOutput.innerHTML = formatAminoAcidProperties(''); // Initialize with empty content
+                    thirdCardSlider.style.display = 'block'; // Show the third card slider
+                } else {
+                    thirdCard.classList.add('hidden');
+                    thirdCardSlider.style.display = 'none';
+                }
+            });
+
+            thirdCardSlider.addEventListener('input', () => {
+                const value = thirdCardSlider.value;
+                const progress = Math.floor((value / 100) * (secondAminoAcidOutput.textContent.length));
+                const aminoAcidsToShow = secondAminoAcidOutput.textContent.substring(0, progress);
+                thirdAminoAcidOutput.innerHTML = formatAminoAcidProperties(aminoAcidsToShow);
             });
 
             function resetTranscription() {
                 rnaOutput.textContent = '';
                 rnaLabel.style.display = 'none';
                 secondCard.classList.add('hidden');
+                thirdCard.classList.add('hidden');
                 rnaContainer.classList.remove('fade-out-down');
                 rnaContainer.style.display = 'block';
             }
@@ -278,6 +368,23 @@
                     const aminoAcid = aminoAcids[i] || '';
                     if (aminoAcid === '_') break;
                     formattedSequence += `<span style="display: inline-block; text-align: center; width: 4ch; color: blue;">${aminoAcid}</span>`;
+                }
+                return formattedSequence;
+            }
+
+            function formatAminoAcidProperties(aminoAcids) {
+                let formattedSequence = '';
+                for (let i = 0; i < aminoAcids.length; i++) {
+                    const aminoAcid = aminoAcids[i];
+                    const property = aminoAcidProperties[aminoAcid] || 'hydrophilic';
+                    const textColor = (property === 'negative') ? 'white' : 'blue';
+                    const backgroundColor = property === 'hydrophobic' ? 'yellow' :
+                        property === 'hydrophilic' ? 'white' :
+                        property === 'positive' ? 'red' :
+                        property === 'negative' ? 'blue' :
+                        property === 'neutral' ? 'grey' :
+                        'grey';
+                    formattedSequence += `<span style="display: inline-block; text-align: center; width: 4ch; color: ${textColor}; background-color: ${backgroundColor};">${aminoAcid}</span>`;
                 }
                 return formattedSequence;
             }
