@@ -536,22 +536,10 @@
         document.getElementById('sequenceInput').addEventListener('input', foldSequence);
 
         // Show the first batch on initial load
-        setTimeout(() => {
-                // Your code to initialize/load the viewers
-                showBatch(currentIndex);
-            }, 2000); // 2000 milliseconds = 2 seconds
-
+        showBatch(currentIndex);
 
         // Periodically check the status of the viewer
         viewerCheckInterval = setInterval(checkViewerStatus, 5000); // Check every 5 seconds
-        document.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                // Your code to initialize/load the viewers
-                showBatch(currentIndex);
-            }, 2000); // 2000 milliseconds = 2 seconds
-
-            
-        });
     </script>
 </body>
 </html>
