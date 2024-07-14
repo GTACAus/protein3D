@@ -74,7 +74,12 @@
             height: 20px;
             margin-right: 10px;
         }
-
+	.expandable-textbox {
+      	width: 100%;
+      	box-sizing: border-box; /* Include padding and border in the element's total width */
+      	overflow: hidden; /* Hide overflow to make the text area expand */
+      	resize: none; /* Disable manual resizing */
+    	}
         #transcription-slider, #second-slider, #second-card-slider, #third-card-slider, #fourth-card-slider {
             width: 80%;
             -webkit-appearance: none;
@@ -282,8 +287,8 @@
 <body>
     <div class="container">
         <h2>Transcription</h2>
-	<label for="textbox">Look at the DNA and write the corresponding mRNA sequence, then check your answer using the slider:</label>
-  	<input type="text" id="textbox" class="char-box" maxlength="50">
+	<label for="textbox">Look at the DNA and write the corresponding mRNA sequence, then check your answer using the slider:</label><br>
+  	<textarea id="textbox" class="expandable-textbox" rows="1"></textarea>
         <b>Coding strand</b>
         <div class="dna-sequence" id="dna-sequence"></div>
         <input type="range" id="transcription-slider" min="0" max="100" value="0">
@@ -302,7 +307,7 @@
     </div>
     <div class="container hidden" id="second-card">
         <h2>Translation</h2>
-	    <label for="textbox">Using the codon wheel, determine and write the corresponding amino acid sequence. Check your answer using the slider:</label>
+	    <label for="textbox">Using the codon wheel, determine and write the corresponding amino acid sequence. Check your answer using the slider:</label><br>
   	<input type="text" id="textbox" class="char-box" maxlength="20">
         <div id="second-rna-container">
             <input type="range" id="second-card-slider" min="0" max="100" value="0">
@@ -318,7 +323,7 @@
     </div>
     <div class="container hidden" id="third-card">
         <h2>Amino Acid Properties</h2>
-	    <label for="textbox">Using the table below, determine the characteristics that correspond to the amino acids. Check your answer using the slider:</label>
+	    <label for="textbox">Using the table below, determine the characteristics that correspond to the amino acids. Check your answer using the slider:</label><br>
   	<input type="text" id="textbox" class="char-box" maxlength="400">
 	    <b>Amino Acid Sequence</b><br><br>
         <div class="amino-acid-sequence" id="all-amino-acid-output"></div>
@@ -561,6 +566,12 @@
             // Initialize DNA and template sequence display
             dnaOutput.innerHTML = dnaSequence.split('').map(base => `<span class="base">${base}</span>`).join('');
             templateOutput.innerHTML = templateSequence.split('').map(base => `<span class="base">${base}</span>`).join('');
+		const textbox = document.getElementById('textbox');
+
+    		textbox.addEventListener('input', function () {
+      		this.style.height = 'auto'; // Reset height to auto
+      		this.style.height = this.scrollHeight + 'px'; // Set height to scrollHeight
+    });
         });
     </script>
 </body>
