@@ -305,8 +305,8 @@
             <div class="amino-acid-sequence" id="second-amino-acid-output"></div>
             <div class="rna-sequence">
                 <span id="second-rna-output"></span>
-		    <div id="rna-label"><b>Messenger RNA</b></div>
             </div>
+		<div id="rna-label"><b>Messenger RNA</b></div>
         </div>
         <div class="image-container">
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Aminoacids_table.svg/600px-Aminoacids_table.svg.png" alt="Amino Acids Table">
@@ -484,7 +484,7 @@
                 if (value == 100) {
                     fourthCard.classList.remove('hidden');
                     fourthCardSlider.value = 0;
-			setTimeout(() => scrollToElement(thirdCard), 2000);
+			setTimeout(() => scrollToElement(fourthCard), 2000);
 		   setTimeout(reloadViewerInIframe, 2000); // Trigger reload of viewer 2 seconds after fourth card is revealed
                 
                 } else {
