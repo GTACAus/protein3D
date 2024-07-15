@@ -9,7 +9,7 @@
     <style>
         body {
             margin: 0;
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Calibri', sans-serif;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -28,7 +28,7 @@
         .card {
             width: 40%;
             background: white;
-            border-radius: 8px;
+            border-radius: 15px; /* Rounded corners */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             padding: 16px;
             position: relative;
@@ -39,7 +39,7 @@
         .middle-card {
             width: 20%; /* Adjusted for better layout */
             background: white;
-            border-radius: 8px;
+            border-radius: 15px; /* Rounded corners */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             padding: 16px;
             display: flex;
@@ -56,12 +56,13 @@
             margin-bottom: 10px;
             font-weight: bold;
             font-size: 16px;
+            color: darkblue; /* Dark blue text */
         }
         #viewer1, #viewer2 {
             width: 100%;
             height: 30vh;
             background-color: #d3d3d3;
-            border-radius: 8px;
+            border-radius: 15px; /* Rounded corners */
             position: relative;
         }
         .ngl-viewer {
@@ -69,7 +70,7 @@
             height: 15vh;
             background-color: #f0f0f0;
             margin-bottom: 10px;
-            border-radius: 8px;
+            border-radius: 15px; /* Rounded corners */
         }
         .slider-container {
             display: flex;
@@ -85,7 +86,7 @@
             margin-bottom: 20px;
         }
         .button-container button {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Calibri', sans-serif;
             background-color: #4285f4;
             color: white;
             border: none;
@@ -106,23 +107,26 @@
             background-color: #f8f9fa;
             box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
             margin-top: 20px;
+            border-radius: 15px; /* Rounded corners */
         }
         .legend {
             display: flex;
             justify-content: space-around;
             width: 100%;
             font-size: 18px;
+            color: darkblue; /* Dark blue text */
         }
         .legend-item {
             display: flex;
             align-items: center;
-            color: #202124;
+            color: darkblue; /* Dark blue text */
         }
         .legend-color {
             width: 30px;
             height: 30px;
             margin-right: 15px;
             border: 1px solid #000;
+            border-radius: 15px; /* Rounded corners */
         }
         .positive-charge {
             background-color: #0000ff; /* Blue */
@@ -147,7 +151,7 @@
         <div class="card">
             <div class="viewer-container">
                 <div id="viewer1"></div>
-                <div class="viewer-title"><b>Phenylalanine hydroxylase</b></div>
+                <div class="viewer-title"><b>Phenylalanine hydroxylase (PAH)</b></div>
             </div>
             <div class="slider-container">
                 <input type="range" min="0" max="2" value="0" class="slider" id="slider1">
@@ -155,18 +159,18 @@
         </div>
         <div class="middle-card">
             <div class="viewer-container">
-                <div class="viewer-title">Phenylalanine</div>
+                <div class="viewer-title">Phenylalanine (PAH)</div>
                 <div id="nglViewer1" class="ngl-viewer"></div>
             </div>
             <div class="viewer-container">
-                <div class="viewer-title">Tyrosine</div>
+                <div class="viewer-title">Tyrosine (TYR)</div>
                 <div id="nglViewer2" class="ngl-viewer"></div>
             </div>
         </div>
         <div class="card">
             <div class="viewer-container">
                 <div id="viewer2"></div>
-                <div class="viewer-title">Non-functional <b>phenylalanine hydroxylase</b></div>
+                <div class="viewer-title">Non-functional <b>phenylalanine hydroxylase (PAH)</b></div>
             </div>
             <div class="slider-container">
                 <input type="range" min="0" max="2" value="0" class="slider" id="slider2">
