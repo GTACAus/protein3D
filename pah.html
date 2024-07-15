@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>3Dmol Protein Viewer</title>
+    <title>3Dmol and NGL Protein Viewer</title>
     <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+    <script src="https://unpkg.com/ngl@2.0.0-dev.32/dist/ngl.js"></script>
     <style>
         body {
             margin: 0;
+            font-family: 'Roboto', sans-serif;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -17,7 +19,8 @@
         }
         .container {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
+            gap: 10px; /* Adjust gap to bring the cards closer together */
             width: 90%;
             padding: 20px;
             box-sizing: border-box;
@@ -29,43 +32,168 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             padding: 16px;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .middle-card {
+            width: 20%; /* Adjusted for better layout */
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .viewer-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .viewer-title {
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 16px;
         }
         #viewer1, #viewer2 {
             width: 100%;
-            height: 50vh;
+            height: 30vh;
             background-color: #d3d3d3;
             border-radius: 8px;
             position: relative;
+        }
+        .ngl-viewer {
+            width: 100%;
+            height: 15vh;
+            background-color: #f0f0f0;
+            margin-bottom: 10px;
+            border-radius: 8px;
         }
         .slider-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: 20px;
+            margin-top: 10px;
         }
         .slider {
             width: 80%;
         }
         .button-container {
-            margin-top: 20px;
+            margin-top: 10px;
+            margin-bottom: 20px;
         }
         .button-container button {
-            margin-right: 10px;
+            font-family: 'Roboto', sans-serif;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 14px;
+        }
+        .button-container button:hover {
+            background-color: #357ae8;
+        }
+        .legend-container {
+            width: 90%; /* Match the width of the container */
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+            background-color: #f8f9fa;
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+        }
+        .legend {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            font-size: 18px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            color: #202124;
+        }
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            margin-right: 15px;
+            border: 1px solid #000;
+        }
+        .positive-charge {
+            background-color: #0000ff; /* Blue */
+        }
+        .negative-charge {
+            background-color: #ff0000; /* Red */
+        }
+        .hydrophilic {
+            background-color: #ffff00; /* Yellow */
+        }
+        .hydrophobic {
+            background-color: #ffffff; /* White */
+            border: 1px solid #000; /* Black border for better visibility */
+        }
+        .neutral-charge {
+            background-color: #808080; /* Gray */
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
-            <div id="viewer1"></div>
+            <div class="viewer-container">
+                <div id="viewer1"></div>
+                <div class="viewer-title"><b>Phenylalanine hydroxylase</b></div>
+            </div>
             <div class="slider-container">
                 <input type="range" min="0" max="2" value="0" class="slider" id="slider1">
             </div>
         </div>
+        <div class="middle-card">
+            <div class="viewer-container">
+                <div class="viewer-title">Phenylalanine</div>
+                <div id="nglViewer1" class="ngl-viewer"></div>
+            </div>
+            <div class="viewer-container">
+                <div class="viewer-title">Tyrosine</div>
+                <div id="nglViewer2" class="ngl-viewer"></div>
+            </div>
+        </div>
         <div class="card">
-            <div id="viewer2"></div>
+            <div class="viewer-container">
+                <div id="viewer2"></div>
+                <div class="viewer-title">Non-functional <b>phenylalanine hydroxylase</b></div>
+            </div>
             <div class="slider-container">
                 <input type="range" min="0" max="2" value="0" class="slider" id="slider2">
+            </div>
+        </div>
+    </div>
+    <div class="legend-container">
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color positive-charge"></div>
+                <span>Positive Charge</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color negative-charge"></div>
+                <span>Negative Charge</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color hydrophilic"></div>
+                <span>Hydrophilic</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color hydrophobic"></div>
+                <span>Hydrophobic</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color neutral-charge"></div>
+                <span>Neutral Charge</span>
             </div>
         </div>
     </div>
@@ -73,6 +201,7 @@
         <button id="moveCameraButton">Focus on Active Site</button>
         <button id="resetCameraButton">Reset Camera Position</button>
     </div>
+
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             let viewer1, viewer2, pheModel1, pheModel2, tyrModel;
@@ -81,7 +210,6 @@
             const targetPosition = { x: 70.142, y: 80.017, z: 61.029 };
             const originalCameraPosition = [-57, -77, -51, -174, -0.08, 0.4, 0.3, -0.9]; // Adjust to the actual original camera position
 
-            // Function to load and add the molecule to the viewer near the specified residue
             function loadAndPositionMolecule(viewer, url, targetPosition, scaleFactor) {
                 return fetch(url)
                     .then(response => response.ok ? response.text() : Promise.reject("Network response was not ok"))
@@ -234,6 +362,27 @@
                 viewer1.render();
                 viewer2.render();
             });
+
+            function loadNGLViewer(viewerId, url) {
+                const stage = new NGL.Stage(viewerId);
+                stage.loadFile(url, { defaultRepresentation: true }).then(comp => {
+                    comp.addRepresentation('ball+stick', {
+                        sele: 'N or C',
+                        opacity: 0.4  // 60% transparent
+                    });
+                    comp.addRepresentation('ball+stick', {
+                        sele: 'not (N or C)',
+                        opacity: 1.0
+                    });
+                    stage.autoView();
+                }).catch(error => {
+                    console.error(`Error loading NGL viewer ${viewerId}:`, error);
+                    setTimeout(() => loadNGLViewer(viewerId, url), 1000);
+                });
+            }
+
+            loadNGLViewer('nglViewer1', 'https://files.rcsb.org/ligands/view/PHE.cif');
+            loadNGLViewer('nglViewer2', 'https://files.rcsb.org/ligands/view/TYR.cif');
         });
     </script>
 </body>
