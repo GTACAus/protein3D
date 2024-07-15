@@ -9,6 +9,7 @@
         body {
             margin: 0;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -27,13 +28,29 @@
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             padding: 16px;
+            position: relative;
         }
         #viewer1, #viewer2 {
             width: 100%;
             height: 50vh;
-            background-color: #d3d3d3; /* Light grey background */
+            background-color: #d3d3d3;
             border-radius: 8px;
             position: relative;
+        }
+        .slider-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .slider {
+            width: 80%;
+        }
+        .button-container {
+            margin-top: 20px;
+        }
+        .button-container button {
+            margin-right: 10px;
         }
     </style>
 </head>
@@ -41,27 +58,36 @@
     <div class="container">
         <div class="card">
             <div id="viewer1"></div>
+            <div class="slider-container">
+                <input type="range" min="0" max="2" value="0" class="slider" id="slider1">
+            </div>
         </div>
         <div class="card">
             <div id="viewer2"></div>
+            <div class="slider-container">
+                <input type="range" min="0" max="2" value="0" class="slider" id="slider2">
+            </div>
         </div>
+    </div>
+    <div class="button-container">
+        <button id="moveCameraButton">Focus on Active Site</button>
+        <button id="resetCameraButton">Reset Camera Position</button>
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Function to load and add the PHE molecule to the viewer near the specified residue
-            function loadAndPositionPHE(viewer, targetPosition) {
-                return fetch("https://gtacaus.github.io/protein3D/PHE.pdb")
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error("Network response was not ok");
-                        }
-                        return response.text();
-                    })
+            let viewer1, viewer2, pheModel1, pheModel2, tyrModel;
+            let flashInterval1, flashInterval2;
+
+            const targetPosition = { x: 70.142, y: 80.017, z: 61.029 };
+            const originalCameraPosition = [-57, -77, -51, -174, -0.08, 0.4, 0.3, -0.9]; // Adjust to the actual original camera position
+
+            // Function to load and add the molecule to the viewer near the specified residue
+            function loadAndPositionMolecule(viewer, url, targetPosition, scaleFactor) {
+                return fetch(url)
+                    .then(response => response.ok ? response.text() : Promise.reject("Network response was not ok"))
                     .then(pdbText => {
                         const model = viewer.addModel(pdbText, "pdb");
                         const atoms = model.selectedAtoms({});
-
-                        // Calculate the center of the PHE molecule
                         let center = { x: 0, y: 0, z: 0 };
                         atoms.forEach(atom => {
                             center.x += atom.x;
@@ -72,9 +98,6 @@
                         center.y /= atoms.length;
                         center.z /= atoms.length;
 
-                        console.log("Center of PHE:", center);
-
-                        // Translate the PHE molecule to the target position
                         let translation = {
                             x: targetPosition.x - center.x,
                             y: targetPosition.y - center.y,
@@ -86,65 +109,32 @@
                             atom.z += translation.z;
                         });
                         model.setCoordinates(atoms);
-                        
-                        // Increase the radius of PHE molecule by 60%
-                        viewer.setStyle({model: model.getID()}, {stick: {colorscheme: "Jmol", radius: 0.68}}); // Default radius is 0.3, 60% increase is 0.48
+                        viewer.setStyle({model: model.getID()}, {stick: {colorscheme: "Jmol", radius: 0.48 * scaleFactor}});
                         viewer.render();
+                        return model;
                     })
-                    .catch(error => console.error('Error loading PHE molecule:', error));
+                    .catch(error => console.error('Error loading molecule:', error));
             }
 
-            // Specific coordinates for residue 428 in chain C
-            const targetPosition = { x: 70.142, y: 80.017, z: 61.029 };
-
-            // Function to initialize viewer
             function initializeViewer(viewerId, customStyles) {
                 let viewer = $3Dmol.createViewer(viewerId, {
                     defaultcolors: $3Dmol.rasmolElementColors,
                     backgroundColor: '#d3d3d3'
                 });
 
-                console.log(`${viewerId} created with dimensions:`, viewer.container.clientWidth, viewer.container.clientHeight);
-
-                // Fetch and display the protein structure in the viewer
-                fetch("https://files.rcsb.org/download/6N1K.pdb")
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error("Network response was not ok");
-                        }
-                        return response.text();
-                    })
+                return fetch("https://files.rcsb.org/download/6N1K.pdb")
+                    .then(response => response.ok ? response.text() : Promise.reject("Network response was not ok"))
                     .then(pdbText => {
-                        console.log(`PDB file loaded for ${viewerId}`);
-
                         viewer.addModel(pdbText, "pdb");
-                        console.log(`Model added to ${viewerId}`);
-
-                        // Apply spacefill style
                         viewer.setStyle({}, {sphere: {color: "pink"}});
-
-                        // Apply custom styles for specific residues
-                        for (let style of customStyles) {
-                            viewer.setStyle(style.selector, style.style);
-                        }
-
-                        console.log(`Custom styles applied to ${viewerId}`);
-
-                        // Add the PHE molecule near the target residue
-                        loadAndPositionPHE(viewer, targetPosition);
-
-                        // Zoom to fit all atoms
+                        customStyles.forEach(style => viewer.setStyle(style.selector, style.style));
                         viewer.zoomTo();
-                        console.log(`Zoom to fit all atoms in ${viewerId}`);
-
-                        // Render the viewer
                         viewer.render();
-                        console.log(`${viewerId} rendered`);
+                        return { viewer, model: null };
                     })
                     .catch(error => console.error(`Error loading PDB file for ${viewerId}:`, error));
             }
 
-            // Custom styles for viewer 1
             const stylesViewer1 = [
                 { selector: {chain: 'B', resi: 425}, style: {sphere: {color: "yellow"}} },
                 { selector: {chain: 'D', resi: 445}, style: {sphere: {color: "yellow"}} },
@@ -153,7 +143,6 @@
                 { selector: {chain: 'A', resi: 446}, style: {sphere: {color: "white"}} }
             ];
 
-            // Custom styles for viewer 2
             const stylesViewer2 = [
                 { selector: {chain: 'B', resi: 425}, style: {sphere: {color: "yellow"}} },
                 { selector: {chain: 'D', resi: 445}, style: {sphere: {color: "yellow"}} },
@@ -162,9 +151,89 @@
                 { selector: {chain: 'A', resi: 446}, style: {sphere: {color: "white"}} }
             ];
 
-            // Initialize both viewers with respective custom styles
-            initializeViewer("viewer1", stylesViewer1);
-            initializeViewer("viewer2", stylesViewer2);
+            initializeViewer("viewer1", stylesViewer1).then(({ viewer }) => {
+                viewer1 = viewer;
+                loadAndPositionMolecule(viewer1, "https://gtacaus.github.io/protein3D/PHE.pdb", targetPosition, 1.6).then(model => pheModel1 = model);
+
+                setInterval(() => {
+                    let view = viewer1.getView();
+                    console.log(`Viewer 1 Camera Position: ${JSON.stringify(view)}`);
+                }, 1000);
+            });
+
+            initializeViewer("viewer2", stylesViewer2).then(({ viewer }) => {
+                viewer2 = viewer;
+                loadAndPositionMolecule(viewer2, "https://gtacaus.github.io/protein3D/PHE.pdb", targetPosition, 1.6).then(model => pheModel2 = model);
+
+                setInterval(() => {
+                    let view = viewer2.getView();
+                    console.log(`Viewer 2 Camera Position: ${JSON.stringify(view)}`);
+                }, 1000);
+            });
+
+            function flashModel(viewer, model) {
+                return setInterval(() => {
+                    if (model) {
+                        viewer.setStyle({model: model.getID()}, {});
+                        viewer.render();
+                        setTimeout(() => {
+                            viewer.setStyle({model: model.getID()}, {stick: {colorscheme: "Jmol", radius: 0.48}});
+                            viewer.render();
+                        }, 500);
+                    }
+                }, 1000);
+            }
+
+            document.getElementById("slider1").addEventListener("input", function(event) {
+                let sliderValue = event.target.value;
+                clearInterval(flashInterval1);
+
+                if (sliderValue == 1) {
+                    if (pheModel1) flashInterval1 = flashModel(viewer1, pheModel1);
+                    else if (tyrModel) flashInterval1 = flashModel(viewer1, tyrModel);
+                } else if (sliderValue == 2) {
+                    if (pheModel1) {
+                        viewer1.removeModel(pheModel1);
+                        pheModel1 = null;
+                    }
+                    loadAndPositionMolecule(viewer1, "https://gtacaus.github.io/protein3D/TYR.pdb", targetPosition, 1.6).then(model => tyrModel = model);
+                } else if (sliderValue == 0) {
+                    if (tyrModel) {
+                        viewer1.removeModel(tyrModel);
+                        tyrModel = null;
+                    }
+                    loadAndPositionMolecule(viewer1, "https://gtacaus.github.io/protein3D/PHE.pdb", targetPosition, 1.6).then(model => pheModel1 = model);
+                }
+            });
+
+            document.getElementById("slider2").addEventListener("input", function(event) {
+                let sliderValue = event.target.value;
+                clearInterval(flashInterval2);
+
+                if (sliderValue == 1) {
+                    if (pheModel2) flashInterval2 = flashModel(viewer2, pheModel2);
+                } else {
+                    clearInterval(flashInterval2);
+                    viewer2.setStyle({model: pheModel2.getID()}, {stick: {colorscheme: "Jmol", radius: 0.48}});
+                    viewer2.render();
+                }
+            });
+
+            const cameraPosition = [-57.368138213163846, -77.55899276791548, -51.61785418949559, 34.37076879488396, -0.08320308033565153, 0.4056650305025829, 0.031064873190342502, -0.9096967099553925];
+
+            document.getElementById("moveCameraButton").addEventListener("click", function() {
+                viewer1.setView(cameraPosition);
+                viewer2.setView(cameraPosition);
+                viewer1.render();
+                viewer2.render();
+            });
+
+            document.getElementById("resetCameraButton").addEventListener("click", function() {
+                viewer1.setView(originalCameraPosition);
+                viewer2.setView(originalCameraPosition);
+                viewer1.render();
+                viewer2.render();
+            });
         });
     </script>
 </body>
