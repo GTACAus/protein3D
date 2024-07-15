@@ -1,0 +1,60 @@
+HEADER                                            15-JUL-24   PHE
+TITLE     PHENYLALANINE
+COMPND    MOL_ID: 1;
+COMPND   2 MOLECULE: PHENYLALANINE;
+COMPND   3 CHAIN: A
+REMARK   4 PHE COMPLIES WITH FORMAT V. 3.30, 15-JUL-24
+REMARK 100
+REMARK 100 THIS ENTRY HAS BEEN PROCESSED BY EBI
+REMARK 100
+HET    PHE  A   1       1
+HETNAM     PHE PHENYLALANINE
+FORMUL    1  PHE    C9 H11 N O2
+HETATM    1    N PHE A   1       3.260  22.302   6.000  1.00 10.00           N 0
+HETATM    2   CA PHE A   1       4.252  21.272   5.710  1.00 10.00           C 0
+HETATM    3    C PHE A   1       5.559  21.899   5.229  1.00 10.00           C 0
+HETATM    4    O PHE A   1       5.836  21.838   4.012  1.00 10.00           O 0
+HETATM    5   CB PHE A   1       3.708  20.298   4.656  1.00 10.00           C 0
+HETATM    6   CG PHE A   1       4.596  19.106   4.406  1.00 10.00           C 0
+HETATM    7  CD1 PHE A   1       5.077  18.339   5.467  1.00 10.00           C 0
+HETATM    8  CD2 PHE A   1       4.927  18.732   3.109  1.00 10.00           C 0
+HETATM    9  CE1 PHE A   1       5.874  17.219   5.237  1.00 10.00           C 0
+HETATM   10  CE2 PHE A   1       5.718  17.618   2.867  1.00 10.00           C 0
+HETATM   11   CZ PHE A   1       6.193  16.860   3.932  1.00 10.00           C 0
+HETATM   12  OXT PHE A   1       6.283  22.460   6.079  1.00 10.00           O 0
+HETATM   13    H PHE A   1       2.387  21.883   6.321  1.00 10.00           H 0
+HETATM   14   H2 PHE A   1       3.111  22.918   5.201  1.00 10.00           H 0
+HETATM   15   HA PHE A   1       4.460  20.708   6.649  1.00 10.00           H 0
+HETATM   16  HB2 PHE A   1       2.676  19.968   4.922  1.00 10.00           H 0
+HETATM   17  HB3 PHE A   1       3.493  20.833   3.701  1.00 10.00           H 0
+HETATM   18  HD1 PHE A   1       4.823  18.622   6.502  1.00 10.00           H 0
+HETATM   19  HD2 PHE A   1       4.556  19.328   2.258  1.00 10.00           H 0
+HETATM   20  HE1 PHE A   1       6.250  16.619   6.083  1.00 10.00           H 0
+HETATM   21  HE2 PHE A   1       5.968  17.335   1.830  1.00 10.00           H 0
+HETATM   22   HZ PHE A   1       6.822  15.974   3.741  1.00 10.00           H 0
+HETATM   23  HXT PHE A   1       7.096  22.850   5.779  1.00 10.00           H 0
+CONECT    1     2    13    14 
+CONECT    2     1     3     5    15 
+CONECT    3     2     4    12 
+CONECT    4     3 
+CONECT    5     2     6    16    17 
+CONECT    6     5     7     8 
+CONECT    7     6     9    18 
+CONECT    8     6    10    19 
+CONECT    9     7    11    20 
+CONECT   10     8    11    21 
+CONECT   11     9    10    22 
+CONECT   12     3    23 
+CONECT   13     1 
+CONECT   14     1 
+CONECT   15     2 
+CONECT   16     5 
+CONECT   17     5 
+CONECT   18     7 
+CONECT   19     8 
+CONECT   20     9 
+CONECT   21    10 
+CONECT   22    11 
+CONECT   23    12 
+MASTER        4    0    1    0    0    0    0    0   23    0   23    0
+END
