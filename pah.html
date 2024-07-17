@@ -22,6 +22,7 @@
             flex-direction: column;
             align-items: center;
             width: 90%;
+            max-width: 1200px; /* Set maximum width */
             padding: 20px;
             box-sizing: border-box;
         }
@@ -42,7 +43,8 @@
             align-items: center;
         }
         .top-card {
-            width: 85%; /* Match the width of the container */
+            width: 85%;
+            max-width: 1000px; /* Set maximum width */
             background: white;
             border-radius: 15px; /* Rounded corners */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -105,7 +107,8 @@
             background-color: #357ae8;
         }
         .legend-container {
-            width: 90%; /* Match the width of the container */
+            width: 90%;
+            max-width: 1000px; /* Set maximum width */
             display: flex;
             justify-content: center;
             padding: 20px 0;
@@ -176,7 +179,8 @@
             width: 30%;
         }
         .card img {
-            width: 80%;
+            width: 100%; /* Set fixed width */
+            max-width: 300px; /* Set maximum width */
             height: auto;
             border-radius: 15px; /* Rounded corners */
         }
@@ -185,6 +189,11 @@
             font-size: 18px;
             text-align: center;
             color: darkblue;
+        }
+        @media (max-width: 768px) {
+            .card-container {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
