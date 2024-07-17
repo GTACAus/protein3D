@@ -22,7 +22,7 @@
             flex-direction: column;
             align-items: center;
             width: 90%;
-            padding: 20px;
+            padding: 10px;
             box-sizing: border-box;
         }
         .card-container {
@@ -33,9 +33,9 @@
         }
         .card {
             background: white;
-            border-radius: 15px; /* Rounded corners */
+            border-radius: 10px; /* Rounded corners */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 16px;
+            padding: 10px;
             position: relative;
             display: flex;
             flex-direction: column;
@@ -44,13 +44,13 @@
         .top-card {
             width: 85%; /* Match the width of the container */
             background: white;
-            border-radius: 15px; /* Rounded corners */
+            border-radius: 10px; /* Rounded corners */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            padding: 16px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         .viewer-container {
             width: 100%;
@@ -59,47 +59,47 @@
             align-items: center;
         }
         .viewer-title {
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             font-weight: bold;
-            font-size: 28px;
+            font-size: 20px;
             color: darkblue; /* Dark blue text */
         }
         #viewer1, #viewer2, #viewer3, #viewer4 {
             width: 100%;
-            height: 30vh;
+            height: 20vh;
             background-color: #d3d3d3;
-            border-radius: 15px; /* Rounded corners */
+            border-radius: 10px; /* Rounded corners */
             position: relative;
         }
         .ngl-viewer {
             width: 30%;
-            height: 15vh;
+            height: 10vh;
             background-color: #f0f0f0;
-            border-radius: 15px; /* Rounded corners */
+            border-radius: 10px; /* Rounded corners */
         }
         .slider-container {
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: 10px;
+            margin-top: 5px;
         }
         .slider {
             width: 80%;
         }
         .button-container {
-            margin-top: 10px;
-            margin-bottom: 20px;
+            margin-top: 5px;
+            margin-bottom: 10px;
         }
         .button-container button {
             font-family: 'Calibri', sans-serif;
             background-color: #4285f4;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 5px 10px;
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.3s;
-            font-size: 30px;
+            font-size: 20px;
         }
         .button-container button:hover {
             background-color: #357ae8;
@@ -108,17 +108,17 @@
             width: 90%; /* Match the width of the container */
             display: flex;
             justify-content: center;
-            padding: 20px 0;
+            padding: 10px 0;
             background-color: #f8f9fa;
             box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
-            margin-top: 20px;
-            border-radius: 15px; /* Rounded corners */
+            margin-top: 10px;
+            border-radius: 10px; /* Rounded corners */
         }
         .legend {
             display: flex;
             justify-content: space-around;
             width: 100%;
-            font-size: 30px;
+            font-size: 20px;
             color: darkblue; /* Dark blue text */
         }
         .legend-item {
@@ -127,11 +127,11 @@
             color: darkblue; /* Dark blue text */
         }
         .legend-color {
-            width: 30px;
-            height: 30px;
-            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
             border: 1px solid #000;
-            border-radius: 15px; /* Rounded corners */
+            border-radius: 10px; /* Rounded corners */
         }
         .positive-charge {
             background-color: #0000ff; /* Blue */
@@ -151,17 +151,17 @@
         }
         .enzyme-equation {
             font-family: Arial, sans-serif;
-            font-size: 20px;
+            font-size: 16px;
             display: flex;
             justify-content: center;
             align-items: center;
-            margin-top: 20px;
+            margin-top: 10px;
         }
         .enzyme {
             position: relative;
-            top: -10px;
-            font-size: 14px;
-            margin: 0 10px;
+            top: -5px;
+            font-size: 12px;
+            margin: 0 5px;
         }
         .ngl-viewer-container {
             display: flex;
@@ -178,7 +178,13 @@
         .card img {
             width: 100%;
             height: auto;
-            border-radius: 15px; /* Rounded corners */
+            border-radius: 10px; /* Rounded corners */
+        }
+        .image-label {
+            margin-top: 5px;
+            font-size: 16px;
+            text-align: center;
+            color: darkblue;
         }
     </style>
 </head>
@@ -212,6 +218,7 @@
             <div class="card">
                 <div class="viewer-container">
                     <img src="g1.png" alt="Image 1">
+                    <div class="image-label">Normal enzyme activity</div>
                 </div>
             </div>
             <div class="card">
@@ -226,6 +233,7 @@
             <div class="card">
                 <div class="viewer-container">
                     <img src="g2.png" alt="Image 2">
+                    <div class="image-label">Non-functional enzyme activity</div>
                 </div>
             </div>
         </div>
@@ -241,11 +249,11 @@
                 </div>
                 <div class="legend-item">
                     <div class="legend-color hydrophilic"></div>
-                    <span>Hydrophilic</span>
+                    <span>Hydrophobic</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color hydrophobic"></div>
-                    <span>Hydrophobic</span>
+                    <span>Hydrophilic</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color neutral-charge"></div>
