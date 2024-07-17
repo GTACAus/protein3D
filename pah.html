@@ -16,7 +16,6 @@
             align-items: center;
             height: 100vh;
             background-color: #f0f0f0;
-            overflow: hidden; /* Added to hide overflow content */
         }
         .container {
             display: flex;
@@ -25,8 +24,6 @@
             width: 90%;
             padding: 10px;
             box-sizing: border-box;
-            overflow: auto; /* Added to handle overflow content */
-            height: 100%; /* Ensure container uses full height */
         }
         .card-container {
             display: grid;
@@ -67,16 +64,16 @@
             font-size: 20px;
             color: darkblue; /* Dark blue text */
         }
-        #viewer1, #viewer2 {
+        #viewer1, #viewer2, #viewer3, #viewer4 {
             width: 100%;
-            height: 15vh; /* Reduced height */
+            height: 20vh;
             background-color: #d3d3d3;
             border-radius: 10px; /* Rounded corners */
             position: relative;
         }
         .ngl-viewer {
-            width: 100%;
-            height: 10vh; /* Reduced height */
+            width: 30%;
+            height: 10vh;
             background-color: #f0f0f0;
             border-radius: 10px; /* Rounded corners */
         }
@@ -102,7 +99,7 @@
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.3s;
-            font-size: 14px; /* Reduced font size */
+            font-size: 20px;
         }
         .button-container button:hover {
             background-color: #357ae8;
@@ -121,7 +118,7 @@
             display: flex;
             justify-content: space-around;
             width: 100%;
-            font-size: 12px; /* Reduced font size */
+            font-size: 20px;
             color: darkblue; /* Dark blue text */
         }
         .legend-item {
@@ -154,7 +151,7 @@
         }
         .enzyme-equation {
             font-family: Arial, sans-serif;
-            font-size: 12px; /* Reduced font size */
+            font-size: 16px;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -163,7 +160,7 @@
         .enzyme {
             position: relative;
             top: -5px;
-            font-size: 10px; /* Reduced font size */
+            font-size: 12px;
             margin: 0 5px;
         }
         .ngl-viewer-container {
@@ -176,7 +173,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 45%;
+            width: 30%;
         }
         .card img {
             width: 100%;
@@ -185,7 +182,7 @@
         }
         .image-label {
             margin-top: 5px;
-            font-size: 14px; /* Reduced font size */
+            font-size: 16px;
             text-align: center;
             color: darkblue;
         }
@@ -256,7 +253,7 @@
                 </div>
                 <div class="legend-item">
                     <div class="legend-color hydrophobic"></div>
-                    <span>Hydrophilic</span>
+                    <span>Hydrophobic</span>
                 </div>
                 <div class="legend-item">
                     <div class="legend-color neutral-charge"></div>
@@ -453,5 +450,5 @@
             loadNGLViewer('nglViewer2', 'https://files.rcsb.org/ligands/view/TYR.cif');
         });
     </script>
-</body>
+</body> 
 </html>
