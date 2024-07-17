@@ -16,6 +16,7 @@
             align-items: center;
             height: 100vh;
             background-color: #f0f0f0;
+            overflow: hidden; /* Added to hide overflow content */
         }
         .container {
             display: flex;
@@ -24,6 +25,8 @@
             width: 90%;
             padding: 10px;
             box-sizing: border-box;
+            overflow: auto; /* Added to handle overflow content */
+            height: 100%; /* Ensure container uses full height */
         }
         .card-container {
             display: grid;
@@ -64,16 +67,16 @@
             font-size: 20px;
             color: darkblue; /* Dark blue text */
         }
-        #viewer1, #viewer2, #viewer3, #viewer4 {
+        #viewer1, #viewer2 {
             width: 100%;
-            height: 20vh;
+            height: 15vh; /* Reduced height */
             background-color: #d3d3d3;
             border-radius: 10px; /* Rounded corners */
             position: relative;
         }
         .ngl-viewer {
-            width: 30%;
-            height: 10vh;
+            width: 100%;
+            height: 10vh; /* Reduced height */
             background-color: #f0f0f0;
             border-radius: 10px; /* Rounded corners */
         }
@@ -99,7 +102,7 @@
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.3s;
-            font-size: 20px;
+            font-size: 14px; /* Reduced font size */
         }
         .button-container button:hover {
             background-color: #357ae8;
@@ -118,7 +121,7 @@
             display: flex;
             justify-content: space-around;
             width: 100%;
-            font-size: 20px;
+            font-size: 12px; /* Reduced font size */
             color: darkblue; /* Dark blue text */
         }
         .legend-item {
@@ -151,7 +154,7 @@
         }
         .enzyme-equation {
             font-family: Arial, sans-serif;
-            font-size: 16px;
+            font-size: 12px; /* Reduced font size */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -160,7 +163,7 @@
         .enzyme {
             position: relative;
             top: -5px;
-            font-size: 12px;
+            font-size: 10px; /* Reduced font size */
             margin: 0 5px;
         }
         .ngl-viewer-container {
@@ -173,7 +176,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 30%;
+            width: 45%;
         }
         .card img {
             width: 100%;
@@ -182,7 +185,7 @@
         }
         .image-label {
             margin-top: 5px;
-            font-size: 16px;
+            font-size: 14px; /* Reduced font size */
             text-align: center;
             color: darkblue;
         }
