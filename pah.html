@@ -19,14 +19,19 @@
         }
         .container {
             display: flex;
-            justify-content: center;
-            gap: 10px; /* Adjust gap to bring the cards closer together */
+            flex-direction: column;
+            align-items: center;
             width: 90%;
             padding: 20px;
             box-sizing: border-box;
         }
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            width: 100%;
+        }
         .card {
-            width: 40%;
             background: white;
             border-radius: 15px; /* Rounded corners */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -36,8 +41,8 @@
             flex-direction: column;
             align-items: center;
         }
-        .middle-card {
-            width: 20%; /* Adjusted for better layout */
+        .top-card {
+            width: 85%; /* Match the width of the container */
             background: white;
             border-radius: 15px; /* Rounded corners */
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -45,6 +50,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            margin-bottom: 20px;
         }
         .viewer-container {
             width: 100%;
@@ -58,7 +64,7 @@
             font-size: 28px;
             color: darkblue; /* Dark blue text */
         }
-        #viewer1, #viewer2 {
+        #viewer1, #viewer2, #viewer3, #viewer4 {
             width: 100%;
             height: 30vh;
             background-color: #d3d3d3;
@@ -66,10 +72,9 @@
             position: relative;
         }
         .ngl-viewer {
-            width: 100%;
+            width: 30%;
             height: 15vh;
             background-color: #f0f0f0;
-            margin-bottom: 10px;
             border-radius: 15px; /* Rounded corners */
         }
         .slider-container {
@@ -144,71 +149,119 @@
         .neutral-charge {
             background-color: #808080; /* Gray */
         }
+        .enzyme-equation {
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .enzyme {
+            position: relative;
+            top: -10px;
+            font-size: 14px;
+            margin: 0 10px;
+        }
+        .ngl-viewer-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        .ngl-viewer-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 30%;
+        }
+        .card img {
+            width: 100%;
+            height: auto;
+            border-radius: 15px; /* Rounded corners */
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="card">
-            <div class="viewer-container">
-                <div id="viewer1"></div>
-                <div class="viewer-title"><b>Phenylalanine hydroxylase (PAH)</b></div>
+        <div class="top-card">
+            <div class="ngl-viewer-container">
+                <div class="ngl-viewer-wrapper">
+                    <div class="viewer-title">Phenylalanine (PHE)</div>
+                    <div id="nglViewer1" class="ngl-viewer"></div>
+                </div>
+                <div class="ngl-viewer-wrapper">
+                    <div class="viewer-title">Tyrosine (TYR)</div>
+                    <div id="nglViewer2" class="ngl-viewer"></div>
+                </div>
             </div>
-            <div class="slider-container">
-                <input type="range" min="0" max="2" value="0" class="slider" id="slider1">
-            </div>
-        </div>
-        <div class="middle-card">
-            <div class="viewer-container">
-                <div class="viewer-title">Phenylalanine (PHE)</div>
-                <div id="nglViewer1" class="ngl-viewer"></div>
-            </div>
-            <div class="viewer-container">
-                <div class="viewer-title">Tyrosine (TYR)</div>
-                <div id="nglViewer2" class="ngl-viewer"></div>
+            <div class="enzyme-equation">
+                Phenylalanine <span class="enzyme">PAH</span> &#8594; Tyrosine
             </div>
         </div>
-        <div class="card">
-            <div class="viewer-container">
-                <div id="viewer2"></div>
-                <div class="viewer-title">Non-functional <b>phenylalanine hydroxylase (PAH)</b></div>
+        <div class="card-container">
+            <div class="card">
+                <div class="viewer-container">
+                    <div id="viewer1"></div>
+                    <div class="viewer-title"><b>Phenylalanine hydroxylase (PAH)</b></div>
+                </div>
+                <div class="slider-container">
+                    <input type="range" min="0" max="2" value="0" class="slider" id="slider1">
+                </div>
             </div>
-            <div class="slider-container">
-                <input type="range" min="0" max="2" value="0" class="slider" id="slider2">
+            <div class="card">
+                <div class="viewer-container">
+                    <img src="g1.png" alt="Image 1">
+                </div>
             </div>
-        </div>
-    </div>
-    <div class="legend-container">
-        <div class="legend">
-            <div class="legend-item">
-                <div class="legend-color positive-charge"></div>
-                <span>Positive Charge</span>
+            <div class="card">
+                <div class="viewer-container">
+                    <div id="viewer2"></div>
+                    <div class="viewer-title">Non-functional <b>phenylalanine hydroxylase (PAH)</b></div>
+                </div>
+                <div class="slider-container">
+                    <input type="range" min="0" max="2" value="0" class="slider" id="slider2">
+                </div>
             </div>
-            <div class="legend-item">
-                <div class="legend-color negative-charge"></div>
-                <span>Negative Charge</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color hydrophilic"></div>
-                <span>Hydrophilic</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color hydrophobic"></div>
-                <span>Hydrophobic</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-color neutral-charge"></div>
-                <span>Neutral Charge</span>
+            <div class="card">
+                <div class="viewer-container">
+                    <img src="g2.png" alt="Image 2">
+                </div>
             </div>
         </div>
-    </div>
-    <div class="button-container">
-        <button id="moveCameraButton">Focus on Active Site</button>
-        <button id="resetCameraButton">Reset Camera Position</button>
+        <div class="legend-container">
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color positive-charge"></div>
+                    <span>Positive Charge</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color negative-charge"></div>
+                    <span>Negative Charge</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color hydrophilic"></div>
+                    <span>Hydrophilic</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color hydrophobic"></div>
+                    <span>Hydrophobic</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color neutral-charge"></div>
+                    <span>Neutral Charge</span>
+                </div>
+            </div>
+        </div>
+        <div class="button-container">
+            <button id="moveCameraButton">Focus on Active Site</button>
+            <button id="resetCameraButton">Reset Camera Position</button>
+        </div>
     </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            let viewer1, viewer2, pheModel1, pheModel2, tyrModel;
+            let viewer1, viewer2, viewer3, viewer4, pheModel1, pheModel2, tyrModel;
             let flashInterval1, flashInterval2;
 
             const targetPosition = { x: 70.142, y: 80.017, z: 61.029 };
