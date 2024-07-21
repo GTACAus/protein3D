@@ -430,10 +430,10 @@
                     
                     loadAndPositionMolecule(viewer1, "https://gtacaus.github.io/protein3D/TYR.pdb", targetPosition, 1.6).then(model => tyrModel = model);
                 } else if (sliderValue == 0) {
-                    if (tyrModel) {
+                    
                         viewer1.removeModel(tyrModel);
                         tyrModel = null;
-                    }
+                    
                     loadAndPositionMolecule(viewer1, "https://gtacaus.github.io/protein3D/PHE.pdb", targetPosition, 1.6).then(model => pheModel1 = model);
                 }
             });
