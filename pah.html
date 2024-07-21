@@ -311,7 +311,7 @@
                             atom.z += translation.z;
                         });
                         model.setCoordinates(atoms);
-                        viewer.setStyle({model: model.getID()}, {stick: {colorscheme: "Jmol", radius: 0.48 * scaleFactor}});
+                        viewer.setStyle({model: model.getID()}, {stick: {colorscheme: "Jmol", radius: 0.48}});
                         viewer.render();
                         return model;
                     })
