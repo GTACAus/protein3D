@@ -409,7 +409,7 @@
                         viewer.setStyle({model: model.getID()}, {});
                         viewer.render();
                         setTimeout(() => {
-                            viewer.setStyle({model: model.getID()}, {stick: {colorscheme: "Jmol", radius: 0.48}});
+                            viewer.setStyle({model: model.getID()}, {stick: {colorscheme: "Jmol", radius: 0.48 * scaleFactor}});
                             viewer.render();
                         }, 500);
                     }
@@ -446,7 +446,7 @@
                     if (pheModel2) flashInterval2 = flashModel(viewer2, pheModel2);
                 } else {
                     clearInterval(flashInterval2);
-                    viewer2.setStyle({model: pheModel2.getID()}, {stick: {colorscheme: "Jmol", radius: 0.48}});
+                    viewer2.setStyle({model: pheModel2.getID()}, {stick: {colorscheme: "Jmol", radius: 0.48 * scaleFactor}});
                     viewer2.render();
                 }
             });
