@@ -424,10 +424,10 @@
                     if (pheModel1) flashInterval1 = flashModel(viewer1, pheModel1);
                     else if (tyrModel) flashInterval1 = flashModel(viewer1, tyrModel);
                 } else if (sliderValue == 2) {
-                    if (pheModel1) {
+                    
                         viewer1.removeModel(pheModel1);
                         pheModel1 = null;
-                    }
+                    
                     loadAndPositionMolecule(viewer1, "https://gtacaus.github.io/protein3D/TYR.pdb", targetPosition, 1.6).then(model => tyrModel = model);
                 } else if (sliderValue == 0) {
                     if (tyrModel) {
