@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3Dmol and NGL Protein Viewer</title>
+    <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+    <script src="https://unpkg.com/ngl@2.0.0-dev.32/dist/ngl.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Calibri', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90%;
+            max-width: 1200px; /* Set maximum width */
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .card-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+        .card {
+            background: white;
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .top-card {
+            width: 85%;
+            max-width: 1000px; /* Set maximum width */
+            background: white;
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .viewer-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .viewer-title {
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 28px;
+            color: darkblue; /* Dark blue text */
+        }
+        #viewer1, #viewer2 {
+            width: 100%;
+            height: 50vh;
+            background-color: #d3d3d3;
+            border-radius: 15px; /* Rounded corners */
+            position: relative;
+        }
+        .ngl-viewer {
+            width: 30%;
+            height: 10vh;
+            background-color: #f0f0f0;
+            border-radius: 15px; /* Rounded corners */
+        }
+        .slider-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .slider {
+            width: 80%;
+        }
+        .button-container {
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .button-container button {
+            font-family: 'Calibri', sans-serif;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 30px;
+            margin: 0 10px; /* Add margin to separate buttons */
+        }
+        .button-container button:hover {
+            background-color: #357ae8;
+        }
+        .legend-container {
+            width: 100%;
+            max-width: 1200px; /* Set maximum width */
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+            background-color: #f8f9fa;
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            border-radius: 15px; /* Rounded corners */
+        }
+        .legend {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            font-size: 30px;
+            color: darkblue; /* Dark blue text */
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            color: darkblue; /* Dark blue text */
+        }
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            margin-right: 15px;
+            border: 1px solid #000;
+            border-radius: 15px; /* Rounded corners */
+        }
+        .positive-charge {
+            background-color: #0000ff; /* Blue */
+        }
+        .negative-charge {
+            background-color: #ff0000; /* Red */
+        }
+        .hydrophilic {
+            background-color: #ffff00; /* Yellow */
+        }
+        .hydrophobic {
+            background-color: #ffffff; /* White */
+            border: 1px solid #000; /* Black border for better visibility */
+        }
+        .neutral-charge {
+            background-color: #808080; /* Gray */
+        }
+        .enzyme-equation {
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        .enzyme {
+            position: relative;
+            top: -10px;
+            font-size: 14px;
+            margin: 0 10px;
+        }
+        .ngl-viewer-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+        .ngl-viewer-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 50%;
+        }
+        @media (max-width: 768px) {
+            .card-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-card">
+            <div class="ngl-viewer-container">
+                <div class="ngl-viewer-wrapper">
+                    <div class="viewer-title">Phenylalanine (PHE)</div>
+                    <div id="nglViewer1" class="ngl-viewer"></div>
+                </div>
+                <div class="ngl-viewer-wrapper">
+                    <div class="viewer-title">Tyrosine (TYR)</div>
+                    <div id="nglViewer2" class="ngl-viewer"></div>
+                </div>
+            </div>
+            <div class="enzyme-equation">
+                Phenylalanine <span class="enzyme">PAH</span> &#8594; Tyrosine
+            </div>
+        </div>
+        <div class="card-container">
+            <div class="card">
+                <div class="viewer-container">
+                    <div id="viewer1"></div>
+                    <div class="viewer-title"><b>Phenylalanine hydroxylase (PAH)</b></div>
+                </div>
+                <div class="slider-container">
+                    <input type="range" min="0" max="2" value="0" class="slider" id="slider1">
+                </div>
+            </div>
+            <div class="card">
+                <div class="viewer-container">
+                    <div id="viewer2"></div>
+                    <div class="viewer-title">Non-functional <b>phenylalanine hydroxylase (PAH)</b></div>
+                </div>
+                <div class="slider-container">
+                    <input type="range" min="0" max="2" value="0" class="slider" id="slider2">
+                </div>
+            </div>
+        </div>
+        <div class="legend-container">
+            <div class="legend">
+                <div class="legend-item">
+                    <div class="legend-color positive-charge"></div>
+                    <span>Negative Charge</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color negative-charge"></div>
+                    <span>Positive Charge</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color hydrophilic"></div>
+                    <span>Hydrophilic</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color hydrophobic"></div>
+                    <span>Hydrophobic</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color neutral-charge"></div>
+                    <span>Neutral Charge</span>
+                </div>
+            </div>
+        </div>
+        <div class="button-container">
+            <button id="moveCameraButton">Focus on Active Site</button>
+            <button id="resetCameraButton">Reset Camera Position</button>
+            <button id="togglePheTyrButton">Toggle PHE/TYR atomic</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let viewer1, viewer2, pheModel1, pheModel2, tyrModel;
+            let flashInterval1, flashInterval2;
+            let isPheTyrShown1 = false;
+            let isPheTyrShown2 = false;
+
+            const targetPosition = { x: 70.142, y: 80.017, z: 61.029 };
+            const originalCameraPosition = [-57, -77, -51, -174, -0.08, 0.4, 0.3, -0.9]; // Adjust to the actual original camera position
+
+            function loadAndPositionMolecule(viewer, url, targetPosition, scaleFactor) {
+                return fetch(url)
+                    .then(response => response.ok ? response.text() : Promise.reject("Network response was not ok"))
+                    .then(pdbText => {
+                        const model = viewer.addModel(pdbText, "pdb");
+                        const atoms = model.selectedAtoms({});
+                        let center = { x: 0, y: 0, z: 0 };
+                        atoms.forEach(atom => {
+                            center.x += atom.x;
+                            center.y += atom.y;
+                            center.z += atom.z;
+                        });
+                        center.x /= atoms.length;
+                        center.y /= atoms.length;
+                        center.z /= atoms.length;
+
+                        let translation = {
+                            x: targetPosition.x - center.x,
+                            y: targetPosition.y - center.y,
+                            z: targetPosition.z - center.z
+                        };
+                        atoms.forEach(atom => {
+                            atom.x += translation.x;
+                            atom.y += translation.y;
+                            atom.z += translation.z;
+                        });
+                        model.setCoordinates(atoms);
+                        viewer.setStyle({model: model.getID()}, {stick: {colorscheme: "Jmol", radius: 0.48}});
+                        viewer.render();
+                        return model;
+                    })
+                    .catch(error => console.error('Error loading molecule:', error));
+            }
+
+            function initializeViewer(viewerId, customStyles) {
+                let viewer = $3Dmol.createViewer(viewerId, {
+                    defaultcolors: $3Dmol.rasmolElementColors,
+                    backgroundColor: '#d3d3d3'
+                });
+
+                return fetch("https://files.rcsb.org/download/6N1K.pdb")
+                    .then(response => response.ok ? response.text() : Promise.reject("Network response was not ok"))
+                    .then(pdbText => {
+                        viewer.addModel(pdbText, "pdb");
+                        viewer.setStyle({}, {sphere: {color: "pink"}});
+                        customStyles.forEach(style => viewer.setStyle(style.selector, style.style));
+                        viewer.zoomTo();
+                        viewer.render();
+                        return { viewer, model: null };
+                    })
+                    .catch(error => console.error(`Error loading PDB file for ${viewerId}:`, error));
+            }
+
+            const stylesViewer1 = [
+                { selector: {chain: 'A', resi: 404}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'A', resi: 412}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'A', resi: 407}, style: {sphere: {color: "blue"}} },
+                { selector: {chain: 'A', resi: 405}, style: {sphere: {color: "red"}} },
+                { selector: {chain: 'A', resi: 409}, style: {sphere: {color: "white"}} },
+                { selector: {chain: 'B', resi: 404}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'B', resi: 412}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'B', resi: 407}, style: {sphere: {color: "blue"}} },
+                { selector: {chain: 'B', resi: 405}, style: {sphere: {color: "red"}} },
+                { selector: {chain: 'B', resi: 409}, style: {sphere: {color: "white"}} },
+                { selector: {chain: 'C', resi: 404}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'C', resi: 412}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'C', resi: 407}, style: {sphere: {color: "blue"}} },
+                { selector: {chain: 'C', resi: 405}, style: {sphere: {color: "red"}} },
+                { selector: {chain: 'C', resi: 409}, style: {sphere: {color: "white"}} },
+                { selector: {chain: 'D', resi: 404}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'D', resi: 412}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'D', resi: 407}, style: {sphere: {color: "blue"}} },
+                { selector: {chain: 'D', resi: 405}, style: {sphere: {color: "red"}} },
+                { selector: {chain: 'D', resi: 409}, style: {sphere: {color: "white"}} }
+            ];
+
+            const stylesViewer2 = [
+                { selector: {chain: 'A', resi: 404}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'A', resi: 412}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'A', resi: 407}, style: {sphere: {color: "blue"}} },
+                { selector: {chain: 'A', resi: 405}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'A', resi: 409}, style: {sphere: {color: "white"}} },
+                { selector: {chain: 'B', resi: 404}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'B', resi: 412}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'B', resi: 407}, style: {sphere: {color: "blue"}} },
+                { selector: {chain: 'B', resi: 405}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'B', resi: 409}, style: {sphere: {color: "white"}} },
+                { selector: {chain: 'C', resi: 404}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'C', resi: 412}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'C', resi: 407}, style: {sphere: {color: "blue"}} },
+                { selector: {chain: 'C', resi: 405}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'C', resi: 409}, style: {sphere: {color: "white"}} },
+                { selector: {chain: 'D', resi: 404}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'D', resi: 412}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'D', resi: 407}, style: {sphere: {color: "blue"}} },
+                { selector: {chain: 'D', resi: 405}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'D', resi: 409}, style: {sphere: {color: "white"}} }
+            ];
+
+            initializeViewer("viewer1", stylesViewer1).then(({ viewer }) => {
+                viewer1 = viewer;
+                loadAndPositionMolecule(viewer1, "https://gtacaus.github.io/protein3D/PHE.pdb", targetPosition, 1.6).then(model => pheModel1 = model);
+
+                setInterval(() => {
+                    let view = viewer1.getView();
+                    console.log(`Viewer 1 Camera Position: ${JSON.stringify(view)}`);
+                }, 1000);
+            });
+
+            initializeViewer("viewer2", stylesViewer2).then(({ viewer }) => {
+                viewer2 = viewer;
+                loadAndPositionMolecule(viewer2, "https://gtacaus.github.io/protein3D/PHE.pdb", targetPosition, 1.6).then(model => pheModel2 = model);
+
+                setInterval(() => {
+                    let view = viewer2.getView();
+                    console.log(`Viewer 2 Camera Position: ${JSON.stringify(view)}`);
+                }, 1000);
+            });
+
+            function flashModel(viewer, model) {
+                return setInterval(() => {
+                    if (model) {
+                        viewer.setStyle({model: model.getID()}, {});
+                        viewer.render();
+                        setTimeout(() => {
+                            viewer.setStyle({model: model.getID()}, {stick: {colorscheme: "Jmol", radius: 0.48}});
+                            viewer.render();
+                        }, 500);
+                    }
+                }, 1000);
+            }
+
+            document.getElementById("slider1").addEventListener("input", function(event) {
+                let sliderValue = event.target.value;
+                clearInterval(flashInterval1);
+
+                if (sliderValue == 1) {
+                    if (pheModel1) flashInterval1 = flashModel(viewer1, pheModel1);
+                    else if (tyrModel) flashInterval1 = flashModel(viewer1, tyrModel);
+                } else if (sliderValue == 2) {
+                    
+                        viewer1.removeModel(pheModel1);
+                        pheModel1 = null;
+                    
+                    loadAndPositionMolecule(viewer1, "https://gtacaus.github.io/protein3D/TYR.pdb", targetPosition, 1.6).then(model => tyrModel = model);
+                } else if (sliderValue == 0) {
+                    
+                        viewer1.removeModel(tyrModel);
+                        tyrModel = null;
+                    
+                    loadAndPositionMolecule(viewer1, "https://gtacaus.github.io/protein3D/PHE.pdb", targetPosition, 1.6).then(model => pheModel1 = model);
+                }
+            });
+
+            document.getElementById("slider2").addEventListener("input", function(event) {
+                let sliderValue = event.target.value;
+                clearInterval(flashInterval2);
+
+                if (sliderValue == 1) {
+                    if (pheModel2) flashInterval2 = flashModel(viewer2, pheModel2);
+                } else {
+                    clearInterval(flashInterval2);
+                    viewer2.setStyle({model: pheModel2.getID()}, {stick: {colorscheme: "Jmol", radius: 0.48}});
+                    viewer2.render();
+                }
+            });
+
+            const cameraPosition = [-57.368138213163846, -77.55899276791548, -51.61785418949559, 34.37076879488396, -0.08320308033565153, 0.4056650305025829, 0.031064873190342502, -0.9096967099553925];
+
+            document.getElementById("moveCameraButton").addEventListener("click", function() {
+                viewer1.setView(cameraPosition);
+                viewer2.setView(cameraPosition);
+                viewer1.render();
+                viewer2.render();
+            });
+
+            document.getElementById("resetCameraButton").addEventListener("click", function() {
+                viewer1.setView(originalCameraPosition);
+                viewer2.setView(originalCameraPosition);
+                viewer1.render();
+                viewer2.render();
+            });
+
+            function togglePheTyr(viewer, isPheTyrShown) {
+                if (isPheTyrShown) {
+                    viewer.setStyle({}, {stick: {colorscheme: "Jmol", radius: 0.48}});
+                } else {
+                    viewer.setStyle({}, {stick: {colorscheme: "Jmol", radius: 0.48}});
+                    viewer.setStyle({resi: [404, 407]}, {ballAndStick: {colorscheme: "Jmol", radius: 0.3}});
+                }
+                viewer.render();
+            }
+
+            document.getElementById("togglePheTyrButton").addEventListener("click", function() {
+                isPheTyrShown1 = !isPheTyrShown1;
+                isPheTyrShown2 = !isPheTyrShown2;
+                togglePheTyr(viewer1, isPheTyrShown1);
+                togglePheTyr(viewer2, isPheTyrShown2);
+            });
+
+            function loadNGLViewer(viewerId, url) {
+                const stage = new NGL.Stage(viewerId);
+                stage.loadFile(url, { defaultRepresentation: true }).then(comp => {
+                    comp.addRepresentation('ball+stick', {
+                        sele: 'N or C',
+                        opacity: 0.4  // 60% transparent
+                    });
+                    comp.addRepresentation('ball+stick', {
+                        sele: 'not (N or C)',
+                        opacity: 1.0
+                    });
+                    stage.autoView();
+                }).catch(error => {
+                    console.error(`Error loading NGL viewer ${viewerId}:`, error);
+                    setTimeout(() => loadNGLViewer(viewerId, url), 1000);
+                });
+            }
+
+            loadNGLViewer('nglViewer1', 'https://files.rcsb.org/ligands/view/PHE.cif');
+            loadNGLViewer('nglViewer2', 'https://files.rcsb.org/ligands/view/TYR.cif');
+        });
+    </script>
+</body>
+</html>
