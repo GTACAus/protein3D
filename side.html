@@ -3,556 +3,466 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DNA to RNA Transcription</title>
+    <title>3Dmol and NGL Protein Viewer</title>
+    <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+    <script src="https://unpkg.com/ngl@2.0.0-dev.32/dist/ngl.js"></script>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            margin: 0;
+            font-family: 'Calibri', sans-serif;
             display: flex;
             flex-direction: column;
+            justify-content: center;
             align-items: center;
             height: 100vh;
             background-color: #f0f0f0;
-            margin: 0;
         }
-
         .container {
-            text-align: left;
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin: 10px;
-            width: 90%;
-            max-width: 800px;
-        }
-
-        .dna-sequence, .rna-sequence, .template-sequence, .amino-acid-sequence {
-            margin: 20px 0;
-            font-size: 20px;
-        }
-
-        .base {
-            font-weight: bold;
-        }
-
-        .rna-sequence {
-            color: green;
-            font-size: 19.2px;
-        }
-
-        .codon-dark {
-            color: darkgreen;
-        }
-
-        .codon-light {
-            color: lightgreen;
-        }
-
-        .amino-acid-sequence {
-            color: blue;
-            font-size: 18.8px;
-            text-align: left;
-        }
-
-        .legend-container {
-            margin-top: 20px;
-        }
-
-        .legend {
             display: flex;
             flex-direction: column;
+            align-items: center;
+            width: 90%;
+            max-width: 1200px; /* Set maximum width */
+            padding: 20px;
+            box-sizing: border-box;
         }
-
+        .card-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            width: 100%;
+        }
+        .card {
+            background: white;
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .top-card {
+            width: 85%;
+            max-width: 1000px; /* Set maximum width */
+            background: white;
+            border-radius: 15px; /* Rounded corners */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .viewer-container {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .viewer-title {
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 28px;
+            color: darkblue; /* Dark blue text */
+        }
+        #viewer1, #viewer2 {
+            width: 100%;
+            height: 50vh;
+            background-color: #d3d3d3;
+            border-radius: 15px; /* Rounded corners */
+            position: relative;
+        }
+        .ngl-viewer {
+            width: 30%;
+            height: 10vh;
+            background-color: #f0f0f0;
+            border-radius: 15px; /* Rounded corners */
+        }
+        .slider-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .slider {
+            width: 80%;
+        }
+        .button-container {
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+        .button-container button {
+            font-family: 'Calibri', sans-serif;
+            background-color: #4285f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 30px;
+        }
+        .button-container button:hover {
+            background-color: #357ae8;
+        }
+        .legend-container {
+            width: 100%;
+            max-width: 1200px; /* Set maximum width */
+            display: flex;
+            justify-content: center;
+            padding: 20px 0;
+            background-color: #f8f9fa;
+            box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
+            border-radius: 15px; /* Rounded corners */
+        }
+        .legend {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            font-size: 30px;
+            color: darkblue; /* Dark blue text */
+        }
         .legend-item {
             display: flex;
             align-items: center;
-            margin: 5px 0;
+            color: darkblue; /* Dark blue text */
         }
-
         .legend-color {
-            width: 20px;
-            height: 20px;
-            margin-right: 10px;
+            width: 30px;
+            height: 30px;
+            margin-right: 15px;
+            border: 1px solid #000;
+            border-radius: 15px; /* Rounded corners */
         }
-
-        #transcription-slider, #second-slider, #second-card-slider, #third-card-slider, #fourth-card-slider {
-            width: 80%;
-            -webkit-appearance: none;
-            appearance: none;
-            height: 3px;
-            background: repeating-linear-gradient(
-                90deg,
-                #ddd,
-                #ddd 1px,
-                transparent 1px,
-                transparent 4px
-            );
-            outline: none;
-            opacity: 0.5;
-            transition: opacity .2s;
-            position: relative;
+        .positive-charge {
+            background-color: #0000ff; /* Blue */
+        }
+        .negative-charge {
+            background-color: #ff0000; /* Red */
+        }
+        .hydrophilic {
+            background-color: #ffff00; /* Yellow */
+        }
+        .hydrophobic {
+            background-color: #ffffff; /* White */
+            border: 1px solid #000; /* Black border for better visibility */
+        }
+        .neutral-charge {
+            background-color: #808080; /* Gray */
+        }
+        .enzyme-equation {
+            font-family: Arial, sans-serif;
+            font-size: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             margin-top: 20px;
         }
-
-        #transcription-slider::-webkit-slider-thumb, #second-card-slider::-webkit-slider-thumb, #third-card-slider::-webkit-slider-thumb, #fourth-card-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 50px;
-            height: 50px;
-            background: #4CAF50;
-            cursor: pointer;
-            border-radius: 50%;
+        .enzyme {
             position: relative;
+            top: -10px;
+            font-size: 14px;
+            margin: 0 10px;
         }
-
-        #second-card-slider::-webkit-slider-thumb {
-            background: orange;
+        .ngl-viewer-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
         }
-
-        #third-card-slider::-webkit-slider-thumb {
-            background: #FF5722;
-            width: 20px;
-            height: 20px;
-        }
-
-        #fourth-card-slider::-webkit-slider-thumb {
-            background: #4CAF50;
-        }
-
-        #transcription-slider::-webkit-slider-thumb::after, #second-card-slider::-webkit-slider-thumb::after, #third-card-slider::-webkit-slider-thumb::after, #fourth-card-slider::-webkit-slider-thumb::after {
-            content: 'RNA Polymerase';
-            position: absolute;
-            top: -40px;
-            left: -25px;
-            width: 100px;
-            text-align: center;
-            font-size: 12px;
-            color: #000;
-        }
-
-        #transcription-slider::-moz-range-thumb, #second-card-slider::-moz-range-thumb, #third-card-slider::-moz-range-thumb, #fourth-card-slider::-moz-range-thumb {
-            width: 50px;
-            height: 50px;
-            background: #4CAF50;
-            cursor: pointer;
-            border-radius: 50%;
-            position: relative;
-        }
-
-        #second-card-slider::-moz-range-thumb {
-            background: orange;
-        }
-
-        #third-card-slider::-moz-range-thumb {
-            background: #FF5722;
-        }
-
-        #fourth-card-slider::-moz-range-thumb {
-            background: #4CAF50;
-        }
-
-        #transcription-slider::-moz-range-thumb::after, #second-card-slider::-moz-range-thumb::after, #third-card-slider::-moz-range-thumb::after, #fourth-card-slider::-moz-range-thumb::after {
-            content: 'RNA Polymerase';
-            position: absolute;
-            top: -40px;
-            left: -25px;
-            width: 100px;
-            text-align: center;
-            font-size: 12px;
-            color: #000;
-        }
-
-        #rna-label {
-            display: none;
-            font-weight: bold;
-            margin-top: 10px;
-            color: green;
-        }
-
-        #second-slider, #third-card-slider, #fourth-card-slider {
-            display: none;
-        }
-
-        #rna-container.bottom {
-            position: absolute;
-            bottom: 20px;
-            width: 80%;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .fade-out-down {
-            animation: fadeOutDown 2s forwards;
-        }
-
-        @keyframes fadeOutDown {
-            0% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(50px);
-            }
-        }
-
-        .image-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .image-container img {
+        .ngl-viewer-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
             width: 50%;
-            max-width: 50%;
-            height: auto;
-            border-radius: 10px;
         }
-
-        .amino-acid-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+        @media (max-width: 768px) {
+            .card-container {
+                grid-template-columns: 1fr;
+            }
         }
-
-        .amino-acid-table th, .amino-acid-table td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-
-        .amino-acid-table th {
-            background-color: #f2f2f2;
-            color: black;
-        }
-
-        .property-positive {
-            background-color: #ffcccc;
-        }
-
-        .property-negative {
-            background-color: #ccccff;
-        }
-
-        .property-hydrophilic {
-            background-color: white;
-        }
-
-        .property-hydrophobic {
-            background-color: #ffffcc;
-        }
-
-        .property-neutral {
-            background-color: #d9d9d9;
-        }
-
-        .iframe-container {
-            border: 1px solid grey;
-            border-radius: 10px;
-            overflow: hidden;
-        }
-
-        .iframe-container iframe {
-            border-radius: 10px;
-            width: 100%;
-            height: 500px;
-        }
-
-        iframe {
-            scrollbar-color: #888 #f0f0f0;
-            scrollbar-width: thin;
-        }
-
-        iframe::-webkit-scrollbar {
-            width: 12px;
-        }
-
-        iframe::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 6px;
-        }
-
-        iframe::-webkit-scrollbar-track {
-            background: #f0f0f0;
-        }
-
     </style>
 </head>
 <body>
     <div class="container">
-        <h2>Transcription</h2>
-        <b>Coding strand</b>
-        <div class="dna-sequence" id="dna-sequence"></div>
-        <input type="range" id="transcription-slider" min="0" max="100" value="0">
-        <div id="rna-container">
-            <div id="rna-label"><b>Messenger RNA</b></div>
-            <div class="rna-sequence">
-                <span id="rna-output"></span>
+        <div class="top-card">
+            <div class="ngl-viewer-container">
+                <div class="ngl-viewer-wrapper">
+                    <div class="viewer-title">Phenylalanine (PHE)</div>
+                    <div id="nglViewer1" class="ngl-viewer"></div>
+                </div>
+                <div class="ngl-viewer-wrapper">
+                    <div class="viewer-title">Tyrosine (TYR)</div>
+                    <div id="nglViewer2" class="ngl-viewer"></div>
+                </div>
             </div>
-            <input type="range" id="second-slider" min="0" max="100" value="0">
-        </div>
-        <div class="template-sequence" id="template-sequence"></div>
-        <b>Template strand</b>
-        <div class="image-container">
-            <img src="https://cdn.kastatic.org/ka-perseus-images/1da89713b9aa8067742244d916749e72561bb3cc.png" alt="DNA Transcription">
-        </div>
-    </div>
-    <div class="container hidden" id="second-card">
-        <h2>Translation</h2>
-        <div id="second-rna-container">
-            <input type="range" id="second-card-slider" min="0" max="100" value="0">
-            <div class="amino-acid-sequence" id="second-amino-acid-output"></div>
-            <div class="rna-sequence">
-                <span id="second-rna-output"></span>
+            <div class="enzyme-equation">
+                Phenylalanine <span class="enzyme">PAH</span> &#8594; Tyrosine
             </div>
         </div>
-        <div class="image-container">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Aminoacids_table.svg/600px-Aminoacids_table.svg.png" alt="Amino Acids Table">
+        <div class="card-container">
+            <div class="card">
+                <div class="viewer-container">
+                    <div id="viewer1"></div>
+                    <div class="viewer-title"><b>Phenylalanine hydroxylase (PAH)</b></div>
+                </div>
+                <div class="slider-container">
+                    <input type="range" min="0" max="2" value="0" class="slider" id="slider1">
+                </div>
+            </div>
+            <div class="card">
+                <div class="viewer-container">
+                    <div id="viewer2"></div>
+                    <div class="viewer-title">Non-functional <b>phenylalanine hydroxylase (PAH)</b></div>
+                </div>
+                <div class="slider-container">
+                    <input type="range" min="0" max="2" value="0" class="slider" id="slider2">
+                </div>
+            </div>
         </div>
-    </div>
-    <div class="container hidden" id="third-card">
-        <h2>Amino Acid Properties</h2>
-        <div class="amino-acid-sequence" id="all-amino-acid-output"></div>
-        <input type="range" id="third-card-slider" min="0" max="100" value="0">
-        <div class="amino-acid-sequence" id="third-amino-acid-output" style="visibility: hidden;"></div>
         <div class="legend-container">
             <div class="legend">
-                <b>Amino acid properties</b>
                 <div class="legend-item">
-                    <div class="legend-color" style="background-color: #ffcccc;"></div>
-                    <span>Positive Charge</span>
-                </div>
-                <div class="legend-item">
-                    <div class="legend-color" style="background-color: #ccccff;"></div>
+                    <div class="legend-color positive-charge"></div>
                     <span>Negative Charge</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background-color: white; border: 1px solid #000;"></div>
+                    <div class="legend-color negative-charge"></div>
+                    <span>Positive Charge</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color hydrophilic"></div>
                     <span>Hydrophilic</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background-color: #ffffcc;"></div>
+                    <div class="legend-color hydrophobic"></div>
                     <span>Hydrophobic</span>
                 </div>
                 <div class="legend-item">
-                    <div class="legend-color" style="background-color: #d9d9d9;"></div>
+                    <div class="legend-color neutral-charge"></div>
                     <span>Neutral Charge</span>
                 </div>
             </div>
         </div>
-        <table class="amino-acid-table">
-            <thead>
-                <tr>
-                    <th>Property</th>
-                    <th>Amino Acids</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr class="property-positive">
-                    <td>Positive Charge</td>
-                    <td>H, K, R</td>
-                </tr>
-                <tr class="property-negative">
-                    <td>Negative Charge</td>
-                    <td>D, E</td>
-                </tr>
-                <tr class="property-hydrophilic">
-                    <td>Hydrophilic</td>
-                    <td>N, Q, S, T, Y</td>
-                </tr>
-                <tr class="property-hydrophobic">
-                    <td>Hydrophobic</td>
-                    <td>A, C, F, I, L, M, V, W</td>
-                </tr>
-                <tr class="property-neutral">
-                    <td>Neutral</td>
-                    <td>G, P</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="container hidden" id="fourth-card">
-        <h2>3D Protein Viewer</h2>
-        <input type="range" id="fourth-card-slider" min="0" max="100" value="0">
-        <div class="iframe-container">
-            <iframe src="https://gtacaus.github.io/protein3D/amino.html" width="100%" height="500px" style="border: none;"></iframe>
+        <div class="button-container">
+            <button id="moveCameraButton">Focus on Active Site</button>
+            <button id="resetCameraButton">Reset Camera Position</button>
         </div>
     </div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const dnaSequence = "ATGGCGTACGATGCCGATCGATCGATCGTAGCTAGCTAGCTGACT";
-            const templateSequence = "TACCGCATGCTACGGCTAGCTAGCTAGCATCGATCGATCGACTGA";
-            const rnaSequence = dnaSequence.replace(/T/g, 'U');
-            const dnaOutput = document.getElementById('dna-sequence');
-            const rnaOutput = document.getElementById('rna-output');
-            const templateOutput = document.getElementById('template-sequence');
-            const slider = document.getElementById('transcription-slider');
-            const rnaLabel = document.getElementById('rna-label');
-            const secondSlider = document.getElementById('second-slider');
-            const rnaContainer = document.getElementById('rna-container');
-            const secondCard = document.getElementById('second-card');
-            const secondCardSlider = document.getElementById('second-card-slider');
-            const secondRnaOutput = document.getElementById('second-rna-output');
-            const secondAminoAcidOutput = document.getElementById('second-amino-acid-output');
-            const thirdCard = document.getElementById('third-card');
-            const thirdCardSlider = document.getElementById('third-card-slider');
-            const thirdAminoAcidOutput = document.getElementById('third-amino-acid-output');
-            const allAminoAcidOutput = document.getElementById('all-amino-acid-output');
-            const fourthCard = document.getElementById('fourth-card');
-            const fourthCardSlider = document.getElementById('fourth-card-slider');
+        document.addEventListener("DOMContentLoaded", function() {
+            let viewer1, viewer2, viewer3, viewer4, pheModel1, pheModel2, tyrModel;
+            let flashInterval1, flashInterval2;
 
-            const codonTable = {
-                'UUU': 'F', 'UUC': 'F', 'UUA': 'L', 'UUG': 'L',
-                'UCU': 'S', 'UCC': 'S', 'UCA': 'S', 'UCG': 'S',
-                'UAU': 'Y', 'UAC': 'Y', 'UAA': '_', 'UAG': '_',
-                'UGU': 'C', 'UGC': 'C', 'UGA': '_', 'UGG': 'W',
-                'CUU': 'L', 'CUC': 'L', 'CUA': 'L', 'CUG': 'L',
-                'CCU': 'P', 'CCC': 'P', 'CCA': 'P', 'CCG': 'P',
-                'CAU': 'H', 'CAC': 'H', 'CAA': 'Q', 'CAG': 'Q',
-                'CGU': 'R', 'CGC': 'R', 'CGA': 'R', 'CGG': 'R',
-                'AUU': 'I', 'AUC': 'I', 'AUA': 'I', 'AUG': 'M',
-                'ACU': 'T', 'ACC': 'T', 'ACA': 'T', 'ACG': 'T',
-                'AAU': 'N', 'AAC': 'N', 'AAA': 'K', 'AAG': 'K',
-                'AGU': 'S', 'AGC': 'S', 'AGA': 'R', 'AGG': 'R',
-                'GUU': 'V', 'GUC': 'V', 'GUA': 'V', 'GUG': 'V',
-                'GCU': 'A', 'GCC': 'A', 'GCA': 'A', 'GCG': 'A',
-                'GAU': 'D', 'GAC': 'D', 'GAA': 'E', 'GAG': 'E',
-                'GGU': 'G', 'GGC': 'G', 'GGA': 'G', 'GGG': 'G'
-            };
+            const targetPosition = { x: 70.142, y: 80.017, z: 61.029 };
+            const originalCameraPosition = [-57, -77, -51, -174, -0.08, 0.4, 0.3, -0.9]; // Adjust to the actual original camera position
 
-            const aminoAcidProperties = {
-                'A': 'hydrophobic', 'C': 'hydrophobic', 'D': 'negative', 'E': 'negative',
-                'F': 'hydrophobic', 'G': 'neutral', 'H': 'positive', 'I': 'hydrophobic',
-                'K': 'positive', 'L': 'hydrophobic', 'M': 'hydrophobic', 'N': 'hydrophilic',
-                'P': 'neutral', 'Q': 'hydrophilic', 'R': 'positive', 'S': 'hydrophilic',
-                'T': 'hydrophilic', 'V': 'hydrophobic', 'W': 'hydrophobic', 'Y': 'hydrophilic'
-            };
+            function loadAndPositionMolecule(viewer, url, targetPosition, scaleFactor) {
+                return fetch(url)
+                    .then(response => response.ok ? response.text() : Promise.reject("Network response was not ok"))
+                    .then(pdbText => {
+                        const model = viewer.addModel(pdbText, "pdb");
+                        const atoms = model.selectedAtoms({});
+                        let center = { x: 0, y: 0, z: 0 };
+                        atoms.forEach(atom => {
+                            center.x += atom.x;
+                            center.y += atom.y;
+                            center.z += atom.z;
+                        });
+                        center.x /= atoms.length;
+                        center.y /= atoms.length;
+                        center.z /= atoms.length;
 
-            slider.addEventListener('input', () => {
-                const value = slider.value;
-                const progress = Math.floor((value / 100) * dnaSequence.length);
-                rnaOutput.textContent = rnaSequence.substring(0, progress);
-                rnaLabel.style.display = progress > 0 ? 'block' : 'none';
+                        let translation = {
+                            x: targetPosition.x - center.x,
+                            y: targetPosition.y - center.y,
+                            z: targetPosition.z - center.z
+                        };
+                        atoms.forEach(atom => {
+                            atom.x += translation.x;
+                            atom.y += translation.y;
+                            atom.z += translation.z;
+                        });
+                        model.setCoordinates(atoms);
+                        viewer.setStyle({model: model.getID()}, {stick: {colorscheme: "Jmol", radius: 0.48}});
+                        viewer.render();
+                        return model;
+                    })
+                    .catch(error => console.error('Error loading molecule:', error));
+            }
 
-                if (value == 100) {
-                    secondCard.classList.remove('hidden');
-                    secondRnaOutput.innerHTML = formatCodons(rnaSequence);
-                    rnaContainer.classList.add('fade-out-down');
-                    rnaContainer.addEventListener('animationend', () => {
-                        rnaContainer.style.display = 'none';
-                    }, { once: true });
-                    scrollToElement(secondCard);
-                } else if (value == 0) {
-                    resetTranscription();
-                } else {
-                    secondCard.classList.add('hidden');
-                    secondCardSlider.value = 0;
-                    rnaContainer.style.display = 'block';
+            function initializeViewer(viewerId, customStyles) {
+                let viewer = $3Dmol.createViewer(viewerId, {
+                    defaultcolors: $3Dmol.rasmolElementColors,
+                    backgroundColor: '#d3d3d3'
+                });
+
+                return fetch("https://files.rcsb.org/download/6N1K.pdb")
+                    .then(response => response.ok ? response.text() : Promise.reject("Network response was not ok"))
+                    .then(pdbText => {
+                        viewer.addModel(pdbText, "pdb");
+                        viewer.setStyle({}, {sphere: {color: "pink"}});
+                        customStyles.forEach(style => viewer.setStyle(style.selector, style.style));
+                        viewer.zoomTo();
+                        viewer.render();
+                        return { viewer, model: null };
+                    })
+                    .catch(error => console.error(`Error loading PDB file for ${viewerId}:`, error));
+            }
+
+            const stylesViewer1 = [
+                { selector: {chain: 'A', resi: 404}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'A', resi: 412}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'A', resi: 407}, style: {sphere: {color: "blue"}} },
+                { selector: {chain: 'A', resi: 405}, style: {sphere: {color: "red"}} },
+                { selector: {chain: 'A', resi: 409}, style: {sphere: {color: "white"}} },
+                { selector: {chain: 'B', resi: 404}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'B', resi: 412}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'B', resi: 407}, style: {sphere: {color: "blue"}} },
+                { selector: {chain: 'B', resi: 405}, style: {sphere: {color: "red"}} },
+                { selector: {chain: 'B', resi: 409}, style: {sphere: {color: "white"}} },
+                { selector: {chain: 'C', resi: 404}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'C', resi: 412}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'C', resi: 407}, style: {sphere: {color: "blue"}} },
+                { selector: {chain: 'C', resi: 405}, style: {sphere: {color: "red"}} },
+                { selector: {chain: 'C', resi: 409}, style: {sphere: {color: "white"}} },
+                { selector: {chain: 'D', resi: 404}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'D', resi: 412}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'D', resi: 407}, style: {sphere: {color: "blue"}} },
+                { selector: {chain: 'D', resi: 405}, style: {sphere: {color: "red"}} },
+                { selector: {chain: 'D', resi: 409}, style: {sphere: {color: "white"}} }
+            ];
+
+            const stylesViewer2 = [
+                { selector: {chain: 'A', resi: 404}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'A', resi: 412}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'A', resi: 407}, style: {sphere: {color: "blue"}} },
+                { selector: {chain: 'A', resi: 405}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'A', resi: 409}, style: {sphere: {color: "white"}} },
+                { selector: {chain: 'B', resi: 404}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'B', resi: 412}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'B', resi: 407}, style: {sphere: {color: "blue"}} },
+                { selector: {chain: 'B', resi: 405}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'B', resi: 409}, style: {sphere: {color: "white"}} },
+                { selector: {chain: 'C', resi: 404}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'C', resi: 412}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'C', resi: 407}, style: {sphere: {color: "blue"}} },
+                { selector: {chain: 'C', resi: 405}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'C', resi: 409}, style: {sphere: {color: "white"}} },
+                { selector: {chain: 'D', resi: 404}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'D', resi: 412}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'D', resi: 407}, style: {sphere: {color: "blue"}} },
+                { selector: {chain: 'D', resi: 405}, style: {sphere: {color: "yellow"}} },
+                { selector: {chain: 'D', resi: 409}, style: {sphere: {color: "white"}} }
+            ];
+
+            initializeViewer("viewer1", stylesViewer1).then(({ viewer }) => {
+                viewer1 = viewer;
+                loadAndPositionMolecule(viewer1, "https://gtacaus.github.io/protein3D/PHE.pdb", targetPosition, 1.6).then(model => pheModel1 = model);
+
+                setInterval(() => {
+                    let view = viewer1.getView();
+                    console.log(`Viewer 1 Camera Position: ${JSON.stringify(view)}`);
+                }, 1000);
+            });
+
+            initializeViewer("viewer2", stylesViewer2).then(({ viewer }) => {
+                viewer2 = viewer;
+                loadAndPositionMolecule(viewer2, "https://gtacaus.github.io/protein3D/PHE.pdb", targetPosition, 1.6).then(model => pheModel2 = model);
+
+                setInterval(() => {
+                    let view = viewer2.getView();
+                    console.log(`Viewer 2 Camera Position: ${JSON.stringify(view)}`);
+                }, 1000);
+            });
+
+            function flashModel(viewer, model) {
+                return setInterval(() => {
+                    if (model) {
+                        viewer.setStyle({model: model.getID()}, {});
+                        viewer.render();
+                        setTimeout(() => {
+                            viewer.setStyle({model: model.getID()}, {stick: {colorscheme: "Jmol", radius: 0.48}});
+                            viewer.render();
+                        }, 500);
+                    }
+                }, 1000);
+            }
+
+            document.getElementById("slider1").addEventListener("input", function(event) {
+                let sliderValue = event.target.value;
+                clearInterval(flashInterval1);
+
+                if (sliderValue == 1) {
+                    if (pheModel1) flashInterval1 = flashModel(viewer1, pheModel1);
+                    else if (tyrModel) flashInterval1 = flashModel(viewer1, tyrModel);
+                } else if (sliderValue == 2) {
+                    
+                        viewer1.removeModel(pheModel1);
+                        pheModel1 = null;
+                    
+                    loadAndPositionMolecule(viewer1, "https://gtacaus.github.io/protein3D/TYR.pdb", targetPosition, 1.6).then(model => tyrModel = model);
+                } else if (sliderValue == 0) {
+                    
+                        viewer1.removeModel(tyrModel);
+                        tyrModel = null;
+                    
+                    loadAndPositionMolecule(viewer1, "https://gtacaus.github.io/protein3D/PHE.pdb", targetPosition, 1.6).then(model => pheModel1 = model);
                 }
             });
 
-            secondCardSlider.addEventListener('input', () => {
-                const value = secondCardSlider.value;
-                const progress = Math.floor((value / 100) * (rnaSequence.length / 3)) * 3;
-                const codons = rnaSequence.substring(0, progress).match(/.{1,3}/g) || [];
-                const aminoAcids = codons.map(codon => codonTable[codon] || '').join('');
-                secondAminoAcidOutput.innerHTML = formatAminoAcids(codons, aminoAcids);
+            document.getElementById("slider2").addEventListener("input", function(event) {
+                let sliderValue = event.target.value;
+                clearInterval(flashInterval2);
 
-                if (value == 100) {
-                    thirdCard.classList.remove('hidden');
-                    thirdCardSlider.value = 0; // Reset third card slider value to 0
-                    thirdAminoAcidOutput.innerHTML = ''; // Clear amino acids at first
-                    thirdAminoAcidOutput.style.visibility = 'hidden'; // Hide the amino acid sequence initially
-                    allAminoAcidOutput.innerHTML = formatAminoAcids(codons, aminoAcids); // Show all amino acids above the slider
-                    thirdCardSlider.style.display = 'block'; // Show the third card slider
-                    scrollToElement(thirdCard);
+                if (sliderValue == 1) {
+                    if (pheModel2) flashInterval2 = flashModel(viewer2, pheModel2);
                 } else {
-                    thirdCard.classList.add('hidden');
-                    thirdCardSlider.style.display = 'none';
+                    clearInterval(flashInterval2);
+                    viewer2.setStyle({model: pheModel2.getID()}, {stick: {colorscheme: "Jmol", radius: 0.48}});
+                    viewer2.render();
                 }
             });
 
-            thirdCardSlider.addEventListener('input', () => {
-                const value = thirdCardSlider.value;
-                const progress = Math.floor((value / 100) * (allAminoAcidOutput.textContent.length));
-                const aminoAcidsToShow = allAminoAcidOutput.textContent.substring(0, progress);
-                thirdAminoAcidOutput.innerHTML = formatAminoAcidProperties(aminoAcidsToShow);
-                thirdAminoAcidOutput.style.visibility = progress > 0 ? 'visible' : 'hidden'; // Reveal the sequence as the slider moves
+            const cameraPosition = [-57.368138213163846, -77.55899276791548, -51.61785418949559, 34.37076879488396, -0.08320308033565153, 0.4056650305025829, 0.031064873190342502, -0.9096967099553925];
 
-                if (value == 100) {
-                    fourthCard.classList.remove('hidden');
-                    fourthCardSlider.value = 0;
-                    scrollToElement(fourthCard);
-		   setTimeout(reloadViewerInIframe, 2000); // Trigger reload of viewer 2 seconds after fourth card is revealed
-                
-                } else {
-                    fourthCard.classList.add('hidden');
-                }
+            document.getElementById("moveCameraButton").addEventListener("click", function() {
+                viewer1.setView(cameraPosition);
+                viewer2.setView(cameraPosition);
+                viewer1.render();
+                viewer2.render();
             });
 
-            function reloadViewerInIframe() {
-                const iframe = document.querySelector('#fourth-card iframe');
-                if (iframe) {
-                    iframe.contentWindow.postMessage('reloadViewer', '*');
-                }
+            document.getElementById("resetCameraButton").addEventListener("click", function() {
+                viewer1.setView(originalCameraPosition);
+                viewer2.setView(originalCameraPosition);
+                viewer1.render();
+                viewer2.render();
+            });
+
+            function loadNGLViewer(viewerId, url) {
+                const stage = new NGL.Stage(viewerId);
+                stage.loadFile(url, { defaultRepresentation: true }).then(comp => {
+                    comp.addRepresentation('ball+stick', {
+                        sele: 'N or C',
+                        opacity: 0.4  // 60% transparent
+                    });
+                    comp.addRepresentation('ball+stick', {
+                        sele: 'not (N or C)',
+                        opacity: 1.0
+                    });
+                    stage.autoView();
+                }).catch(error => {
+                    console.error(`Error loading NGL viewer ${viewerId}:`, error);
+                    setTimeout(() => loadNGLViewer(viewerId, url), 1000);
+                });
             }
 
-            function resetTranscription() {
-                rnaOutput.textContent = '';
-                rnaLabel.style.display = 'none';
-                secondCard.classList.add('hidden');
-                thirdCard.classList.add('hidden');
-                fourthCard.classList.add('hidden');
-                rnaContainer.classList.remove('fade-out-down');
-                rnaContainer.style.display = 'block';
-            }
-
-            function formatCodons(sequence) {
-                let formattedSequence = '';
-                for (let i = 0; i < sequence.length; i += 3) {
-                    const codon = sequence.substring(i, i + 3);
-                    const className = Math.floor(i / 3) % 2 === 0 ? 'codon-dark' : 'codon-light';
-                    formattedSequence += `<span class="${className}">${codon}</span>`;
-                }
-                return formattedSequence;
-            }
-
-            function formatAminoAcids(codons, aminoAcids) {
-                let formattedSequence = '';
-                for (let i = 0; i < codons.length; i++) {
-                    const codon = codons[i];
-                    const aminoAcid = aminoAcids[i] || '';
-                    if (aminoAcid === '_') break;
-                    formattedSequence += `<span style="display: inline-block; text-align: center; width: 4ch; color: blue;">${aminoAcid}</span>`;
-                }
-                return formattedSequence;
-            }
-
-            function formatAminoAcidProperties(aminoAcids) {
-                let formattedSequence = '';
-                for (let i = 0; i < aminoAcids.length; i++) {
-                    const aminoAcid = aminoAcids[i];
-                    const property = aminoAcidProperties[aminoAcid] || 'hydrophilic';
-                    const textColor = (property === 'negative') ? 'white' : 'blue';
-                    const backgroundColor = property === 'hydrophobic' ? 'yellow' :
-                        property === 'hydrophilic' ? 'white' :
-                        property === 'positive' ? 'red' :
-                        property === 'negative' ? 'blue' :
-                        property === 'neutral' ? 'grey' :
-                        'grey';
-                    formattedSequence += `<span style="display: inline-block; text-align: center; width: 4ch; color: ${textColor}; background-color: ${backgroundColor};">${aminoAcid}</span>`;
-                }
-                return formattedSequence;
-            }
-
-            function scrollToElement(element) {
-                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-
-            // Initialize DNA and template sequence display
-            dnaOutput.innerHTML = dnaSequence.split('').map(base => `<span class="base">${base}</span>`).join('');
-            templateOutput.innerHTML = templateSequence.split('').map(base => `<span class="base">${base}</span>`).join('');
+            loadNGLViewer('nglViewer1', 'https://files.rcsb.org/ligands/view/PHE.cif');
+            loadNGLViewer('nglViewer2', 'https://files.rcsb.org/ligands/view/TYR.cif');
         });
     </script>
 </body>
