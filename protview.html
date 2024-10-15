@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
     <style>
         /* Add your CSS styles here */
-        /* Keeping the previous styles as is */
         pre {
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -71,6 +70,8 @@
             margin: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            width: 100%;
         }
         .card-content {
             padding: 20px;
@@ -113,9 +114,6 @@
             box-sizing: border-box;
             overflow-y: auto;
         }
-        .sequence-title {
-            font-size: 1.2em;
-        }
         .highlight-blue {
             background-color: #e0f7fa;
         }
@@ -127,8 +125,8 @@
         }
         .spacefill-key span {
             display: inline-block;
-            width: 16px; /* Adjust width as needed */
-            text-align: left; /* Ensure left alignment */
+            width: 16px;
+            text-align: left;
         }
         .spacefill-key li {
             display: flex;
@@ -155,6 +153,14 @@
         }
         .button-container button {
             margin-left: 20px;
+        }
+
+        /* Flexbox container for the cards */
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
         }
 
         /* Responsive styles */
@@ -220,25 +226,28 @@
             <button onclick="redirectToXML()">Make XML</button>
         </div>
         <br><br>
-        
-        <div id="content" class="hidden">
-            <table class="sequence-table card">
-                <thead>
-                    <tr>
-                        <th colspan="50" id="sequenceTitle">Sequence of <span id="fileName"></span></th>
-                    </tr>
-                </thead>
-                <tbody id="sequenceTable"></tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="50" style="text-align: center;">
-                            <button class="deselect-button" onclick="deselectAll()">Deselect</button>
-                            <p id="aminoAcidDescription">The amino acid sequences (primary structures) of the protein are shown in the Sequence viewer. Each letter represents an individual amino acid (e.g. s = serine; t = threonine, i = isoleucine, etc.).</p>
-                            <p class="big-blue-text">Identify the primary structure of the <span id="proteinName1"></span>.</p>
-                        </td>
-                    </tr>
-                </tfoot>
-            </table>
+
+        <div id="content" class="hidden card-container">
+            <div class="card">
+                <table class="sequence-table card-content">
+                    <thead>
+                        <tr>
+                            <th colspan="50" id="sequenceTitle">Sequence of <span id="fileName"></span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="sequenceTable"></tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="50" style="text-align: center;">
+                                <button class="deselect-button" onclick="deselectAll()">Deselect</button>
+                                <p id="aminoAcidDescription">The amino acid sequences (primary structures) of the protein are shown in the Sequence viewer. Each letter represents an individual amino acid (e.g. s = serine; t = threonine, i = isoleucine, etc.).</p>
+                                <p class="big-blue-text">Identify the primary structure of the <span id="proteinName1"></span>.</p>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
             <div class="card">
                 <div class="card-content">
                     <h2>Secondary structure</h2>
@@ -252,7 +261,7 @@
             </div>
 
             <!-- Copy mecA Gene Sequence -->
-            <div class="container card">
+            <div class="card">
                 <div class="card-content">
                     <h2>Copy the <span id="geneName1"></span> gene for translation by our bioinformatics tool</h2>
                     <p>Click/tap copy text to take the DNA sequence from <span id="geneName2"></span> for translation.</p>
@@ -262,7 +271,7 @@
             </div>
 
             <!-- Translate the mecA Gene -->
-            <div class="container card">
+            <div class="card">
                 <div class="card-content">
                     <h2>Translate the <span id="geneName3"></span> gene</h2>
                     <p>Bioinformatics tools can quickly perform this task. You will use the translate tool to quickly process your coding DNA sequence into a translated amino acid sequence. Use the tool below to translate the copied <span id="geneName4"></span> nucleotide sequence to a protein primary structure. Paste the sequence into the sequence box and click/tap TRANSLATE.</p>
@@ -276,7 +285,7 @@
             </div>
 
             <!-- Mutate the mecA Gene -->
-            <div class="container card">
+            <div class="card">
                 <div class="card-content">
                     <h2>Mutate the <span id="geneName5"></span> gene</h2>
                     <p>Paste the same sequence into the sequence box. Delete 1, 2 or 3 nucleotides and click/tap TRANSLATE to generate a mutant primary structure.</p>
@@ -291,7 +300,7 @@
             </div>
 
             <!-- Compare Original and Mutant Gene Sequences -->
-            <div class="container card">
+            <div class="card">
                 <div class="card-content">
                     <h2>Compare the original and mutant gene sequences</h2>
                     <div>
@@ -314,7 +323,7 @@
             </div>
 
             <!-- Use AI to Fold Protein -->
-            <div class="container card">
+            <div class="card">
                 <div class="card-content">
                     <h2>Use AI to fold your mutant protein</h2>
                     <p>Recent advances in artificial intelligence have allowed scientists to use computers to simulate protein folding in order to determine what a protein’s 3D structure might look like without needing to make observations of real proteins. AlphaFold is a tool that uses machine learning algorithms to perform high accuracy predictions about what a protein’s 3D structure might look like using only an amino acid sequence as an input. Copy the amino acid sequence from your mutant amino acid translation.</p>
@@ -989,7 +998,7 @@
 
         // Call adjustResiduesPerLine on load and on resize
         window.addEventListener('load', adjustResiduesPerLine);
-        //window.addEventListener('resize', adjustResiduesPerLine);
+        window.addEventListener('resize', adjustResiduesPerLine);
 
         function handleFileInput(event) {
             const file = event.target.files[0];
@@ -1109,6 +1118,7 @@
             }
         }
     </script>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </body>
 </html>
