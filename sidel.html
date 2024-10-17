@@ -584,7 +584,6 @@
                     viewer.addModel(data, "pdb");
                     viewer.setStyle({}, originalStyles[styleIndex]);
                     viewer.zoomTo();
-                    viewer.setRotation([0.01, 0.005, 0]);
                     viewer.render();
                     selectedResidues.forEach(residueIndex => {
                         viewer.setStyle({ resi: residueIndex }, { stick: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } });
@@ -592,6 +591,10 @@
                     viewer.render();
                 })
                 .catch(error => console.error('Error fetching the PDB file:', error));
+
+            // Start automatic rotation for the viewer
+            autoRotateViewer(viewer, 0.02, 0.01); // Adjust speedX and speedY for desired rotation speed
+
             return viewer;
         }
 
@@ -1117,6 +1120,15 @@
             } catch (err) {
                 console.error('Failed to read clipboard contents: ', err);
             }
+        }
+
+        // Function to enable automatic rotation
+        function autoRotateViewer(viewer, speedX, speedY) {
+            const rotateInterval = setInterval(() => {
+                viewer.rotate(speedX, 'y'); // Rotate along y-axis
+                viewer.rotate(speedY, 'x'); // Rotate along x-axis
+                viewer.render();
+            }, 100); // Adjust the interval timing to control rotation speed
         }
     </script>
 
