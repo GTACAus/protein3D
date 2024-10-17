@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive 3D Protein Viewer</title>
+    <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
+    <script src="https://stuk.github.io/jszip/dist/jszip.min.js"></script>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <style>
+        /* Add your CSS styles here */
+        pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        body {
+            background-color: #fafafa;
+            font-family: 'Roboto', sans-serif;
+        }
+        .sequence-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .sequence-table th, .sequence-table td {
+            padding: 5px;
+            cursor: pointer;
+        }
+        .sequence-table th {
+            background-color: #f2f2f2;
+        }
+        .sequence-numbers {
+            color: #1e88e5;
+            font-weight: bold;
+        }
+        .highlight {
+            background-color: #a5d6a7;
+        }
+        .viewer-container {
+            position: relative;
+            margin-bottom: 20px;
+            display: inline-block;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            overflow: hidden;
+            width: 100%;
+        }
+        .refresh-button, .deselect-button, .toggle-style-button {
+            margin: 10px;
+            padding: 10px 20px;
+            background-color: #1e88e5;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .refresh-button:hover, .deselect-button:hover, .toggle-style-button:hover {
+            background-color: #1565c0;
+        }
+        .viewer {
+            height: 400px;
+            width: 100%;
+            position: relative;
+            background-color: white;
+        }
+        .card {
+            margin: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            width: 100%;
+        }
+        .card-content {
+            padding: 20px;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+        }
+        h1 {
+            color: #424242;
+            font-size: 2.5em;
+        }
+        h2 {
+            color: #424242;
+            font-size: 1.5em;
+        }
+        p {
+            color: #757575;
+            font-size: 1.2em;
+        }
+        .big-blue-text {
+            font-size: 1.5em;
+            color: #1e88e5;
+        }
+        textarea {
+            width: 100%;
+            font-family: monospace;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #proteinSequence {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-family: monospace;
+            width: 100%;
+            height: 200px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+        .highlight-blue {
+            background-color: #e0f7fa;
+        }
+        .highlight-red {
+            background-color: #d54056;
+        }
+        .highlight-purple {
+            background-color: #e1bee7;
+        }
+        .spacefill-key span {
+            display: inline-block;
+            width: 16px;
+            text-align: left;
+        }
+        .spacefill-key li {
+            display: flex;
+            margin-right: 10px;
+            font-size: 1.5em;
+        }
+        .spacefill-key li span.hydrophilic {
+            background-color: white;
+            border: 0.5px solid black;
+            border-radius: 50%;
+            display: inline-block;
+            height: 12px;
+            width: 12px;
+        }
+        .active-site-text {
+            font-size: 1.2em;
+        }
+        .hidden {
+            display: none;
+        }
+        .button-container {
+            display: flex;
+            align-items: center;
+        }
+        .button-container button {
+            margin-left: 20px;
+        }
+
+        /* Flexbox container for the cards */
+        .card-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .viewer {
+                height: 300px;
+            }
+            .active-site-text {
+                font-size: 1em;
+            }
+            h1 {
+                font-size: 2em;
+            }
+            h2 {
+                font-size: 1.3em;
+            }
+            p {
+                font-size: 1em;
+            }
+            .big-blue-text {
+                font-size: 1.2em;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .viewer {
+                height: 250px;
+            }
+            .active-site-text {
+                font-size: 0.9em;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            h2 {
+                font-size: 1.1em;
+            }
+            p {
+                font-size: 0.9em;
+            }
+            .big-blue-text {
+                font-size: 1em;
+            }
+            .button-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .button-container button {
+                margin: 10px 0 0 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    
+            <!-- Compare Mutant PBP -->
+            <div class="card">
+                <div class="card-content">
+                    <div>
+                        <h2>Compare your mutant <span id="proteinName5"></span> with the original protein</h2>
+                        <p id="proteinFunction"></p>
+                    </div>
+                    <p>Return to <a href="https://alphafoldserver.com/" target="_blank">AlphaFold Server</a> and download and/or screenshot your model. Upload and view the mutant protein.</p>
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <h3 class="sequence-title"><b>Mutant protein</b></h3>
+                            <div id="mutantViewer" class="viewer" style="height: 400px; width: 100%;"></div>
+                            <button class="refresh-button" onclick="reloadMutantViewer()">Reset mutant protein</button>
+                            <button class="toggle-style-button" onclick="toggleMutantViewerStyle()">Toggle secondary structure/spacefill</button>
+                        </div>                        
+                        <div class="col s12 m6">
+                            <h3 class="sequence-title"><b>Original protein</b></h3>
+                            <div id="alphafoldViewer" class="viewer" style="height: 400px; width: 100%;"></div>
+                            <button class="refresh-button" onclick="reloadAlphaFoldViewer()">Reset original protein</button>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col s12 m6">
+                            <h3 class="sequence-title"><b>Upload PDB or ZIP file</b></h3>
+                            <input type="file" id="pdbFileInput" accept=".pdb, .zip, .cif" />
+                        </div>
+                        <div class="col s12 m6">
+                            <h3 class="sequence-title"><b>AlphaFold Image</b></h3>
+                            <input type="file" id="alphafoldImageInput" accept="image/*" />
+                            <img id="alphafoldImage" style="max-width: 100%; display: none;" />
+                            <button id="pasteImageButton" onclick="pasteImageFromClipboard()">Insert image from clipboard</button>
+                        </div>
+                    </div>
+                    <p class="big-blue-text">How might the mutation impact the ability of <span id="substrateOrDrug"></span> to do their job? How might the mutation impact the ability of this protein to do its job?</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let originalText = "";
+        let pdbUri = "";
+        let sequence = "";
+        let currentStyle = 'spectrum';
+        let residuesPerLine = 50;
+
+        let viewer1, viewer2, viewer3, alphafoldViewer, mutantViewer;
+        let selectedResidues = new Set();
+        const spectrumStyle = { cartoon: { color: 'spectrum' } };
+        const spacefillStyle = {
+            sphere: {
+                colorfunc: function (atom) {
+                    const hydrophobic = new Set(['ALA', 'VAL', 'ILE', 'LEU', 'MET', 'PHE', 'TRP', 'PRO', 'GLY']);
+                    const hydrophilic = new Set(['ARG', 'LYS', 'ASP', 'GLU', 'ASN', 'GLN']);
+                    const positive = new Set(['ARG', 'LYS']);
+                    const negative = new Set(['ASP', 'GLU']);
+                    if (positive.has(atom.resn)) return 'blue';
+                    else if (negative.has(atom.resn)) return 'red';
+                    else if (hydrophobic.has(atom.resn)) return 'yellow';
+                    else if (hydrophilic.has(atom.resn)) return 'lightgrey';
+                    return 'grey';
+                }
+            }
+        };
+        const originalStyles = [
+            spectrumStyle,
+            { stick: {} },
+            spacefillStyle
+        ];
+
+        async function fetchPDBData(pdbUri) {
+            const response = await fetch(pdbUri);
+            const pdbText = await response.text();
+            const sequence = parseSequenceFromPDB(pdbText);
+            const title = parseTitleFromPDB(pdbText);
+            return { sequence, title };
+        }
+        function redirectToXML() {
+        window.location.href = 'https://gtacaus.github.io/protein3D/xml.html';
+        }
+        function reloadPage() {
+        location.reload();
+        }
+        function parseSequenceFromPDB(pdbText) {
+            const lines = pdbText.split('\n');
+            const residues = new Map();
+            for (const line of lines) {
+                if (line.startsWith('ATOM') || line.startsWith('HETATM')) {
+                    const resSeq = parseInt(line.substring(22, 26).trim());
+                    const resName = line.substring(17, 20).trim();
+                    if (!residues.has(resSeq)) {
+                        residues.set(resSeq, resName);
+                    }
+                }
+            }
+            const oneLetterMapping = {
+                'ALA': 'A', 'ARG': 'R', 'ASN': 'N', 'ASP': 'D', 'CYS': 'C',
+                'GLU': 'E', 'GLN': 'Q', 'GLY': 'G', 'HIS': 'H', 'ILE': 'I',
+                'LEU': 'L', 'LYS': 'K', 'MET': 'M', 'PHE': 'F', 'PRO': 'P',
+                'SER': 'S', 'THR': 'T', 'TRP': 'W', 'TYR': 'Y', 'VAL': 'V'
+            };
+            let sequence = '';
+            residues.forEach((resName) => {
+                sequence += oneLetterMapping[resName] || 'X';
+            });
+            return sequence;
+        }
+
+        function parseTitleFromPDB(pdbText) {
+            const lines = pdbText.split('\n');
+            let title = "";
+            for (const line of lines) {
+                if (line.startsWith('TITLE')) {
+                    title += line.substring(10).trim() + " ";
+                }
+            }
+            return title.trim();
+        }
+
+        function createSequenceTable(sequence) {
+            const tableBody = document.getElementById('sequenceTable');
+            tableBody.innerHTML = '';
+            for (let i = 0; i < sequence.length; i += residuesPerLine) {
+                const positionRow = document.createElement('tr');
+                const sequenceRow = document.createElement('tr');
+
+                for (let j = 0; j < residuesPerLine; j++) {
+                    if (i + j >= sequence.length) break;
+
+                    if (j % 10 === 0) {
+                        const positionCell = document.createElement('td');
+                        positionCell.className = 'sequence-numbers';
+                        positionCell.textContent = i + j + 1;
+                        positionRow.appendChild(positionCell);
+                    } else {
+                        const emptyCell = document.createElement('td');
+                        positionRow.appendChild(emptyCell);
+                    }
+
+                    const sequenceCell = document.createElement('td');
+                    sequenceCell.textContent = sequence[i + j];
+                    sequenceCell.dataset.residueIndex = i + j + 1;
+                    sequenceCell.addEventListener('click', () => toggleResidueHighlight(sequenceCell));
+                    sequenceRow.appendChild(sequenceCell);
+                }
+
+                tableBody.appendChild(positionRow);
+                tableBody.appendChild(sequenceRow);
+            }
+        }
+
+        function toggleResidueHighlight(cell) {
+            const residueIndex = parseInt(cell.dataset.residueIndex);
+            if (selectedResidues.has(residueIndex)) {
+                selectedResidues.delete(residueIndex);
+                cell.classList.remove('highlight');
+            } else {
+                selectedResidues.add(residueIndex);
+                cell.classList.add('highlight');
+            }
+            updateResidueHighlighting();
+        }
+
+        function updateResidueHighlighting() {
+            const highlightStyle = { stick: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } };
+            const viewers = [viewer1, viewer2, viewer3];
+
+            viewers.forEach((viewer, index) => {
+                if (viewer) {
+                    viewer.setStyle({}, originalStyles[index]);
+                    selectedResidues.forEach(residueIndex => {
+                        viewer.setStyle({ resi: residueIndex }, highlightStyle);
+                    });
+                    viewer.render();
+                }
+            });
+        }
+
+        function deselectAll() {
+            selectedResidues.clear();
+            document.querySelectorAll('.highlight').forEach(cell => cell.classList.remove('highlight'));
+            updateResidueHighlighting();
+        }
+
+        async function initializeViewers() {
+            const { sequence, title } = await fetchPDBData(pdbUri);
+            document.getElementById('sequenceTitle').textContent = 'Sequence of ' + title;
+            createSequenceTable(sequence);
+
+            viewer1 = initializeViewer("viewer1", 0);
+            viewer2 = initializeViewer("viewer2", 1);
+            viewer3 = initializeViewer("viewer3", 2);
+
+            // Load alphafoldViewer with the original PDB from XML
+            reloadAlphaFoldViewer();
+        }
+
+        function initializeViewer(viewerElementId, styleIndex) {
+            const config = { backgroundColor: '0xffffff' };
+            const viewer = $3Dmol.createViewer(viewerElementId, config);
+
+            fetch(pdbUri)
+                .then(response => response.text())
+                .then(data => {
+                    viewer.addModel(data, "pdb");
+                    viewer.setStyle({}, originalStyles[styleIndex]);
+                    viewer.zoomTo();
+                    viewer.render();
+                    selectedResidues.forEach(residueIndex => {
+                        viewer.setStyle({ resi: residueIndex }, { stick: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } });
+                    });
+                    viewer.render();
+                })
+                .catch(error => console.error('Error fetching the PDB file:', error));
+            return viewer;
+        }
+
+        function reloadViewer(viewerElementId, styleIndex) {
+            const viewer = $3Dmol.createViewer(viewerElementId, { backgroundColor: '0xffffff' });
+            fetch(pdbUri)
+                .then(response => response.text())
+                .then(data => {
+                    viewer.addModel(data, "pdb");
+                    viewer.setStyle({}, originalStyles[styleIndex]);
+                    viewer.zoomTo();
+                    viewer.render();
+                    selectedResidues.forEach(residueIndex => {
+                        viewer.setStyle({ resi: residueIndex }, { stick: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } });
+                    });
+                    viewer.render();
+                })
+                .catch(error => console.error('Error fetching the PDB file:', error));
+        }
+
+        const codonTable = {
+            'TTT': 'F', 'TTC': 'F', 'TTA': 'L', 'TTG': 'L',
+            'CTT': 'L', 'CTC': 'L', 'CTA': 'L', 'CTG': 'L',
+            'ATT': 'I', 'ATC': 'I', 'ATA': 'I', 'ATG': 'M',
+            'GTT': 'V', 'GTC': 'V', 'GTA': 'V', 'GTG': 'V',
+            'TCT': 'S', 'TCC': 'S', 'TCA': 'S', 'TCG': 'S',
+            'CCT': 'P', 'CCC': 'P', 'CCA': 'P', 'CCG': 'P',
+            'ACT': 'T', 'ACC': 'T', 'ACA': 'T', 'ACG': 'T',
+            'GCT': 'A', 'GCC': 'A', 'GCA': 'A', 'GCG': 'A',
+            'TAT': 'Y', 'TAC': 'Y', 'TAA': '*', 'TAG': '*',
+            'CAT': 'H', 'CAC': 'H', 'CAA': 'Q', 'CAG': 'Q',
+            'AAT': 'N', 'AAC': 'N', 'AAA': 'K', 'AAG': 'K',
+            'GAT': 'D', 'GAC': 'D', 'GAA': 'E', 'GAG': 'E',
+            'TGT': 'C', 'TGC': 'C', 'TGA': '*', 'TGG': 'W',
+            'CGT': 'R', 'CGC': 'R', 'CGA': 'R', 'CGG': 'R',
+            'AGT': 'S', 'AGC': 'S', 'AGA': 'R', 'AGG': 'R',
+            'GGT': 'G', 'GGC': 'G', 'GGA': 'G', 'GGG': 'G'
+        };
+
+        function translateDNA(inputId, outputId) {
+            const dnaSequence = document.getElementById(inputId).value.toUpperCase().replace(/[^ATCG]/g, '');
+            let proteinSequence = '';
+            let highlightedSequence = '';
+            let restOfSequence = '';
+            let foundStopCodon = false;
+
+            for (let i = 0; i < dnaSequence.length; i += 3) {
+                const codon = dnaSequence.substr(i, 3);
+                if (codonTable[codon]) {
+                    if (foundStopCodon) {
+                        restOfSequence += codonTable[codon];
+                    } else {
+                        if (codonTable[codon] === '*') {
+                            foundStopCodon = true;
+                            break;
+                        }
+                        highlightedSequence += codonTable[codon];
+                    }
+                } else {
+                    if (foundStopCodon) {
+                        restOfSequence += '?';
+                    } else {
+                        highlightedSequence += '?';
+                    }
+                }
+            }
+
+            const highlightedHtml = `<span class="highlight">${highlightedSequence}</span>`;
+            const restOfSequenceHtml = `<span>${restOfSequence}</span>`;
+            proteinSequence = highlightedHtml + restOfSequenceHtml;
+
+            document.getElementById(outputId).innerHTML = proteinSequence;
+        }
+
+        function copyText() {
+            const sequenceContainer = document.getElementById('sequence-container');
+            const sequenceText = sequenceContainer.textContent.split('\n').slice(1).join('').trim();
+            navigator.clipboard.writeText(sequenceText).then(() => {
+                alert('Text copied to clipboard');
+            });
+        }
+
+        function copyMutantText() {
+            const proteinSequenceDiv = document.getElementById('proteinSequence2');
+            const highlightedText = proteinSequenceDiv.querySelector('.highlight').innerText;
+            navigator.clipboard.writeText(highlightedText).then(() => {
+                alert('Highlighted text copied to clipboard');
+            });
+        }
+
+        function loadXMLFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const xmlText = event.target.result;
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+                
+                const proteinName = xmlDoc.getElementsByTagName('proteinName')[0].textContent;
+                const geneName = xmlDoc.getElementsByTagName('geneName')[0].textContent;
+                const geneSeq = xmlDoc.getElementsByTagName('geneSeq')[0].textContent;
+                const activeSite = xmlDoc.getElementsByTagName('activeSite')[0].textContent;
+                const activeSiteText = xmlDoc.getElementsByTagName('activeSiteText')[0].textContent;
+                const proteinFunction = xmlDoc.getElementsByTagName('proteinFunction')[0].textContent;
+                const substrateOrDrug = xmlDoc.getElementsByTagName('substrateOrDrug')[0].textContent;
+                pdbUri = xmlDoc.getElementsByTagName('PDBurl')[0].textContent;
+
+                document.getElementById('proteinName').textContent = proteinName;
+                document.getElementById('fileName').textContent = proteinName;
+                document.getElementById('proteinName1').textContent = proteinName;
+                document.getElementById('proteinName2').textContent = proteinName;
+                document.getElementById('proteinName3').textContent = proteinName;
+                document.getElementById('proteinName4').textContent = proteinName;
+                document.getElementById('proteinName5').textContent = proteinName;
+                document.getElementById('geneName1').textContent = geneName;
+                document.getElementById('geneName2').textContent = geneName;
+                document.getElementById('geneName3').textContent = geneName;
+                document.getElementById('geneName4').textContent = geneName;
+                document.getElementById('geneName5').textContent = geneName;
+                document.getElementById('activeSite').textContent = activeSite;
+                document.getElementById('activeSiteText').textContent = activeSiteText;
+                document.getElementById('proteinFunction').textContent = proteinFunction;
+                document.getElementById('substrateOrDrug').textContent = substrateOrDrug;
+
+                originalText = geneSeq;
+                document.getElementById('sequence-container').textContent = geneSeq;
+
+                document.getElementById('content').classList.remove('hidden');
+                initializeViewers();
+            };
+            reader.readAsText(file);
+        }
+
+        async function loadDataXML() {
+            const response = await fetch('data.xml');
+            const xmlText = await response.text();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+            
+            const proteinName = xmlDoc.getElementsByTagName('proteinName')[0].textContent;
+            const geneName = xmlDoc.getElementsByTagName('geneName')[0].textContent;
+            const geneSeq = xmlDoc.getElementsByTagName('geneSeq')[0].textContent;
+            const activeSite = xmlDoc.getElementsByTagName('activeSite')[0].textContent;
+            const activeSiteText = xmlDoc.getElementsByTagName('activeSiteText')[0].textContent;
+            const proteinFunction = xmlDoc.getElementsByTagName('proteinFunction')[0].textContent;
+            const substrateOrDrug = xmlDoc.getElementsByTagName('substrateOrDrug')[0].textContent;
+            pdbUri = xmlDoc.getElementsByTagName('PDBurl')[0].textContent;
+
+            document.getElementById('proteinName').textContent = proteinName;
+            document.getElementById('fileName').textContent = proteinName;
+            document.getElementById('proteinName1').textContent = proteinName;
+            document.getElementById('proteinName2').textContent = proteinName;
+            document.getElementById('proteinName3').textContent = proteinName;
+            document.getElementById('proteinName4').textContent = proteinName;
+            document.getElementById('proteinName5').textContent = proteinName;
+            document.getElementById('geneName1').textContent = geneName;
+            document.getElementById('geneName2').textContent = geneName;
+            document.getElementById('geneName3').textContent = geneName;
+            document.getElementById('geneName4').textContent = geneName;
+            document.getElementById('geneName5').textContent = geneName;
+            document.getElementById('activeSite').textContent = activeSite;
+            document.getElementById('activeSiteText').textContent = activeSiteText;
+            document.getElementById('proteinFunction').textContent = proteinFunction;
+            document.getElementById('substrateOrDrug').textContent = substrateOrDrug;
+
+            originalText = geneSeq;
+            document.getElementById('sequence-container').textContent = geneSeq;
+
+            document.getElementById('content').classList.remove('hidden');
+            initializeViewers();
+        }
+        async function loadDataXMLCLDN8() {
+            const response = await fetch('CLDN8.xml');
+            const xmlText = await response.text();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+            
+            const proteinName = xmlDoc.getElementsByTagName('proteinName')[0].textContent;
+            const geneName = xmlDoc.getElementsByTagName('geneName')[0].textContent;
+            const geneSeq = xmlDoc.getElementsByTagName('geneSeq')[0].textContent;
+            const activeSite = xmlDoc.getElementsByTagName('activeSite')[0].textContent;
+            const activeSiteText = xmlDoc.getElementsByTagName('activeSiteText')[0].textContent;
+            const proteinFunction = xmlDoc.getElementsByTagName('proteinFunction')[0].textContent;
+            const substrateOrDrug = xmlDoc.getElementsByTagName('substrateOrDrug')[0].textContent;
+            pdbUri = xmlDoc.getElementsByTagName('PDBurl')[0].textContent;
+
+            document.getElementById('proteinName').textContent = proteinName;
+            document.getElementById('fileName').textContent = proteinName;
+            document.getElementById('proteinName1').textContent = proteinName;
+            document.getElementById('proteinName2').textContent = proteinName;
+            document.getElementById('proteinName3').textContent = proteinName;
+            document.getElementById('proteinName4').textContent = proteinName;
+            document.getElementById('proteinName5').textContent = proteinName;
+            document.getElementById('geneName1').textContent = geneName;
+            document.getElementById('geneName2').textContent = geneName;
+            document.getElementById('geneName3').textContent = geneName;
+            document.getElementById('geneName4').textContent = geneName;
+            document.getElementById('geneName5').textContent = geneName;
+            document.getElementById('activeSite').textContent = activeSite;
+            document.getElementById('activeSiteText').textContent = activeSiteText;
+            document.getElementById('proteinFunction').textContent = proteinFunction;
+            document.getElementById('substrateOrDrug').textContent = substrateOrDrug;
+
+            originalText = geneSeq;
+            document.getElementById('sequence-container').textContent = geneSeq;
+
+            document.getElementById('content').classList.remove('hidden');
+            initializeViewers();
+        }
+         async function loadDataXMLMC1R() {
+            const response = await fetch('MC1R.xml');
+            const xmlText = await response.text();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(xmlText, 'application/xml');
+            
+            const proteinName = xmlDoc.getElementsByTagName('proteinName')[0].textContent;
+            const geneName = xmlDoc.getElementsByTagName('geneName')[0].textContent;
+            const geneSeq = xmlDoc.getElementsByTagName('geneSeq')[0].textContent;
+            const activeSite = xmlDoc.getElementsByTagName('activeSite')[0].textContent;
+            const activeSiteText = xmlDoc.getElementsByTagName('activeSiteText')[0].textContent;
+            const proteinFunction = xmlDoc.getElementsByTagName('proteinFunction')[0].textContent;
+            const substrateOrDrug = xmlDoc.getElementsByTagName('substrateOrDrug')[0].textContent;
+            pdbUri = xmlDoc.getElementsByTagName('PDBurl')[0].textContent;
+
+            document.getElementById('proteinName').textContent = proteinName;
+            document.getElementById('fileName').textContent = proteinName;
+            document.getElementById('proteinName1').textContent = proteinName;
+            document.getElementById('proteinName2').textContent = proteinName;
+            document.getElementById('proteinName3').textContent = proteinName;
+            document.getElementById('proteinName4').textContent = proteinName;
+            document.getElementById('proteinName5').textContent = proteinName;
+            document.getElementById('geneName1').textContent = geneName;
+            document.getElementById('geneName2').textContent = geneName;
+            document.getElementById('geneName3').textContent = geneName;
+            document.getElementById('geneName4').textContent = geneName;
+            document.getElementById('geneName5').textContent = geneName;
+            document.getElementById('activeSite').textContent = activeSite;
+            document.getElementById('activeSiteText').textContent = activeSiteText;
+            document.getElementById('proteinFunction').textContent = proteinFunction;
+            document.getElementById('substrateOrDrug').textContent = substrateOrDrug;
+
+            originalText = geneSeq;
+            document.getElementById('sequence-container').textContent = geneSeq;
+
+            document.getElementById('content').classList.remove('hidden');
+            initializeViewers();
+        }
+        document.getElementById('fileInput').addEventListener('change', handleFileInput);
+        document.getElementById('pdbFileInput').addEventListener('change', handleFileInput);
+
+        function highlightOriginalSequence(originalSeq) {
+            function getCodons(dnaSequence) {
+                const codons = [];
+                for (let i = 0; i < dnaSequence.length; i += 3) {
+                    codons.push(dnaSequence.substr(i, 3));
+                }
+                return codons;
+            }
+
+            const originalCodons = getCodons(originalSeq);
+            let originalHTML = '';
+            let foundStopCodon = false;
+
+            for (let i = 0; i < originalCodons.length; i++) {
+                let originalCodon = originalCodons[i];
+
+                // Apply blue highlight only if no stop codon has been found yet
+                if (!foundStopCodon && i % 2 === 1) {
+                    originalHTML += `<span class="highlight-blue">${originalCodon}</span> `;
+                } else {
+                    originalHTML += `${originalCodon} `;
+                }
+
+                // Check for stop codon and apply red highlight
+                if (codonTable[originalCodon] === '*' && !foundStopCodon) {
+                    foundStopCodon = true;
+                    originalHTML = originalHTML.replace(`${originalCodon}`, `<span class="highlight-red">${originalCodon}</span>`);
+                }
+            }
+
+            document.getElementById('originalSequence').innerHTML = originalHTML.trim();
+        }
+
+        function highlightMutantSequence(mutantSeq) {
+            function getCodons(dnaSequence) {
+                const codons = [];
+                for (let i = 0; i < dnaSequence.length; i += 3) {
+                    codons.push(dnaSequence.substr(i, 3));
+                }
+                return codons;
+            }
+
+            const mutantCodons = getCodons(mutantSeq);
+            let mutantHTML = '';
+            let foundStopCodon = false;
+
+            for (let i = 0; i < mutantCodons.length; i++) {
+                let mutantCodon = mutantCodons[i];
+
+                // Apply blue highlight only if no stop codon has been found yet
+                if (!foundStopCodon && i % 2 === 1) {
+                    mutantHTML += `<span class="highlight-blue">${mutantCodon}</span> `;
+                } else {
+                    mutantHTML += `${mutantCodon} `;
+                }
+
+                // Check for stop codon and apply red highlight
+                if (codonTable[mutantCodon] === '*' && !foundStopCodon) {
+                    foundStopCodon = true;
+                    mutantHTML = mutantHTML.replace(`${mutantCodon}`, `<span class="highlight-red">${mutantCodon}</span>`);
+                }
+            }
+
+            document.getElementById('mutantSequence').innerHTML = mutantHTML.trim();
+        }
+
+        function compareSequences() {
+            const originalSeq = document.getElementById('dnaSequence1').value.toUpperCase().replace(/[^ATCG]/g, '');
+            const mutantSeq = document.getElementById('dnaSequence2').value.toUpperCase().replace(/[^ATCG]/g, '');
+            highlightOriginalSequence(originalSeq);
+            highlightMutantSequence(mutantSeq);
+        }
+
+        document.getElementById('dnaSequence1').addEventListener('input', compareSequences);
+        document.getElementById('dnaSequence2').addEventListener('input', compareSequences);
+
+        document.getElementById('alphafoldImageInput').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('alphafoldImage').src = e.target.result;
+                    document.getElementById('alphafoldImage').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        async function reloadAlphaFoldViewer() {
+            const viewer = $3Dmol.createViewer('alphafoldViewer', { backgroundColor: '0xffffff' });
+            const response = await fetch(pdbUri);
+            const pdbText = await response.text();
+            viewer.addModel(pdbText, "pdb");
+            viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+            viewer.zoomTo();
+            viewer.render();
+            alphafoldViewer = viewer;
+        }
+
+        let currentMutantStyle = 'spectrum';
+
+        async function reloadMutantViewer() {
+            if (mutantContent) {
+                const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
+                viewer.addModel(mutantContent.content, mutantContent.format);
+                viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+                viewer.zoomTo();
+                viewer.render();
+                mutantViewer = viewer;
+            } else {
+                alert("No mutant model loaded yet.");
+            }
+        }
+
+        function toggleMutantViewerStyle() {
+            currentMutantStyle = currentMutantStyle === 'spectrum' ? 'spacefill' : 'spectrum';
+            if (mutantViewer) {
+                mutantViewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+                mutantViewer.render();
+            }
+            if (alphafoldViewer) {
+                alphafoldViewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+                alphafoldViewer.render();
+            }
+        }
+
+        function toggleStyles() {
+            currentStyle = currentStyle === 'spectrum' ? 'spacefill' : 'spectrum';
+            const style = currentStyle === 'spectrum' ? spectrumStyle : spacefillStyle;
+
+            if (alphafoldViewer) {
+                alphafoldViewer.setStyle({}, style);
+                alphafoldViewer.render();
+            }
+
+            if (mutantViewer) {
+                mutantViewer.setStyle({}, style);
+                mutantViewer.render();
+            }
+        }
+
+        // Adjust residues per line based on screen width
+        function adjustResiduesPerLine() {
+            const screenWidth = window.innerWidth;
+            if (screenWidth <= 480) {
+                residuesPerLine = 20;
+            } else if (screenWidth <= 768) {
+                residuesPerLine = 30;
+            } else {
+                residuesPerLine = 50;
+            }
+            createSequenceTable(sequence);
+        }
+
+        // Call adjustResiduesPerLine on load and on resize
+        window.addEventListener('load', adjustResiduesPerLine);
+        window.addEventListener('resize', adjustResiduesPerLine);
+
+        function handleFileInput(event) {
+            const file = event.target.files[0];
+            if (file.name.endsWith('.xml')) {
+                loadXMLFile();
+            } else if (file.name.endsWith('.zip')) {
+                handleZipFile(file);
+            } else if (file.name.endsWith('.pdb')) {
+                handlePdbFile(file);
+            } else if (file.name.endsWith('.cif')) {
+                handleCifFile(file);
+            }
+        }
+
+        function handleZipFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const zip = new JSZip();
+                zip.loadAsync(e.target.result).then(function(zip) {
+                    let foundFile = false;
+                    zip.forEach(function (relativePath, zipEntry) {
+                        if (!foundFile && zipEntry.name.endsWith('.pdb')) {
+                            foundFile = true;
+                            zipEntry.async("string").then(function (content) {
+                                loadModelIntoViewer(content, 'pdb');
+                            });
+                        } else if (!foundFile && zipEntry.name.endsWith('.cif')) {
+                            foundFile = true;
+                            zipEntry.async("string").then(function (content) {
+                                loadModelIntoViewer(content, 'cif');
+                            });
+                        }
+                    });
+                    if (!foundFile) {
+                        alert('No PDB or CIF file found in the ZIP archive.');
+                    }
+                });
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function handlePdbFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                loadModelIntoViewer(content, 'pdb');
+            };
+            reader.readAsText(file);
+        }
+
+        function handleCifFile(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                loadModelIntoViewer(content, 'cif');
+            };
+            reader.readAsText(file);
+        }
+
+        function loadModelIntoViewer(content, format) {
+            // Load the model into mutantViewer and store the content for later reloading
+            const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
+            viewer.addModel(content, format);
+            viewer.setStyle({}, spectrumStyle);
+            viewer.zoomTo();
+            viewer.render();
+            mutantViewer = viewer;
+            mutantContent = { content: content, format: format }; // Save the content for reloading
+
+            // Reload the alphafoldViewer with the original protein
+            reloadAlphaFoldViewer();
+        }
+
+        let mutantContent = null;
+
+        async function reloadAlphaFoldViewer() {
+            const viewer = $3Dmol.createViewer('alphafoldViewer', { backgroundColor: '0xffffff' });
+            const response = await fetch(pdbUri);
+            const pdbText = await response.text();
+            viewer.addModel(pdbText, "pdb");
+            viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+            viewer.zoomTo();
+            viewer.render();
+            alphafoldViewer = viewer;
+        }
+
+        async function reloadMutantViewer() {
+            if (mutantContent) {
+                const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
+                viewer.addModel(mutantContent.content, mutantContent.format);
+                viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+                viewer.zoomTo();
+                viewer.render();
+                mutantViewer = viewer;
+            } else {
+                alert("No mutant model loaded yet.");
+            }
+        }
+
+        async function pasteImageFromClipboard() {
+            try {
+                const clipboardItems = await navigator.clipboard.read();
+                for (const clipboardItem of clipboardItems) {
+                    if (clipboardItem.types.includes('image/png')) {
+                        const blob = await clipboardItem.getType('image/png');
+                        const reader = new FileReader();
+                        reader.onload = function (event) {
+                            document.getElementById('alphafoldImage').src = event.target.result;
+                            document.getElementById('alphafoldImage').style.display = 'block';
+                        };
+                        reader.readAsDataURL(blob);
+                        break;
+                    }
+                }
+            } catch (err) {
+                console.error('Failed to read clipboard contents: ', err);
+            }
+        }
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+</html>
