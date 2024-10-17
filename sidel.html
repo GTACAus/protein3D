@@ -215,7 +215,167 @@
     </style>
 </head>
 <body>
-    
+    <div class="container">
+        <h1 id="mainHeading">Exploring the structure of <span id="proteinName"></span></h1>
+        <div class="button-container">
+            <input type="file" id="fileInput" accept=".xml" />
+            <button onclick="loadDataXML()">Load PBP</button>
+            <button onclick="loadDataXMLCLDN8()">Load CLDN8</button>
+            <button onclick="loadDataXMLMC1R()">Load MC1R</button>
+            <button onclick="reloadPage()">Reload page for new data</button>
+            <button onclick="redirectToXML()">Make XML</button>
+        </div>
+        <br><br>
+
+        <div id="content" class="hidden card-container">
+            <div class="card">
+                <table class="sequence-table card-content">
+                    <thead>
+                        <tr>
+                            <th colspan="50" id="sequenceTitle">Sequence of <span id="fileName"></span></th>
+                        </tr>
+                    </thead>
+                    <tbody id="sequenceTable"></tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="50" style="text-align: center;">
+                                <button class="deselect-button" onclick="deselectAll()">Deselect</button>
+                                <p id="aminoAcidDescription">The amino acid sequences (primary structures) of the protein are shown in the Sequence viewer. Each letter represents an individual amino acid (e.g. s = serine; t = threonine, i = isoleucine, etc.).</p>
+                                <p class="big-blue-text">Identify the primary structure of the <span id="proteinName1"></span>.</p>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+            <div class="card">
+                <div class="card-content">
+                    <h2>Secondary structure</h2>
+                    <p>In the cartoon representation, you are able to see structures of <span id="proteinName2"></span>. The folded protein structures of alpha helices, beta pleated sheets, and random coils are represented in the 3D Structure below. You can click and drag the protein to rotate it.</p>
+                    <div class="viewer-container">
+                        <div id="viewer1" class="viewer"></div>
+                        <button class="refresh-button" onclick="reloadViewer('viewer1', 0)">Reset model</button>
+                    </div>
+                    <p class="big-blue-text">Identify alpha helices, beta-pleated sheets, and random coils in the <span id="proteinName3"></span>.</p>
+                </div>
+            </div>
+
+            <!-- Copy mecA Gene Sequence -->
+            <div class="card">
+                <div class="card-content">
+                    <h2>Copy the <span id="geneName1"></span> gene for translation by our bioinformatics tool</h2>
+                    <p>Click/tap copy text to take the DNA sequence from <span id="geneName2"></span> for translation.</p>
+                    <pre id="sequence-container"></pre>
+                    <button onclick="copyText()">Copy Text</button>
+                </div>
+            </div>
+
+            <!-- Translate the mecA Gene -->
+            <div class="card">
+                <div class="card-content">
+                    <h2>Translate the <span id="geneName3"></span> gene</h2>
+                    <p>Bioinformatics tools can quickly perform this task. You will use the translate tool to quickly process your coding DNA sequence into a translated amino acid sequence. Use the tool below to translate the copied <span id="geneName4"></span> nucleotide sequence to a protein primary structure. Paste the sequence into the sequence box and click/tap TRANSLATE.</p>
+                    <textarea id="dnaSequence1" rows="10" placeholder="Enter DNA sequence here..."></textarea>
+                    <br>
+                    <button onclick="translateDNA('dnaSequence1', 'proteinSequence1')">Translate</button>
+                    <h2>Protein Sequence</h2>
+                    <div id="proteinSequence1" style="white-space: pre-wrap; word-wrap: break-word;"></div>
+                    <p class="big-blue-text">Compare your protein sequence with the primary structure in the table at the top of the page. What do you notice?</p>
+                </div>
+            </div>
+
+            <!-- Mutate the mecA Gene -->
+            <div class="card">
+                <div class="card-content">
+                    <h2>Mutate the <span id="geneName5"></span> gene</h2>
+                    <p>Paste the same sequence into the sequence box. Delete 1, 2 or 3 nucleotides and click/tap TRANSLATE to generate a mutant primary structure.</p>
+                    <textarea id="dnaSequence2" rows="10" placeholder="Enter DNA sequence here..."></textarea>
+                    <br>
+                    <button onclick="translateDNA('dnaSequence2', 'proteinSequence2')">Translate</button>
+                    <h2>Protein Sequence</h2>
+                    <div id="proteinSequence2" style="white-space: pre-wrap; word-wrap: break-word;"></div>
+                    <button onclick="copyMutantText()">Copy Text</button>
+                    <p class="big-blue-text">Compare your mutant protein sequence with your original protein sequence. What do you notice?</p>
+                </div>
+            </div>
+
+            <!-- Compare Original and Mutant Gene Sequences -->
+            <div class="card">
+                <div class="card-content">
+                    <h2>Compare the original and mutant gene sequences</h2>
+                    <div>
+                        <p>Your coding DNA consists of the start codon, the stop codon and all of the nucleotides between. Each codon in your coding DNA will be transcribed into mRNA and translated into a sequence of amino acids.</p>
+                        <h3 class="sequence-title">Original Sequence</h3>
+                        <div id="originalSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
+                    </div>
+                    <div>
+                        <h3 class="sequence-title">Mutant Sequence</h3>
+                        <div id="mutantSequence" style="white-space: pre-wrap; word-wrap: break-word;"></div>
+                    </div>
+                    <div>
+                        <h3 class="sequence-title">
+                            <span class="highlight-blue" style="display: block;">Every second codon</span>
+                            <span class="highlight-red" style="display: block; margin-top: 2px;">First stop codon</span>
+                        </h3>
+                    </div>                    
+                    <p class="big-blue-text">Identify the impact of your mutation: compare the codons in your original and mutant gene</p>
+                </div>
+            </div>
+
+            <!-- Use AI to Fold Protein -->
+            <div class="card">
+                <div class="card-content">
+                    <h2>Use AI to fold your mutant protein</h2>
+                    <p>Recent advances in artificial intelligence have allowed scientists to use computers to simulate protein folding in order to determine what a protein’s 3D structure might look like without needing to make observations of real proteins. AlphaFold is a tool that uses machine learning algorithms to perform high accuracy predictions about what a protein’s 3D structure might look like using only an amino acid sequence as an input. Copy the amino acid sequence from your mutant amino acid translation.</p>
+                    <p>Navigate to this page: <a href="https://alphafoldserver.com/" target="_blank">AlphaFold Server.</a></p>
+                    <p class="big-blue-text">How does your mutation impact the 3D structure of your <span id="proteinName4"></span>?</p>
+                </div>
+            </div>
+
+            <!-- Atomic Structure -->
+            <div class="card">
+                <div class="card-content">
+                    <h2>Atomic Structure</h2>
+                    <p>Amino acid chains fold into tertiary structures that have 3D shapes. These shapes are closely related to how they function and interact with systems within organisms. Historically, 3D protein structures have been empirically determined using powerful tools and techniques including X-ray crystallography and electron microscopy. In the atomic structure model, every atom in each amino acid is shown. Carbon, Oxygen, Nitrogen, and Hydrogen are represented in this view.</p>
+                    <div class="viewer-container">
+                        <div id="viewer2" class="viewer"></div>
+                        <button class="refresh-button" onclick="reloadViewer('viewer2', 1)">Reset model</button>
+                    </div>
+                    <p class="big-blue-text">Suggest which elements are represented by the grey, blue, red, and yellow atoms.</p>
+                </div>
+            </div>
+
+            <!-- Space Fill Structure -->
+            <div class="card">
+                <div class="card-content">
+                    <h2>Space fill structure</h2>
+                    <p>The properties of amino acids determines how they arrange themselves and interact with one another. In this representation, the space taken up by each amino acid is represented by spheres. In addition, each amino acid is coloured by its hydrophobicity and charge:</p>
+                    <ul class="spacefill-key">
+                        <li><span style="color: yellow;">●</span> Hydrophobic</li>
+                        <li><span class="hydrophilic" style="color: lightgrey;"></span> Hydrophilic</li>
+                        <li><span style="color: red;">●</span> Negatively charged (Asp, Glu)</li>
+                        <li><span style="color: blue;">●</span> Positively charged (Arg, Lys)</li>
+                       <li><span style="color: white;">●</span></li>
+                    </ul>
+                    <div class="viewer-container">
+                        <div id="viewer3" class="viewer"></div>
+                        <button class="refresh-button" onclick="reloadViewer('viewer3', 2)">Reset model</button>
+                    </div>
+                    <p class="big-blue-text">Where are the hydrophilic and hydrophobic amino acids mainly located – inside or outside the protein? Why do you think that might occur? Where are the positively and negatively charged amino acids located in relation to one another? Why might this be the case?</p>
+                </div>
+            </div>
+
+            <!-- Active Site -->
+            <div class="card">
+                <div class="card-content">
+                    <h2>Active site</h2>
+                    <p><span id="activeSite"></span></p>
+                    <p id="activeSiteText" class="active-site-text"></p>
+                    <p>Select residues in the primary structure by clicking or tapping the single letter code to highlight any part of the protein with green spheres.</p>
+                    <p class="big-blue-text">Where is the sequence located in the 3D structure? How might PBP function be affected if some of the amino acids are changed?</p>
+                </div>
+            </div>
+
             <!-- Compare Mutant PBP -->
             <div class="card">
                 <div class="card-content">
@@ -424,6 +584,7 @@
                     viewer.addModel(data, "pdb");
                     viewer.setStyle({}, originalStyles[styleIndex]);
                     viewer.zoomTo();
+                    viewer.setRotation([0.01, 0.005, 0]);
                     viewer.render();
                     selectedResidues.forEach(residueIndex => {
                         viewer.setStyle({ resi: residueIndex }, { stick: { color: 'lightgreen' }, sphere: { color: 'lightgreen' } });
