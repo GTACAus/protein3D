@@ -417,6 +417,34 @@
     </div>
 
     <script>
+        let rotateMutantInterval, rotateAlphaFoldInterval;
+
+function autoRotate(viewer, speedX = 0.02, speedY = 0.01) {
+    return setInterval(() => {
+        viewer.rotate(speedX, 'y');
+        viewer.rotate(speedY, 'x');
+        viewer.render();
+    }, 100); // Adjust the interval for rotation speed
+}
+
+function startRotation() {
+    if (mutantViewer) {
+        rotateMutantInterval = autoRotate(mutantViewer, 0.02, 0.01);
+    }
+    if (alphafoldViewer) {
+        rotateAlphaFoldInterval = autoRotate(alphafoldViewer, 0.02, 0.01);
+    }
+}
+
+function stopRotation() {
+    if (rotateMutantInterval) {
+        clearInterval(rotateMutantInterval);
+    }
+    if (rotateAlphaFoldInterval) {
+        clearInterval(rotateAlphaFoldInterval);
+    }
+}
+
         let originalText = "";
         let pdbUri = "";
         let sequence = "";
@@ -591,10 +619,6 @@
                     viewer.render();
                 })
                 .catch(error => console.error('Error fetching the PDB file:', error));
-
-            // Start automatic rotation for the viewer
-            autoRotateViewer(viewer, 0.02, 0.01); // Adjust speedX and speedY for desired rotation speed
-
             return viewer;
         }
 
@@ -1078,29 +1102,38 @@
 
         let mutantContent = null;
 
-        async function reloadAlphaFoldViewer() {
-            const viewer = $3Dmol.createViewer('alphafoldViewer', { backgroundColor: '0xffffff' });
-            const response = await fetch(pdbUri);
-            const pdbText = await response.text();
-            viewer.addModel(pdbText, "pdb");
-            viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
-            viewer.zoomTo();
-            viewer.render();
-            alphafoldViewer = viewer;
-        }
+       async function reloadAlphaFoldViewer() {
+    const viewer = $3Dmol.createViewer('alphafoldViewer', { backgroundColor: '0xffffff' });
+    const response = await fetch(pdbUri);
+    const pdbText = await response.text();
+    viewer.addModel(pdbText, "pdb");
+    viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+    viewer.zoomTo();
+    viewer.render();
+    alphafoldViewer = viewer;
+    
+    // Start rotating alphafoldViewer
+    stopRotation();  // Stop previous rotations if any
+    startRotation();
+}
 
-        async function reloadMutantViewer() {
-            if (mutantContent) {
-                const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
-                viewer.addModel(mutantContent.content, mutantContent.format);
-                viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
-                viewer.zoomTo();
-                viewer.render();
-                mutantViewer = viewer;
-            } else {
-                alert("No mutant model loaded yet.");
-            }
-        }
+async function reloadMutantViewer() {
+    if (mutantContent) {
+        const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
+        viewer.addModel(mutantContent.content, mutantContent.format);
+        viewer.setStyle({}, currentMutantStyle === 'spectrum' ? spectrumStyle : spacefillStyle);
+        viewer.zoomTo();
+        viewer.render();
+        mutantViewer = viewer;
+        
+        // Start rotating mutantViewer
+        stopRotation();  // Stop previous rotations if any
+        startRotation();
+    } else {
+        alert("No mutant model loaded yet.");
+    }
+}
+
 
         async function pasteImageFromClipboard() {
             try {
@@ -1120,15 +1153,6 @@
             } catch (err) {
                 console.error('Failed to read clipboard contents: ', err);
             }
-        }
-
-        // Function to enable automatic rotation
-        function autoRotateViewer(viewer, speedX, speedY) {
-            const rotateInterval = setInterval(() => {
-                viewer.rotate(speedX, 'y'); // Rotate along y-axis
-                viewer.rotate(speedY, 'x'); // Rotate along x-axis
-                viewer.render();
-            }, 100); // Adjust the interval timing to control rotation speed
         }
     </script>
 
