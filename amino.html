@@ -316,65 +316,67 @@
             e.preventDefault();
         }
 
-        function showBatch(startIndex) {
-            const container = document.getElementById('viewer-container');
-            container.innerHTML = '';
+function showBatch(startIndex) {
+    const container = document.getElementById('viewer-container');
+    container.innerHTML = ''; // Clear the container
 
-            const batch = aminoAcids.slice(startIndex, startIndex + batchSize);
+    // Create the reload box first
+    const reloadBox = document.createElement('div');
+    reloadBox.className = 'viewer-box';
+    reloadBox.style.backgroundColor = 'lightgrey';
 
-            batch.forEach(amino => {
-                const viewerBox = document.createElement('div');
-                viewerBox.className = 'viewer-box';
-                viewerBox.style.backgroundColor = getColor(amino.charge, amino.hydrophobicity);
+    const reloadImage = document.createElement('img');
+    reloadImage.src = 'https://s3-us-west-2.amazonaws.com/courses-images/wp-content/uploads/sites/110/2016/05/02212734/Figure_03_04_01.jpg';
+    reloadImage.alt = 'Amino Acid Structure';
+    reloadImage.className = 'reload-image';
+    reloadBox.appendChild(reloadImage);
 
-                const info = document.createElement('div');
-                info.innerHTML = `<strong>${amino.name}</strong><br>Three-letter code: ${amino.id}<br>One-letter code: ${amino.oneLetter}`;
-                viewerBox.appendChild(info);
+    const reloadButton = document.createElement('button');
+    reloadButton.innerText = 'Reload Viewers';
+    reloadButton.className = 'reload-button';
+    reloadButton.onclick = () => showBatch(currentIndex);
+    reloadBox.appendChild(reloadButton);
 
-                const viewerDiv = document.createElement('div');
-                viewerDiv.id = `viewer-${amino.id}`;
-                viewerDiv.className = 'viewer';
-                viewerDiv.onmouseenter = disableScroll;
-                viewerDiv.onmouseleave = enableScroll;
-                viewerBox.appendChild(viewerDiv);
+    const reloadText = document.createElement('div');
+    reloadText.className = 'reload-text';
+    reloadText.innerHTML = 'Some amino acids contain';
+    const circle = document.createElement('div');
+    circle.className = 'circle';
+    circle.innerText = 'S';
+    reloadText.appendChild(circle);
+    reloadBox.appendChild(reloadText);
 
-                container.appendChild(viewerBox);
+    // Prepend the reload box to the container
+    container.appendChild(reloadBox);
 
-                loadViewer(amino.url, viewerDiv.id);
-            });
+    // Then add the viewer boxes
+    const batch = aminoAcids.slice(startIndex, startIndex + batchSize);
 
-            // Add reload box with image and button in the 6th grid box if it exists
-            const reloadBox = document.createElement('div');
-            reloadBox.className = 'viewer-box';
-            reloadBox.style.backgroundColor = 'lightgrey';
+    batch.forEach(amino => {
+        const viewerBox = document.createElement('div');
+        viewerBox.className = 'viewer-box';
+        viewerBox.style.backgroundColor = getColor(amino.charge, amino.hydrophobicity);
 
-            const reloadImage = document.createElement('img');
-            reloadImage.src = 'https://s3-us-west-2.amazonaws.com/courses-images/wp-content/uploads/sites/110/2016/05/02212734/Figure_03_04_01.jpg';
-            reloadImage.alt = 'Amino Acid Structure';
-            reloadImage.className = 'reload-image';
-            reloadBox.appendChild(reloadImage);
+        const info = document.createElement('div');
+        info.innerHTML = `<strong>${amino.name}</strong><br>Three-letter code: ${amino.id}<br>One-letter code: ${amino.oneLetter}`;
+        viewerBox.appendChild(info);
 
-            const reloadButton = document.createElement('button');
-            reloadButton.innerText = 'Reload Viewers';
-            reloadButton.className = 'reload-button';
-            reloadButton.onclick = () => showBatch(currentIndex);
+        const viewerDiv = document.createElement('div');
+        viewerDiv.id = `viewer-${amino.id}`;
+        viewerDiv.className = 'viewer';
+        viewerDiv.onmouseenter = disableScroll;
+        viewerDiv.onmouseleave = enableScroll;
+        viewerBox.appendChild(viewerDiv);
 
-            reloadBox.appendChild(reloadButton);
+        container.appendChild(viewerBox);
 
-            const reloadText = document.createElement('div');
-            reloadText.className = 'reload-text';
-            reloadText.innerHTML = 'Some amino acids contain';
-            const circle = document.createElement('div');
-            circle.className = 'circle';
-            circle.innerText = 'S';
-            reloadText.appendChild(circle);
-            reloadBox.appendChild(reloadText);
+        loadViewer(amino.url, viewerDiv.id);
+    });
 
-            container.appendChild(reloadBox);
+    // Wait half a second, then load the amino acid sequence viewer
+    setTimeout(foldSequence, 500);
+}
 
-            // Wait half a second, then load the amino acid sequence viewer
-            setTimeout(foldSequence, 500);
-        }
 
         function loadViewer(url, viewerId) {
             const stage = new NGL.Stage(viewerId, { disableControls: true });
