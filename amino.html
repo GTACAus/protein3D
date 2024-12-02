@@ -7,214 +7,221 @@
     <script src="https://unpkg.com/ngl@2.0.0-dev.32/dist/ngl.js"></script>
     <script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
     <style>
-      body {
-        font-family: "Roboto", sans-serif;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        background-color: #f8f9fa;
+            body {
+              font-family: "Roboto", sans-serif;
+              margin: 0;
+              padding: 0;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              background-color: #f8f9fa;
+            }
+            .header {
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              margin: 20px 0;
+              width: 100%;
+              max-width: 1200px;
+              text-align: center;
+            }
+            .title {
+              font-size: 24px;
+              margin: 10px 0;
+              color: #202124;
+            }
+            .navigation {
+              display: flex;
+              flex-direction: column;
+              margin: 10px 0;
+            }
+            .navigation button {
+              padding: 10px 20px;
+              font-size: 16px;
+              cursor: pointer;
+              border: none;
+              background-color: #4285f4;
+              color: white;
+              border-radius: 4px;
+              margin: 5px 0;
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+              transition: background-color 0.3s;
+            }
+            .navigation button:hover {
+              background-color: #357ae8;
+            }
+      .atom-legend-container {
+          width: 95%;
+          max-width: 1200px;
+          display: flex;
+          justify-content: center;
+          padding: 10px;
+          margin-top: 20px;
       }
-      .header {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        margin: 20px 0;
-        width: 100%;
-        max-width: 1200px;
-        text-align: center;
+
+      .legend-container,
+      .atom-legend-container {
+          margin-bottom: 20px;
       }
-      .title {
-        font-size: 24px;
-        margin: 10px 0;
-        color: #202124;
-      }
-      .navigation {
-        display: flex;
-        flex-direction: column;
-        margin: 10px 0;
-      }
-      .navigation button {
-        padding: 10px 20px;
-        font-size: 16px;
-        cursor: pointer;
-        border: none;
-        background-color: #4285f4;
-        color: white;
-        border-radius: 4px;
-        margin: 5px 0;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        transition: background-color 0.3s;
-      }
-      .navigation button:hover {
-        background-color: #357ae8;
-      }
-      .legend-container {
-        width: 95%;
-        max-width: 1200px;
-        display: flex;
-        justify-content: center;
-        padding: 0 10px;
-      }
+
       .legend {
-        display: flex;
-        flex-direction: column;
-        justify-content: space-around;
-        margin-bottom: 20px;
-        width: 93%;
-        padding: 10px 0;
-        background-color: white;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        border-radius: 4px;
-        text-align: left;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-around;
+          background-color: white;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          border-radius: 4px;
+          padding: 10px;
+          width: 93%;
       }
-      .legend-item {
-        display: flex;
-        align-items: center;
-        color: #5f6368;
-        justify-content: center;
-        margin: 5px 0;
-      }
-      .legend-color {
-        width: 20px;
-        height: 20px;
-        margin-right: 10px;
-        border: 1px solid #ccc;
-      }
-      .viewer-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        width: 100%;
-        max-width: 1200px;
-      }
-      .viewer-box {
-        width: 100%;
-        max-width: 300px;
-        margin: 10px;
-        padding: 10px;
-        box-sizing: border-box;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        background-color: #f3f6f4;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      .viewer {
-        width: 80%;
-        height: 300px;
-        border: 1px solid #ccc;
-        margin-bottom: 10px;
-        border-radius: 4px;
-      }
-      .reload-button {
-        padding: 10px 20px;
-        font-size: 14px;
-        border: none;
-        background-color: #4285f4;
-        color: white;
-        border-radius: 4px;
-        cursor: pointer;
-        transition: background-color 0.3s;
-        margin-top: 10px;
-      }
-      .reload-button:hover {
-        background-color: #357ae8;
-      }
-      .reload-image {
-        width: 100%;
-        margin-bottom: 10px;
-      }
-      .circle {
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
-        background-color: yellow;
-        border: 1px solid black;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        margin-left: 10px;
-      }
-      .reload-text {
-        display: flex;
-        align-items: center;
-        font-size: 14px;
-        margin-top: 10px;
-      }
-      .card {
-        background-color: #f3f6f4;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        margin: 20px;
-        padding: 20px;
-        width: 90%;
-        max-width: 1200px;
-        box-sizing: border-box;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      .card h2 {
-        margin-top: 0;
-      }
-      .card textarea {
-        width: calc(100% - 20px);
-        margin: 10px 0;
-        padding: 10px;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-        box-sizing: border-box;
-      }
-      #viewer {
-        width: 100%;
-        height: 400px;
-        margin-top: 20px;
-        position: relative;
-        border-radius: 8px;
-        overflow: hidden;
-      }
+       text-align: left;
+            }
+            .legend-item {
+              display: flex;
+              align-items: center;
+              color: #5f6368;
+              justify-content: center;
+              margin: 5px 0;
+            }
+            .legend-color {
+              width: 20px;
+              height: 20px;
+              margin-right: 10px;
+              border: 1px solid #ccc;
+            }
+            .viewer-container {
+              display: flex;
+              flex-wrap: wrap;
+              justify-content: center;
+              width: 100%;
+              max-width: 1200px;
+            }
+            .viewer-box {
+              width: 100%;
+              max-width: 300px;
+              margin: 10px;
+              padding: 10px;
+              box-sizing: border-box;
+              border: 1px solid #ccc;
+              border-radius: 4px;
+              background-color: #f3f6f4;
+              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+              position: relative;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+            }
+            .viewer {
+              width: 80%;
+              height: 300px;
+              border: 1px solid #ccc;
+              margin-bottom: 10px;
+              border-radius: 4px;
+            }
+            .reload-button {
+              padding: 10px 20px;
+              font-size: 14px;
+              border: none;
+              background-color: #4285f4;
+              color: white;
+              border-radius: 4px;
+              cursor: pointer;
+              transition: background-color 0.3s;
+              margin-top: 10px;
+            }
+            .reload-button:hover {
+              background-color: #357ae8;
+            }
+            .reload-image {
+              width: 100%;
+              margin-bottom: 10px;
+            }
+            .circle {
+              width: 20px;
+              height: 20px;
+              border-radius: 50%;
+              background-color: yellow;
+              border: 1px solid black;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              margin-left: 10px;
+            }
+            .reload-text {
+              display: flex;
+              align-items: center;
+              font-size: 14px;
+              margin-top: 10px;
+            }
+            .card {
+              background-color: #f3f6f4;
+              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+              border-radius: 8px;
+              margin: 20px;
+              padding: 20px;
+              width: 90%;
+              max-width: 1200px;
+              box-sizing: border-box;
+              overflow: hidden;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+            }
+            .card h2 {
+              margin-top: 0;
+            }
+            .card textarea {
+              width: calc(100% - 20px);
+              margin: 10px 0;
+              padding: 10px;
+              border-radius: 4px;
+              border: 1px solid #ccc;
+              box-sizing: border-box;
+            }
+            #viewer {
+              width: 100%;
+              height: 400px;
+              margin-top: 20px;
+              position: relative;
+              border-radius: 8px;
+              overflow: hidden;
+            }
 
-      /* Media Queries for Responsive Design */
-      @media (min-width: 768px) {
-        .header {
-          flex-direction: row;
-          justify-content: space-between;
-        }
-        .navigation {
-          flex-direction: row;
-          margin: 0;
-        }
-        .navigation button {
-          margin: 0 5px;
-        }
-        .legend {
-          flex-direction: row;
-          text-align: left;
-        }
-        .legend-item {
-          justify-content: flex-start;
-          margin: 0 10px;
-        }
-        .reload-button {
-          margin-top: 0;
-        }
-      }
+            /* Media Queries for Responsive Design */
+            @media (min-width: 768px) {
+              .header {
+                flex-direction: row;
+                justify-content: space-between;
+              }
+              .navigation {
+                flex-direction: row;
+                margin: 0;
+              }
+              .navigation button {
+                margin: 0 5px;
+              }
+              .legend {
+                flex-direction: row;
+                text-align: left;
+              }
+              .legend-item {
+                justify-content: flex-start;
+                margin: 0 10px;
+              }
+              .reload-button {
+                margin-top: 0;
+              }
+            }
 
-      @media (min-width: 1024px) {
-        .viewer-box {
-          width: 30%;
-        }
-        .card {
-          width: 80%;
-        }
-      }
+            @media (min-width: 1024px) {
+              .viewer-box {
+                width: 30%;
+              }
+              .card {
+                width: 80%;
+              }
+            }
     </style>
   </head>
   <body>
