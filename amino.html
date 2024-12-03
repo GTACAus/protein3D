@@ -1,57 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amino acids: Structures, Properties and Sequence</title>
     <script src="https://unpkg.com/ngl@2.0.0-dev.32/dist/ngl.js"></script>
     <script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
     <style>
-            body {
-              font-family: "Roboto", sans-serif;
-              margin: 0;
-              padding: 0;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-              background-color: #f8f9fa;
-            }
-            .header {
-              display: flex;
-              flex-direction: column;
-              justify-content: center;
-              align-items: center;
-              margin: 20px 0;
-              width: 100%;
-              max-width: 1200px;
-              text-align: center;
-            }
-            .title {
-              font-size: 24px;
-              margin: 10px 0;
-              color: #202124;
-            }
-            .navigation {
-              display: flex;
-              flex-direction: column;
-              margin: 10px 0;
-            }
-            .navigation button {
-              padding: 10px 20px;
-              font-size: 16px;
-              cursor: pointer;
-              border: none;
-              background-color: #4285f4;
-              color: white;
-              border-radius: 4px;
-              margin: 5px 0;
-              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-              transition: background-color 0.3s;
-            }
-            .navigation button:hover {
-              background-color: #357ae8;
-            }
-      .atom-legend-container {
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #f8f9fa;
+        }
+        .header {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 20px 0;
+            width: 100%;
+            max-width: 1200px;
+            text-align: center;
+        }
+        .title {
+            font-size: 24px;
+            margin: 10px 0;
+            color: #202124;
+        }
+        .navigation {
+            display: flex;
+            flex-direction: column;
+            margin: 10px 0;
+        }
+        .navigation button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            background-color: #4285f4;
+            color: white;
+            border-radius: 4px;
+            margin: 5px 0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s;
+        }
+        .navigation button:hover {
+            background-color: #357ae8;
+        }
+        .atom-legend-container {
           width: 95%;
           max-width: 1200px;
           display: flex;
@@ -64,212 +64,212 @@
       .atom-legend-container {
           margin-bottom: 20px;
       }
+        .legend-container {
+            width: 95%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: center;
+            padding: 0 10px;
+        }
+        .legend {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            margin-bottom: 20px;
+            width: 93%;
+            padding: 10px 0;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            text-align: left;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            color: #5f6368;
+            justify-content: center;
+            margin: 5px 0;
+        }
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            border: 1px solid #ccc;
+        }
+        .viewer-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            max-width: 1200px;
+        }
+        .viewer-box {
+            width: 100%;
+            max-width: 300px;
+            margin: 10px;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f3f6f4;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .viewer {
+            width: 80%;
+            height: 300px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .reload-button {
+            padding: 10px 20px;
+            font-size: 14px;
+            border: none;
+            background-color: #4285f4;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 10px;
+        }
+        .reload-button:hover {
+            background-color: #357ae8;
+        }
+        .reload-image {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .circle {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: yellow;
+            border: 1px solid black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-left: 10px;
+        }
+        .reload-text {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .card {
+            background-color: #f3f6f4;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            margin: 20px;
+            padding: 20px;
+            width: 90%;
+            max-width: 1200px;
+            box-sizing: border-box;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card h2 {
+            margin-top: 0;
+        }
+        .card textarea {
+            width: calc(100% - 20px);
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        #viewer {
+            width: 100%;
+            height: 400px;
+            margin-top: 20px;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
 
-      .legend {
-          display: flex;
-          flex-direction: column;
-          justify-content: space-around;
-          background-color: white;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-          border-radius: 4px;
-          padding: 10px;
-          width: 93%;
-      }
-       text-align: left;
-            }
-            .legend-item {
-              display: flex;
-              align-items: center;
-              color: #5f6368;
-              justify-content: center;
-              margin: 5px 0;
-            }
-            .legend-color {
-              width: 20px;
-              height: 20px;
-              margin-right: 10px;
-              border: 1px solid #ccc;
-            }
-            .viewer-container {
-              display: flex;
-              flex-wrap: wrap;
-              justify-content: center;
-              width: 100%;
-              max-width: 1200px;
-            }
-            .viewer-box {
-              width: 100%;
-              max-width: 300px;
-              margin: 10px;
-              padding: 10px;
-              box-sizing: border-box;
-              border: 1px solid #ccc;
-              border-radius: 4px;
-              background-color: #f3f6f4;
-              box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-              position: relative;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-            }
-            .viewer {
-              width: 80%;
-              height: 300px;
-              border: 1px solid #ccc;
-              margin-bottom: 10px;
-              border-radius: 4px;
-            }
-            .reload-button {
-              padding: 10px 20px;
-              font-size: 14px;
-              border: none;
-              background-color: #4285f4;
-              color: white;
-              border-radius: 4px;
-              cursor: pointer;
-              transition: background-color 0.3s;
-              margin-top: 10px;
-            }
-            .reload-button:hover {
-              background-color: #357ae8;
-            }
-            .reload-image {
-              width: 100%;
-              margin-bottom: 10px;
-            }
-            .circle {
-              width: 20px;
-              height: 20px;
-              border-radius: 50%;
-              background-color: yellow;
-              border: 1px solid black;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              margin-left: 10px;
-            }
-            .reload-text {
-              display: flex;
-              align-items: center;
-              font-size: 14px;
-              margin-top: 10px;
-            }
-            .card {
-              background-color: #f3f6f4;
-              box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-              border-radius: 8px;
-              margin: 20px;
-              padding: 20px;
-              width: 90%;
-              max-width: 1200px;
-              box-sizing: border-box;
-              overflow: hidden;
-              display: flex;
-              flex-direction: column;
-              align-items: center;
-            }
-            .card h2 {
-              margin-top: 0;
-            }
-            .card textarea {
-              width: calc(100% - 20px);
-              margin: 10px 0;
-              padding: 10px;
-              border-radius: 4px;
-              border: 1px solid #ccc;
-              box-sizing: border-box;
-            }
-            #viewer {
-              width: 100%;
-              height: 400px;
-              margin-top: 20px;
-              position: relative;
-              border-radius: 8px;
-              overflow: hidden;
-            }
-
-            /* Media Queries for Responsive Design */
-            @media (min-width: 768px) {
-              .header {
+        /* Media Queries for Responsive Design */
+        @media (min-width: 768px) {
+            .header {
                 flex-direction: row;
                 justify-content: space-between;
-              }
-              .navigation {
+            }
+            .navigation {
                 flex-direction: row;
                 margin: 0;
-              }
-              .navigation button {
+            }
+            .navigation button {
                 margin: 0 5px;
-              }
-              .legend {
+            }
+            .legend {
                 flex-direction: row;
                 text-align: left;
-              }
-              .legend-item {
+            }
+            .legend-item {
                 justify-content: flex-start;
                 margin: 0 10px;
-              }
-              .reload-button {
+            }
+            .reload-button {
                 margin-top: 0;
-              }
             }
+        }
 
-            @media (min-width: 1024px) {
-              .viewer-box {
+        @media (min-width: 1024px) {
+            .viewer-box {
                 width: 30%;
-              }
-              .card {
-                width: 80%;
-              }
             }
+            .card {
+                width: 80%;
+            }
+        }
     </style>
-  </head>
-  <body>
+</head>
+<body>
     <div class="header">
-      <h1 class="title">Amino acids: Structures, Properties and Sequence</h1>
-      <div class="navigation">
-        <button id="prev-button" onclick="showPrevBatch()">Previous</button>
-        <button id="next-button" onclick="showNextBatch()">
-          Next 5 Amino Acids
-        </button>
-      </div>
-    </div>
-    <div class="instruction-container">
+        <h1 class="title">Amino acids: Structures, Properties and Sequence</h1>
+          <div class="instruction-container">
       <p>
         Click the blue next/previous buttons to view other amino acid
         structures. You can zoom in on and rotate the amino acid structures.
       </p>
     </div>
-    <div class="legend-container">
-      <!-- Amino Acid Properties Legend -->
-      <div class="legend">
-        <b>Amino acid properties</b>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #ccccff"></div>
-          <span>Positive Charge</span>
+        <div class="navigation">
+            <button id="prev-button" onclick="showPrevBatch()">Previous</button>
+            <button id="next-button" onclick="showNextBatch()">Next 5 Amino Acids</button>
         </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #ffcccc"></div>
-          <span>Negative Charge</span>
-        </div>
-        <div class="legend-item">
-          <div
-            class="legend-color"
-            style="background-color: white; border: 1px solid #000"
-          ></div>
-          <span>Hydrophilic</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #ffffcc"></div>
-          <span>Hydrophobic</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-color" style="background-color: #d9d9d9"></div>
-          <span>Neutral Charge</span>
-        </div>
-      </div>
     </div>
 
+    <div class="legend-container">
+        <div class="legend">
+            <b>Amino acid properties</b>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #ccccff;"></div>
+                <span>Positive Charge</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #ffcccc;"></div>
+                <span>Negative Charge</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: white; border: 1px solid #000;"></div>
+                <span>Hydrophilic</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #ffffcc;"></div>
+                <span>Hydrophobic</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background-color: #d9d9d9;"></div>
+                <span>Neutral Charge</span>
+            </div>
+        </div>
+    </div>
     <div class="viewer-container" id="viewer-container"></div>
     <!-- Separate Atom Colors Legend Container -->
     <div class="atom-legend-container">
@@ -300,487 +300,308 @@
         </div>
       </div>
     </div>
+    <div class="viewer-container" id="viewer-container"></div>
 
     <div class="card">
-      <h2>
-        Create a Peptide - type in an amino acid sequence to view its structure
-      </h2>
-      <textarea id="sequenceInput" rows="2" cols="50">MAYDADRSIVAS</textarea>
-      <div>
-        <label for="representationSelect">Select Representation:</label>
-        <select id="representationSelect">
-          <option value="atomic">Atomic structure</option>
-          <option value="spacefill">
-            Coloured by amino acid characteristics
-          </option>
-          <option value="cartoon">Secondary structures</option>
-        </select>
-      </div>
-      <div id="viewer"></div>
+        <h2>Create a Peptide - type in an amino acid sequence to view its structure</h2>
+        <textarea id="sequenceInput" rows="2" cols="50">MAYDADRSIVAS</textarea>
+        <div>
+            <label for="representationSelect">Select Representation:</label>
+            <select id="representationSelect">
+                <option value="atomic">Atomic structure</option>
+                <option value="spacefill">Coloured by amino acid characteristics</option>
+                <option value="cartoon">Secondary structures</option>
+            </select>
+        </div>
+        <div id="viewer"></div>
     </div>
 
     <script>
-      const aminoAcids = [
-        {
-          id: "ALA",
-          name: "Alanine",
-          oneLetter: "A",
-          url: "https://files.rcsb.org/ligands/view/ALA.cif",
-          charge: "neutral",
-          hydrophobicity: "hydrophobic",
-        },
-        {
-          id: "ARG",
-          name: "Arginine",
-          oneLetter: "R",
-          url: "https://files.rcsb.org/ligands/view/ARG.cif",
-          charge: "positive",
-          hydrophobicity: "hydrophilic",
-        },
-        {
-          id: "ASN",
-          name: "Asparagine",
-          oneLetter: "N",
-          url: "https://files.rcsb.org/ligands/view/ASN.cif",
-          charge: "neutral",
-          hydrophobicity: "hydrophilic",
-        },
-        {
-          id: "ASP",
-          name: "Aspartic Acid",
-          oneLetter: "D",
-          url: "https://files.rcsb.org/ligands/view/ASP.cif",
-          charge: "negative",
-          hydrophobicity: "hydrophilic",
-        },
-        {
-          id: "CYS",
-          name: "Cysteine",
-          oneLetter: "C",
-          url: "https://files.rcsb.org/ligands/view/CYS.cif",
-          charge: "neutral",
-          hydrophobicity: "hydrophobic",
-        },
-        {
-          id: "GLU",
-          name: "Glutamic Acid",
-          oneLetter: "E",
-          url: "https://files.rcsb.org/ligands/view/GLU.cif",
-          charge: "negative",
-          hydrophobicity: "hydrophilic",
-        },
-        {
-          id: "GLN",
-          name: "Glutamine",
-          oneLetter: "Q",
-          url: "https://files.rcsb.org/ligands/view/GLN.cif",
-          charge: "neutral",
-          hydrophobicity: "hydrophilic",
-        },
-        {
-          id: "GLY",
-          name: "Glycine",
-          oneLetter: "G",
-          url: "https://files.rcsb.org/ligands/view/GLY.cif",
-          charge: "neutral",
-          hydrophobicity: "hydrophilic",
-        },
-        {
-          id: "HIS",
-          name: "Histidine",
-          oneLetter: "H",
-          url: "https://files.rcsb.org/ligands/view/HIS.cif",
-          charge: "positive",
-          hydrophobicity: "hydrophilic",
-        },
-        {
-          id: "ILE",
-          name: "Isoleucine",
-          oneLetter: "I",
-          url: "https://files.rcsb.org/ligands/view/ILE.cif",
-          charge: "neutral",
-          hydrophobicity: "hydrophobic",
-        },
-        {
-          id: "LEU",
-          name: "Leucine",
-          oneLetter: "L",
-          url: "https://files.rcsb.org/ligands/view/LEU.cif",
-          charge: "neutral",
-          hydrophobicity: "hydrophobic",
-        },
-        {
-          id: "LYS",
-          name: "Lysine",
-          oneLetter: "K",
-          url: "https://files.rcsb.org/ligands/view/LYS.cif",
-          charge: "positive",
-          hydrophobicity: "hydrophilic",
-        },
-        {
-          id: "MET",
-          name: "Methionine",
-          oneLetter: "M",
-          url: "https://files.rcsb.org/ligands/view/MET.cif",
-          charge: "neutral",
-          hydrophobicity: "hydrophobic",
-        },
-        {
-          id: "PHE",
-          name: "Phenylalanine",
-          oneLetter: "F",
-          url: "https://files.rcsb.org/ligands/view/PHE.cif",
-          charge: "neutral",
-          hydrophobicity: "hydrophobic",
-        },
-        {
-          id: "PRO",
-          name: "Proline",
-          oneLetter: "P",
-          url: "https://files.rcsb.org/ligands/view/PRO.cif",
-          charge: "neutral",
-          hydrophobicity: "hydrophobic",
-        },
-        {
-          id: "SER",
-          name: "Serine",
-          oneLetter: "S",
-          url: "https://files.rcsb.org/ligands/view/SER.cif",
-          charge: "neutral",
-          hydrophobicity: "hydrophilic",
-        },
-        {
-          id: "THR",
-          name: "Threonine",
-          oneLetter: "T",
-          url: "https://files.rcsb.org/ligands/view/THR.cif",
-          charge: "neutral",
-          hydrophobicity: "hydrophilic",
-        },
-        {
-          id: "TRP",
-          name: "Tryptophan",
-          oneLetter: "W",
-          url: "https://files.rcsb.org/ligands/view/TRP.cif",
-          charge: "neutral",
-          hydrophobicity: "hydrophobic",
-        },
-        {
-          id: "TYR",
-          name: "Tyrosine",
-          oneLetter: "Y",
-          url: "https://files.rcsb.org/ligands/view/TYR.cif",
-          charge: "neutral",
-          hydrophobicity: "hydrophilic",
-        },
-        {
-          id: "VAL",
-          name: "Valine",
-          oneLetter: "V",
-          url: "https://files.rcsb.org/ligands/view/VAL.cif",
-          charge: "neutral",
-          hydrophobicity: "hydrophobic",
-        },
-      ];
+        const aminoAcids = [
+            {id: 'ALA', name: 'Alanine', oneLetter: 'A', url: 'https://files.rcsb.org/ligands/view/ALA.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
+            {id: 'ARG', name: 'Arginine', oneLetter: 'R', url: 'https://files.rcsb.org/ligands/view/ARG.cif', charge: 'positive', hydrophobicity: 'hydrophilic'},
+            {id: 'ASN', name: 'Asparagine', oneLetter: 'N', url: 'https://files.rcsb.org/ligands/view/ASN.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
+            {id: 'ASP', name: 'Aspartic Acid', oneLetter: 'D', url: 'https://files.rcsb.org/ligands/view/ASP.cif', charge: 'negative', hydrophobicity: 'hydrophilic'},
+            {id: 'CYS', name: 'Cysteine', oneLetter: 'C', url: 'https://files.rcsb.org/ligands/view/CYS.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
+            {id: 'GLU', name: 'Glutamic Acid', oneLetter: 'E', url: 'https://files.rcsb.org/ligands/view/GLU.cif', charge: 'negative', hydrophobicity: 'hydrophilic'},
+            {id: 'GLN', name: 'Glutamine', oneLetter: 'Q', url: 'https://files.rcsb.org/ligands/view/GLN.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
+            {id: 'GLY', name: 'Glycine', oneLetter: 'G', url: 'https://files.rcsb.org/ligands/view/GLY.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
+            {id: 'HIS', name: 'Histidine', oneLetter: 'H', url: 'https://files.rcsb.org/ligands/view/HIS.cif', charge: 'positive', hydrophobicity: 'hydrophilic'},
+            {id: 'ILE', name: 'Isoleucine', oneLetter: 'I', url: 'https://files.rcsb.org/ligands/view/ILE.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
+            {id: 'LEU', name: 'Leucine', oneLetter: 'L', url: 'https://files.rcsb.org/ligands/view/LEU.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
+            {id: 'LYS', name: 'Lysine', oneLetter: 'K', url: 'https://files.rcsb.org/ligands/view/LYS.cif', charge: 'positive', hydrophobicity: 'hydrophilic'},
+            {id: 'MET', name: 'Methionine', oneLetter: 'M', url: 'https://files.rcsb.org/ligands/view/MET.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
+            {id: 'PHE', name: 'Phenylalanine', oneLetter: 'F', url: 'https://files.rcsb.org/ligands/view/PHE.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
+            {id: 'PRO', name: 'Proline', oneLetter: 'P', url: 'https://files.rcsb.org/ligands/view/PRO.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
+            {id: 'SER', name: 'Serine', oneLetter: 'S', url: 'https://files.rcsb.org/ligands/view/SER.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
+            {id: 'THR', name: 'Threonine', oneLetter: 'T', url: 'https://files.rcsb.org/ligands/view/THR.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
+            {id: 'TRP', name: 'Tryptophan', oneLetter: 'W', url: 'https://files.rcsb.org/ligands/view/TRP.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'},
+            {id: 'TYR', name: 'Tyrosine', oneLetter: 'Y', url: 'https://files.rcsb.org/ligands/view/TYR.cif', charge: 'neutral', hydrophobicity: 'hydrophilic'},
+            {id: 'VAL', name: 'Valine', oneLetter: 'V', url: 'https://files.rcsb.org/ligands/view/VAL.cif', charge: 'neutral', hydrophobicity: 'hydrophobic'}
+        ];
 
-      let currentIndex = 0;
-      const batchSize = 5;
-      let viewerCheckInterval;
+        let currentIndex = 0;
+        const batchSize = 5;
+        let viewerCheckInterval;
 
-      function getColor(charge, hydrophobicity) {
-        if (charge === "positive") return "#ccccff"; // Pastel red
-        if (charge === "negative") return "#ffcccc"; // Pastel blue
-        if (hydrophobicity === "hydrophilic") return "white"; // White
-        if (hydrophobicity === "hydrophobic") return "#ffffcc"; // Pastel yellow
-        return "#d9d9d9"; // Light gray
-      }
+        function getColor(charge, hydrophobicity) {
+            if (charge === 'positive') return '#ccccff'; // Pastel red
+            if (charge === 'negative') return '#ffcccc'; // Pastel blue
+            if (hydrophobicity === 'hydrophilic') return 'white'; // White
+            if (hydrophobicity === 'hydrophobic') return '#ffffcc'; // Pastel yellow
+            return '#d9d9d9'; // Light gray
+        }
 
-      function disableScroll() {
-        window.addEventListener("wheel", preventDefault, { passive: false });
-      }
+        function disableScroll() {
+            window.addEventListener('wheel', preventDefault, { passive: false });
+        }
 
-      function enableScroll() {
-        window.removeEventListener("wheel", preventDefault, { passive: false });
-      }
+        function enableScroll() {
+            window.removeEventListener('wheel', preventDefault, { passive: false });
+        }
 
-      function preventDefault(e) {
-        e.preventDefault();
-      }
+        function preventDefault(e) {
+            e.preventDefault();
+        }
 
-      function showBatch(startIndex) {
-        const container = document.getElementById("viewer-container");
-        container.innerHTML = ""; // Clear the container
+function showBatch(startIndex) {
+    const container = document.getElementById('viewer-container');
+    container.innerHTML = ''; // Clear the container
 
-        // Create the reload box first
-        const reloadBox = document.createElement("div");
-        reloadBox.className = "viewer-box";
-        reloadBox.style.backgroundColor = "lightgrey";
+    // Create the reload box first
+    const reloadBox = document.createElement('div');
+    reloadBox.className = 'viewer-box';
+    reloadBox.style.backgroundColor = 'lightgrey';
 
-        const reloadImage = document.createElement("img");
-        reloadImage.src =
-          "https://s3-us-west-2.amazonaws.com/courses-images/wp-content/uploads/sites/110/2016/05/02212734/Figure_03_04_01.jpg";
-        reloadImage.alt = "Amino Acid Structure";
-        reloadImage.className = "reload-image";
-        reloadBox.appendChild(reloadImage);
+    const reloadImage = document.createElement('img');
+    reloadImage.src = 'https://s3-us-west-2.amazonaws.com/courses-images/wp-content/uploads/sites/110/2016/05/02212734/Figure_03_04_01.jpg';
+    reloadImage.alt = 'Amino Acid Structure';
+    reloadImage.className = 'reload-image';
+    reloadBox.appendChild(reloadImage);
 
-        const reloadButton = document.createElement("button");
-        reloadButton.innerText = "Reload Viewers";
-        reloadButton.className = "reload-button";
-        reloadButton.onclick = () => showBatch(currentIndex);
-        reloadBox.appendChild(reloadButton);
+    const reloadButton = document.createElement('button');
+    reloadButton.innerText = 'Reload Viewers';
+    reloadButton.className = 'reload-button';
+    reloadButton.onclick = () => showBatch(currentIndex);
+    reloadBox.appendChild(reloadButton);
 
-        const reloadText = document.createElement("div");
-        reloadText.className = "reload-text";
-        reloadText.innerHTML = "Some amino acids contain";
-        const circle = document.createElement("div");
-        circle.className = "circle";
-        circle.innerText = "S";
-        reloadText.appendChild(circle);
-        reloadBox.appendChild(reloadText);
+    const reloadText = document.createElement('div');
+    reloadText.className = 'reload-text';
+    reloadText.innerHTML = 'Some amino acids contain';
+    const circle = document.createElement('div');
+    circle.className = 'circle';
+    circle.innerText = 'S';
+    reloadText.appendChild(circle);
+    reloadBox.appendChild(reloadText);
 
-        // Prepend the reload box to the container
-        container.appendChild(reloadBox);
+    // Prepend the reload box to the container
+    container.appendChild(reloadBox);
 
-        // Then add the viewer boxes
-        const batch = aminoAcids.slice(startIndex, startIndex + batchSize);
+    // Then add the viewer boxes
+    const batch = aminoAcids.slice(startIndex, startIndex + batchSize);
 
-        batch.forEach((amino) => {
-          const viewerBox = document.createElement("div");
-          viewerBox.className = "viewer-box";
-          viewerBox.style.backgroundColor = getColor(
-            amino.charge,
-            amino.hydrophobicity
-          );
+    batch.forEach(amino => {
+        const viewerBox = document.createElement('div');
+        viewerBox.className = 'viewer-box';
+        viewerBox.style.backgroundColor = getColor(amino.charge, amino.hydrophobicity);
 
-          const info = document.createElement("div");
-          info.innerHTML = `<strong>${amino.name}</strong><br>Three-letter code: ${amino.id}<br>One-letter code: ${amino.oneLetter}`;
-          viewerBox.appendChild(info);
+        const info = document.createElement('div');
+        info.innerHTML = `<strong>${amino.name}</strong><br>Three-letter code: ${amino.id}<br>One-letter code: ${amino.oneLetter}`;
+        viewerBox.appendChild(info);
 
-          const viewerDiv = document.createElement("div");
-          viewerDiv.id = `viewer-${amino.id}`;
-          viewerDiv.className = "viewer";
-          viewerDiv.onmouseenter = disableScroll;
-          viewerDiv.onmouseleave = enableScroll;
-          viewerBox.appendChild(viewerDiv);
+        const viewerDiv = document.createElement('div');
+        viewerDiv.id = `viewer-${amino.id}`;
+        viewerDiv.className = 'viewer';
+        viewerDiv.onmouseenter = disableScroll;
+        viewerDiv.onmouseleave = enableScroll;
+        viewerBox.appendChild(viewerDiv);
 
-          container.appendChild(viewerBox);
+        container.appendChild(viewerBox);
 
-          loadViewer(amino.url, viewerDiv.id);
-        });
+        loadViewer(amino.url, viewerDiv.id);
+    });
 
-        // Wait half a second, then load the amino acid sequence viewer
-        setTimeout(foldSequence, 5000);
-      }
+    // Wait half a second, then load the amino acid sequence viewer
+    setTimeout(foldSequence, 500);
+}
 
-      function loadViewer(url, viewerId) {
-        const stage = new NGL.Stage(viewerId, { disableControls: true });
-        stage
-          .loadFile(url, { defaultRepresentation: true })
-          .then((comp) => {
-            comp.addRepresentation("ball+stick", {
-              sele: "N or C",
-              opacity: 0.4, // 60% transparent
+
+        function loadViewer(url, viewerId) {
+            const stage = new NGL.Stage(viewerId, { disableControls: true });
+            stage.loadFile(url, { defaultRepresentation: true }).then(comp => {
+                comp.addRepresentation('ball+stick', {
+                    sele: 'N or C',
+                    opacity: 0.4  // 60% transparent
+                });
+                comp.addRepresentation('ball+stick', {
+                    sele: 'not (N or C)',
+                    opacity: 1.0
+                });
+                stage.autoView();
+            }).catch(error => {
+                console.error(`Error loading viewer ${viewerId}:`, error);
+                setTimeout(() => loadViewer(url, viewerId), 1000);
             });
-            comp.addRepresentation("ball+stick", {
-              sele: "not (N or C)",
-              opacity: 1.0,
-            });
-            stage.autoView();
-          })
-          .catch((error) => {
-            console.error(`Error loading viewer ${viewerId}:`, error);
-            setTimeout(() => loadViewer(url, viewerId), 1000);
-          });
-      }
-
-      function checkViewerStatus() {
-        const viewerElement = document.getElementById("viewer");
-        const stageCanvas = viewerElement.querySelector("canvas");
-        if (
-          !viewerElement ||
-          !stageCanvas ||
-          stageCanvas.width === 0 ||
-          stageCanvas.height === 0
-        ) {
-          console.warn("Viewer appears to have crashed. Reloading...");
-          foldSequence();
         }
-      }
 
-      function showNextBatch() {
-        if (currentIndex + batchSize < aminoAcids.length) {
-          currentIndex += batchSize;
-          showBatch(currentIndex);
-        }
-      }
-
-      function showPrevBatch() {
-        if (currentIndex - batchSize >= 0) {
-          currentIndex -= batchSize;
-          showBatch(currentIndex);
-        }
-      }
-
-      function foldSequence() {
-        const sequence = document.getElementById("sequenceInput").value;
-        const url = "https://api.esmatlas.com/foldSequence/v1/pdb/";
-        const params = `${encodeURIComponent(sequence)}`;
-
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", url, true);
-        xhr.setRequestHeader(
-          "Content-type",
-          "application/x-www-form-urlencoded"
-        );
-
-        xhr.onreadystatechange = function () {
-          if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-              display3DStructure(xhr.responseText);
-            } else {
-              console.error(
-                `Error: ${xhr.status} - ${xhr.statusText}\n${xhr.responseText}`
-              );
-              setTimeout(() => foldSequence(), 5000);
+        function checkViewerStatus() {
+            const viewerElement = document.getElementById('viewer');
+            const stageCanvas = viewerElement.querySelector('canvas');
+            if (!viewerElement || !stageCanvas || stageCanvas.width === 0 || stageCanvas.height === 0) {
+                console.warn('Viewer appears to have crashed. Reloading...');
+                foldSequence();
             }
-          }
-        };
+        }
 
-        xhr.onerror = function () {
-          console.error("Request failed");
-          setTimeout(() => foldSequence(), 5000);
-        };
+        function showNextBatch() {
+            if (currentIndex + batchSize < aminoAcids.length) {
+                currentIndex += batchSize;
+                showBatch(currentIndex);
+            }
+        }
 
-        console.log("Sending request with params:", params);
-        xhr.send(params);
-      }
+        function showPrevBatch() {
+            if (currentIndex - batchSize >= 0) {
+                currentIndex -= batchSize;
+                showBatch(currentIndex);
+            }
+        }
 
-      function display3DStructure(pdbData) {
-        const viewerElement = document.getElementById("viewer");
-        viewerElement.innerHTML = ""; // Clear the viewer to reload it properly
+        function foldSequence() {
+            const sequence = document.getElementById('sequenceInput').value;
+            const url = 'https://api.esmatlas.com/foldSequence/v1/pdb/';
+            const params = `${encodeURIComponent(sequence)}`;
 
-        const viewer = $3Dmol.createViewer(viewerElement, {
-          defaultcolors: $3Dmol.rasmolElementColors,
-        });
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', url, true);
+            xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
 
-        viewer.addModel(pdbData, "pdb");
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        display3DStructure(xhr.responseText);
+                    } else {
+                        console.error(`Error: ${xhr.status} - ${xhr.statusText}\n${xhr.responseText}`);
+                        setTimeout(() => foldSequence(), 1000);
+                    }
+                }
+            };
 
-        // Function to set representation based on user selection
-        function setRepresentation(representation) {
-          viewer.setStyle(
-            {},
-            { stick: { radius: 0.2 }, sphere: { scale: 0.3 } }
-          ); // Default representation
+            xhr.onerror = function() {
+                console.error('Request failed');
+                setTimeout(() => foldSequence(), 1000);
+            };
 
-          if (representation === "spacefill") {
-            viewer.setStyle(
-              {},
-              {
-                sphere: {
-                  scale: 1.0, // Adjusted scale for spacefill representation
-                  colorscheme: {
-                    prop: "resn",
-                    map: colorMap,
-                  },
-                },
-              }
-            );
-          } else if (representation === "atomic") {
-            viewer.setStyle(
-              {},
-              { stick: { radius: 0.2 }, sphere: { scale: 0.3 } }
-            );
-          } else if (representation === "cartoon") {
-            viewer.setStyle(
-              {},
-              {
-                cartoon: {
-                  color: "sstruc", // Color by secondary structure
-                },
-              }
-            );
+            console.log('Sending request with params:', params);
+            xhr.send(params);
+        }
 
-            viewer.setStyle({
-              cartoon: {
-                colorfunc: function (atom) {
-                  if (atom.ss === "h") {
-                    return "cyan"; // Alpha helices
-                  } else if (atom.ss === "s") {
-                    return "purple"; // Beta sheets
-                  } else {
-                    return "indigo"; // Random coils
-                  }
-                },
-              },
+        function display3DStructure(pdbData) {
+            const viewerElement = document.getElementById('viewer');
+            viewerElement.innerHTML = ''; // Clear the viewer to reload it properly
+
+            const viewer = $3Dmol.createViewer(viewerElement, {
+                defaultcolors: $3Dmol.rasmolElementColors
             });
-          }
 
-          viewer.zoomTo();
-          viewer.render();
+            viewer.addModel(pdbData, "pdb");
+
+            // Function to set representation based on user selection
+            function setRepresentation(representation) {
+                viewer.setStyle({}, {stick: {radius: 0.2}, sphere: {scale: 0.3}}); // Default representation
+
+                if (representation === 'spacefill') {
+                    viewer.setStyle({}, {
+                        sphere: {
+                            scale: 1.0, // Adjusted scale for spacefill representation
+                            colorscheme: {
+                                prop: 'resn',
+                                map: colorMap
+                            }
+                        }
+                    });
+                } else if (representation === 'atomic') {
+                    viewer.setStyle({}, {stick: {radius: 0.2}, sphere: {scale: 0.3}});
+                } else if (representation === 'cartoon') {
+                    viewer.setStyle({}, {
+                        cartoon: {
+                            color: 'sstruc' // Color by secondary structure
+                        }
+                    });
+
+                    viewer.setStyle({ cartoon: { colorfunc: function(atom) {
+                        if (atom.ss === 'h') {
+                            return 'cyan'; // Alpha helices
+                        } else if (atom.ss === 's') {
+                            return 'purple'; // Beta sheets
+                        } else {
+                            return 'indigo'; // Random coils
+                        }
+                    }}});
+                }
+
+                viewer.zoomTo();
+                viewer.render();
+            }
+
+            // Initial display based on default selection
+            const representationSelect = document.getElementById('representationSelect');
+            let currentRepresentation = representationSelect.value;
+            setRepresentation(currentRepresentation);
+
+            // Event listener for changing representation
+            representationSelect.addEventListener('change', function() {
+                currentRepresentation = representationSelect.value;
+                setRepresentation(currentRepresentation);
+            });
+
+            viewer.zoomTo();
+            viewer.render();
         }
 
-        // Initial display based on default selection
-        const representationSelect = document.getElementById(
-          "representationSelect"
-        );
-        let currentRepresentation = representationSelect.value;
-        setRepresentation(currentRepresentation);
+        // Define the color map
+        const colorMap = {
+            'ALA': 'yellow',
+            'VAL': 'yellow',
+            'ILE': 'yellow',
+            'LEU': 'yellow',
+            'MET': 'yellow',
+            'PHE': 'yellow',
+            'TRP': 'yellow',
+            'PRO': 'yellow',
+            'GLY': 'yellow',
+            'ARG': 'blue',
+            'LYS': 'blue',
+            'ASP': 'red',
+            'GLU': 'red',
+            'ASN': 'lightgrey',
+            'GLN': 'lightgrey',
+            'SER': 'lightgrey',
+            'THR': 'lightgrey',
+            'CYS': 'grey',
+            'HIS': 'blue',
+            'TYR': 'grey'
+        };
 
-        // Event listener for changing representation
-        representationSelect.addEventListener("change", function () {
-          currentRepresentation = representationSelect.value;
-          setRepresentation(currentRepresentation);
+        // Function to reload the viewers
+        function reloadViewers() {
+            showBatch(currentIndex);
+        }
+
+        // Event listener for messages from parent window
+        window.addEventListener('message', (event) => {
+            if (event.data === 'reloadViewer') {
+                reloadViewers();
+            }
         });
 
-        viewer.zoomTo();
-        viewer.render();
-      }
+        document.getElementById('sequenceInput').addEventListener('input', foldSequence);
 
-      // Define the color map
-      const colorMap = {
-        ALA: "yellow",
-        VAL: "yellow",
-        ILE: "yellow",
-        LEU: "yellow",
-        MET: "yellow",
-        PHE: "yellow",
-        TRP: "yellow",
-        PRO: "yellow",
-        GLY: "yellow",
-        ARG: "blue",
-        LYS: "blue",
-        ASP: "red",
-        GLU: "red",
-        ASN: "lightgrey",
-        GLN: "lightgrey",
-        SER: "lightgrey",
-        THR: "lightgrey",
-        CYS: "grey",
-        HIS: "blue",
-        TYR: "grey",
-      };
-
-      // Function to reload the viewers
-      function reloadViewers() {
+        // Show the first batch on initial load
         showBatch(currentIndex);
-      }
 
-      // Event listener for messages from parent window
-      window.addEventListener("message", (event) => {
-        if (event.data === "reloadViewer") {
-          reloadViewers();
-        }
-      });
-
-      document
-        .getElementById("sequenceInput")
-        .addEventListener("input", foldSequence);
-
-      // Show the first batch on initial load
-      showBatch(currentIndex);
-
-      // Periodically check the status of the viewer
-      viewerCheckInterval = setInterval(checkViewerStatus, 5000); // Check every 5 seconds
+        // Periodically check the status of the viewer
+        viewerCheckInterval = setInterval(checkViewerStatus, 5000); // Check every 5 seconds
     </script>
-  </body>
+</body>
 </html>
