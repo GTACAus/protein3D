@@ -569,7 +569,7 @@
         });
 
         // Wait half a second, then load the amino acid sequence viewer
-        setTimeout(foldSequence, 500);
+        setTimeout(foldSequence, 5000);
       }
 
       function loadViewer(url, viewerId) {
@@ -641,14 +641,14 @@
               console.error(
                 `Error: ${xhr.status} - ${xhr.statusText}\n${xhr.responseText}`
               );
-              setTimeout(() => foldSequence(), 1000);
+              setTimeout(() => foldSequence(), 5000);
             }
           }
         };
 
         xhr.onerror = function () {
           console.error("Request failed");
-          setTimeout(() => foldSequence(), 1000);
+          setTimeout(() => foldSequence(), 5000);
         };
 
         console.log("Sending request with params:", params);
