@@ -341,7 +341,7 @@
         />
       </div>
     </div>
-    <div class="container hidden" id="second-card">
+    <div class="container" id="second-card">
       <h2>Translation</h2>
       <label for="textbox2"
         >Using the mRNA codon wheel, determine and write the corresponding amino acid
@@ -370,7 +370,7 @@
         />
       </div>
     </div>
-    <div class="container hidden" id="third-card">
+    <div class="container" id="third-card">
       <h2>Amino Acid Properties</h2>
       <label for="textbox"
         >Using the table below, determine the characteristics that correspond to
@@ -445,7 +445,7 @@
         </tbody>
       </table>
     </div>
-    <div class="container hidden" id="fourth-card">
+    <div class="container" id="fourth-card">
       <h2>Amino Acid and Protein Structure</h2>
       <input type="range" id="fourth-card-slider" min="0" max="100" value="0" />
       <div class="iframe-container"><iframe
@@ -575,9 +575,9 @@
           W: "hydrophobic",
           Y: "hydrophilic",
         };
-        let secondCardRevealed = true;
-        let thirdCardRevealed = true;
-        let fourthCardRevealed = true;
+        let secondCardRevealed = false;
+        let thirdCardRevealed = false;
+        let fourthCardRevealed = false;
 
         slider.addEventListener("input", () => {
           const value = slider.value;
