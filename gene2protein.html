@@ -305,6 +305,17 @@
       iframe::-webkit-scrollbar-track {
         background: #f0f0f0;
       }
+      #rotatable-image-container {
+      display: inline-block; /* So the container only wraps the image */
+      position: relative;    /* Needed for calculating the center */
+      }
+
+      #wheel-image {
+      transform-origin: center center; /* Rotate around center */
+      cursor: grab;                    /* Show grab cursor on hover */
+      user-select: none;               /* Prevent text selection while dragging */
+      }
+
     </style>
   </head>
   <body>
@@ -363,12 +374,17 @@
           <b>Messenger RNA</b>
         </div>
       </div>
-      <div class="image-container">
-        <img
-          src="wheel.PNG"
-          alt="Amino Acids Table"
-        />
-      </div>
+  <div class="image-container" id="rotatable-image-container">
+  <img
+    src="wheel.PNG"
+    alt="Amino Acids Wheel"
+    id="wheel-image"
+  />
+  </div>
+      <br><br><br>
+      <p>
+        Click and drag to rotate the codon wheel
+      </p>
     </div>
     <div class="container" id="third-card">
       <h2>Amino Acid Properties</h2>
@@ -782,6 +798,52 @@
           this.style.height = this.scrollHeight + "px"; // Set height to scrollHeight
         });
       });
+      document.addEventListener("DOMContentLoaded", function () {
+  const wheelImage = document.getElementById("wheel-image");
+
+  let isDragging = false;
+  let currentAngle = 0;   // Current total rotation in radians
+  let initialAngle = 0;   // Angle between mouse pointer & center at mousedown
+  let centerX, centerY;   // To hold the center of the image
+
+  wheelImage.addEventListener("mousedown", (event) => {
+    isDragging = true;
+
+    // Get bounding box of the image to compute its center
+    const rect = wheelImage.getBoundingClientRect();
+    centerX = rect.left + rect.width / 2;
+    centerY = rect.top + rect.height / 2;
+
+    // Calculate the angle of the pointer relative to the image center
+    const dx = event.clientX - centerX;
+    const dy = event.clientY - centerY;
+    // We store the difference between the pointer angle and current rotation
+    initialAngle = Math.atan2(dy, dx) - currentAngle;
+
+    // Change the cursor for grabbing effect
+    wheelImage.style.cursor = "grabbing";
+  });
+
+  document.addEventListener("mousemove", (event) => {
+    if (!isDragging) return;
+
+    // Compute new angle based on mouse position
+    const dx = event.clientX - centerX;
+    const dy = event.clientY - centerY;
+    const newAngle = Math.atan2(dy, dx);
+
+    // currentAngle is the net rotation the image should have
+    currentAngle = newAngle - initialAngle;
+
+    // Rotate the image
+    wheelImage.style.transform = `rotate(${currentAngle}rad)`;
+  });
+
+  document.addEventListener("mouseup", () => {
+    isDragging = false;
+    wheelImage.style.cursor = "grab";
+  });
+});
     </script>
   </body>
 </html>
