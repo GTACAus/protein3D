@@ -4,17 +4,102 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amino acids: Structures, Properties and Sequence</title>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/ngl@2.0.0-dev.32/dist/ngl.js"></script>
     <script src="https://3Dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
     <style>
+        /* GTAC HERO COLOURS AS CSS VARIABLES */
+        :root {
+            --eggshell: #F9F6E7;
+            --sodium-flame: #FF6D3A;
+            --cadmium-yellow: #FFCD1F;
+            --chlorophyll-green: #00BC74;
+            --aquamarine: #6BE7BE;
+            --lavender: #C0ADFF;
+            --cobalt-blue: #4C34E5;
+            --onyx: #272A24;
+
+            /* Helper Tints/Shades for accessibility or borders */
+            --dark-accent: var(--cobalt-blue);
+            --secondary-accent: var(--chlorophyll-green);
+            --tertiary-accent: var(--sodium-flame);
+            --text-on-light: var(--onyx);
+            --text-on-dark: var(--eggshell);
+        }
+
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Figtree', sans-serif;
+            font-size: 18px;
             margin: 0;
-            padding: 0;
+            padding: 20px;
+            background-color: var(--eggshell);
+            color: var(--text-on-light);
             display: flex;
             flex-direction: column;
             align-items: center;
-            background-color: #f8f9fa;
+        }
+
+        /* Header Branding */
+        .header-branding {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 1200px;
+        }
+
+        .gtac-logo {
+            max-height: 50px;
+            width: auto;
+        }
+
+        h1 {
+            color: var(--cobalt-blue);
+            border-bottom: 4px solid var(--sodium-flame);
+            padding-bottom: 10px;
+            margin-bottom: 0;
+            margin-top: 0;
+        }
+
+        /* Dropdown menu hidden by default */
+        .header-dropdown {
+            display: none;
+            position: absolute;
+            right: 20px;
+            top: 100px;
+            background: white;
+            border: 2px solid var(--aquamarine);
+            border-radius: 10px;
+            padding: 12px;
+            width: 220px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 9999;
+        }
+
+        /* Show dropdown when header is hovered */
+        .header-wrapper:hover .header-dropdown {
+            display: block;
+        }
+
+        .header-wrapper {
+            position: relative;
+            display: flex;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .header-dropdown a {
+            display: block;
+            margin: 8px 0;
+            text-decoration: none;
+            color: var(--cobalt-blue);
+            font-weight: 600;
+        }
+
+        .header-dropdown a:hover {
+            color: var(--onyx);
+            text-decoration: underline;
         }
         .header {
             display: flex;
@@ -29,7 +114,7 @@
         .title {
             font-size: 24px;
             margin: 10px 0;
-            color: #202124;
+            color: var(--text-on-light);
         }
         .navigation {
             display: flex;
@@ -41,15 +126,16 @@
             font-size: 16px;
             cursor: pointer;
             border: none;
-            background-color: #4285f4;
-            color: white;
+            background-color: var(--cobalt-blue);
+            color: var(--eggshell);
             border-radius: 4px;
             margin: 5px 0;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
             transition: background-color 0.3s;
+            font-weight: 600;
         }
         .navigation button:hover {
-            background-color: #357ae8;
+            background-color: var(--sodium-flame);
         }
         .atom-legend-container {
           width: 95%;
@@ -77,24 +163,26 @@
             justify-content: space-around;
             margin-bottom: 20px;
             width: 93%;
-            padding: 10px 0;
-            background-color: white;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border-radius: 4px;
+            padding: 20px;
+            background-color: var(--eggshell);
+            border: 1px solid var(--aquamarine);
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             text-align: left;
         }
         .legend-item {
             display: flex;
             align-items: center;
-            color: #5f6368;
+            color: var(--text-on-light);
             justify-content: center;
-            margin: 5px 0;
+            margin: 8px 0;
         }
         .legend-color {
             width: 20px;
             height: 20px;
             margin-right: 10px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--aquamarine);
+            border-radius: 3px;
         }
         .viewer-container {
             display: flex;
@@ -107,12 +195,12 @@
             width: 100%;
             max-width: 300px;
             margin: 10px;
-            padding: 10px;
+            padding: 15px;
             box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            background-color: #f3f6f4;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--aquamarine);
+            border-radius: 10px;
+            background-color: var(--eggshell);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
             position: relative;
             display: flex;
             flex-direction: column;
@@ -121,23 +209,24 @@
         .viewer {
             width: 80%;
             height: 300px;
-            border: 1px solid #ccc;
+            border: 1px solid var(--aquamarine);
             margin-bottom: 10px;
-            border-radius: 4px;
+            border-radius: 8px;
         }
         .reload-button {
             padding: 10px 20px;
             font-size: 14px;
             border: none;
-            background-color: #4285f4;
-            color: white;
+            background-color: var(--cobalt-blue);
+            color: var(--eggshell);
             border-radius: 4px;
             cursor: pointer;
             transition: background-color 0.3s;
             margin-top: 10px;
+            font-weight: 600;
         }
         .reload-button:hover {
-            background-color: #357ae8;
+            background-color: var(--sodium-flame);
         }
         .reload-image {
             width: 100%;
@@ -161,11 +250,12 @@
             margin-top: 10px;
         }
         .card {
-            background-color: #f3f6f4;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            border-radius: 8px;
+            background-color: var(--eggshell);
+            border: 1px solid var(--aquamarine);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border-radius: 10px;
             margin: 20px;
-            padding: 20px;
+            padding: 25px;
             width: 90%;
             max-width: 1200px;
             box-sizing: border-box;
@@ -176,14 +266,20 @@
         }
         .card h2 {
             margin-top: 0;
+            color: var(--text-on-light);
+            border-left: 5px solid var(--chlorophyll-green);
+            padding-left: 10px;
         }
         .card textarea {
             width: calc(100% - 20px);
             margin: 10px 0;
             padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
+            border-radius: 5px;
+            border: 2px solid var(--aquamarine);
             box-sizing: border-box;
+            font-family: 'Figtree', sans-serif;
+            color: var(--text-on-light);
+            background-color: #fff;
         }
         #viewer {
             width: 100%;
@@ -192,6 +288,7 @@
             position: relative;
             border-radius: 8px;
             overflow: hidden;
+            border: 1px solid var(--aquamarine);
         }
 
         /* Media Queries for Responsive Design */
@@ -231,6 +328,19 @@
     </style>
 </head>
 <body>
+    <div class="header-wrapper">
+        <div class="header-branding">
+
+            <img src="https://gtac.edu.au/wp-content/themes/gtac/assets/images/logo-2024.png" alt="GTAC Logo" class="gtac-logo">
+        </div>
+
+        <!-- Dropdown menu -->
+        <div class="header-dropdown">
+            <a href="gene2protein.html">Gene to Protein</a>
+            <a href="amino.html">Amino Acid Viewer</a>
+        </div>
+    </div>
+
     <div class="header">
         <h1 class="title">Amino acids: Structures, Properties and Sequence</h1>
           <div class="instruction-container">

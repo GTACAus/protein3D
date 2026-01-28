@@ -4,56 +4,142 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gene to Protein</title>
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;700&display=swap" rel="stylesheet">
     <style>
+      /* GTAC HERO COLOURS AS CSS VARIABLES */
+      :root {
+        --eggshell: #F9F6E7;
+        --sodium-flame: #FF6D3A;
+        --cadmium-yellow: #FFCD1F;
+        --chlorophyll-green: #00BC74;
+        --aquamarine: #6BE7BE;
+        --lavender: #C0ADFF;
+        --cobalt-blue: #4C34E5;
+        --onyx: #272A24;
+
+        /* Helper Tints/Shades for accessibility or borders */
+        --dark-accent: var(--cobalt-blue);
+        --secondary-accent: var(--chlorophyll-green);
+        --tertiary-accent: var(--sodium-flame);
+        --text-on-light: var(--onyx);
+        --text-on-dark: var(--eggshell);
+      }
+
+      /* General Styling */
       body {
-        font-family: Arial, sans-serif;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        height: 100vh;
-        background-color: #f0f0f0;
+        /* APPLY FIGTREE FONT */
+        font-family: 'Figtree', sans-serif;
+        font-size: 19px;
         margin: 0;
+        padding: 20px;
+        /* Background: Eggshell (light base) */
+        background-color: var(--eggshell);
+        /* Primary Text: Onyx (on light background) */
+        color: var(--text-on-light);
+      }
+
+      /* HEADER BRANDING (New Container for Title and Logo) */
+      .header-branding {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+      }
+      .gtac-logo {
+        max-height: 50px;
+        width: auto;
+      }
+
+      /* H1: Cobalt Blue on Eggshell, Border: Sodium Flame for visual pop */
+      h1 {
+        color: var(--cobalt-blue);
+        border-bottom: 4px solid var(--sodium-flame); /* Bold, bright accent */
+        padding-bottom: 10px;
+        margin-bottom: 0; /* Adjusted to be controlled by .header-branding */
+      }
+
+      /* H2: Onyx on Eggshell, Border: Chlorophyll Green */
+      h2 {
+        color: var(--text-on-light);
+        margin-top: 40px;
+        margin-bottom: 20px;
+        border-left: 5px solid var(--chlorophyll-green);
+        padding-left: 10px;
+      }
+
+      /* H3: Cobalt Blue */
+      h3 {
+        color: var(--cobalt-blue);
+        border-bottom: 2px dashed var(--aquamarine); /* Lighter accent line */
+        padding-bottom: 5px;
+        margin-bottom: 15px;
+      }
+
+      
+      /* Content Container - Reused for main content sections */
+      .content-container {
+        margin-top: 30px;
+        padding: 15px;
+        /* Border: Aquamarine */
+        border: 1px solid var(--aquamarine);
+        border-radius: 10px;
+        /* Background: Maintain Eggshell for consistency */
+        background-color: var(--eggshell);
+        /* Box Shadow remains neutral */
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
       }
 
       .container {
-        text-align: left;
-        background-color: #fff;
-        padding: 20px;
+        margin-top: 30px;
+        padding: 25px;
+        /* Border: Aquamarine */
+        border: 1px solid var(--aquamarine);
         border-radius: 10px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        margin: 10px;
-        width: 90%;
-        max-width: 800px;
+        /* Background: Maintain Eggshell for consistency */
+        background-color: var(--eggshell);
+        /* Box Shadow remains neutral */
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        text-align: left;
       }
 
       .dna-sequence,
       .rna-sequence,
-      .template-sequence,
-      .amino-acid-sequence {
+      .template-sequence{
         margin: 20px 0;
-        font-size: 20px;
+        font-size: 30px;
+        color: var(--text-on-light);
+      }
+
+      .amino-acid-sequence {
+        margin: 15px 0;
+        font-size: 35px;
+        color: var(--text-on-light);
       }
 
       .base {
+        margin: 20px 0;
         font-weight: bold;
+        font-size: 30px;
+        color: var(--cobalt-blue);
       }
 
       .rna-sequence {
-        color: green;
-        font-size: 19.2px;
+        color: var(--chlorophyll-green);
+        margin: 10px 0;
+        font-size: 28.5px;
       }
 
       .codon-dark {
-        color: darkgreen;
+        color: var(--secondary-accent);
       }
 
       .codon-light {
-        color: lightgreen;
+        color: var(--aquamarine);
       }
 
       .amino-acid-sequence {
-        color: blue;
-        font-size: 18.8px;
+        color: var(--cobalt-blue);
+        font-size: 24px;
         text-align: left;
       }
 
@@ -77,13 +163,48 @@
         height: 20px;
         margin-right: 10px;
       }
+
+      /* Link Styling - Primary links set to Cobalt Blue for high contrast */
+      a, .primary-link {
+        font-size: 1.25em;
+        font-weight: bold;
+        color: var(--cobalt-blue); /* Meets AA on Eggshell */
+        text-decoration: none;
+        display: inline-block;
+        margin-bottom: 10px;
+        transition: color 0.3s;
+      }
+      a:hover, .primary-link:hover {
+        /* Hover state can use Onyx or a slightly darker shade of Cobalt Blue */
+        color: var(--onyx);
+        text-decoration: underline;
+      }
+
+      /* Horizontal Rule - Using Sodium Flame for separation */
+      hr {
+        border: 0;
+        height: 1px;
+        background-color: var(--sodium-flame);
+        margin: 20px 0;
+      }
       .expandable-textbox {
         width: 100%;
         box-sizing: border-box; /* Include padding and border in the element's total width */
         overflow: hidden; /* Hide overflow to make the text area expand */
         resize: none; /* Disable manual resizing */
-        font-family: Arial, sans-serif;
+        font-family: 'Courier New', monospace;
         font-size: 19px;
+        border: 2px solid var(--aquamarine);
+        border-radius: 5px;
+        padding: 5px;
+        color: var(--text-on-light);
+        background-color: #fff;
+      }
+
+      .expandable-textbox:focus {
+        outline: none;
+        border-color: var(--cobalt-blue);
+        box-shadow: 0 0 5px rgba(76, 52, 229, 0.3);
       }
       #transcription-slider,
       #second-slider,
@@ -96,13 +217,13 @@
         height: 3px;
         background: repeating-linear-gradient(
           90deg,
-          #ddd,
-          #ddd 1px,
+          var(--aquamarine),
+          var(--aquamarine) 1px,
           transparent 1px,
           transparent 4px
         );
         outline: none;
-        opacity: 0.5;
+        opacity: 0.7;
         transition: opacity 0.2s;
         position: relative;
         margin-top: 20px;
@@ -116,38 +237,24 @@
         appearance: none;
         width: 50px;
         height: 50px;
-        background: #4caf50;
+        background: var(--chlorophyll-green);
         cursor: pointer;
         border-radius: 50%;
         position: relative;
       }
 
       #second-card-slider::-webkit-slider-thumb {
-        background: orange;
+        background: var(--sodium-flame);
       }
 
       #third-card-slider::-webkit-slider-thumb {
-        background: #ff5722;
+        background: var(--sodium-flame);
         width: 20px;
         height: 20px;
       }
 
       #fourth-card-slider::-webkit-slider-thumb {
-        background: #4caf50;
-      }
-
-      #transcription-slider::-webkit-slider-thumb::after,
-      #second-card-slider::-webkit-slider-thumb::after,
-      #third-card-slider::-webkit-slider-thumb::after,
-      #fourth-card-slider::-webkit-slider-thumb::after {
-        content: "RNA Polymerase";
-        position: absolute;
-        top: -40px;
-        left: -25px;
-        width: 100px;
-        text-align: center;
-        font-size: 12px;
-        color: #000;
+        background: var(--chlorophyll-green);
       }
 
       #transcription-slider::-moz-range-thumb,
@@ -156,36 +263,25 @@
       #fourth-card-slider::-moz-range-thumb {
         width: 50px;
         height: 50px;
-        background: #4caf50;
+        background: var(--chlorophyll-green);
         cursor: pointer;
         border-radius: 50%;
         position: relative;
+        border: none;
       }
 
       #second-card-slider::-moz-range-thumb {
-        background: orange;
+        background: var(--sodium-flame);
       }
 
       #third-card-slider::-moz-range-thumb {
-        background: #ff5722;
+        background: var(--sodium-flame);
+        width: 20px;
+        height: 20px;
       }
 
       #fourth-card-slider::-moz-range-thumb {
-        background: #4caf50;
-      }
-
-      #transcription-slider::-moz-range-thumb::after,
-      #second-card-slider::-moz-range-thumb::after,
-      #third-card-slider::-moz-range-thumb::after,
-      #fourth-card-slider::-moz-range-thumb::after {
-        content: "RNA Polymerase";
-        position: absolute;
-        top: -40px;
-        left: -25px;
-        width: 100px;
-        text-align: center;
-        font-size: 12px;
-        color: #000;
+        background: var(--chlorophyll-green);
       }
 
       #rna-label {
@@ -232,54 +328,19 @@
       }
 
       .image-container img {
-        width: 50%;
-        max-width: 50%;
+        width: 100%;
+        max-width: 100%;
         height: auto;
         border-radius: 10px;
-      }
-
-      .amino-acid-table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 20px;
-      }
-
-      .amino-acid-table th,
-      .amino-acid-table td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: center;
-      }
-
-      .amino-acid-table th {
-        background-color: #f2f2f2;
-        color: black;
-      }
-
-      .property-positive {
-        background-color: #ccccff;
-      }
-
-      .property-negative {
-        background-color: #ffcccc;
-      }
-
-      .property-hydrophilic {
-        background-color: white;
-      }
-
-      .property-hydrophobic {
-        background-color: #ffffcc;
-      }
-
-      .property-neutral {
-        background-color: #d9d9d9;
+        border: 2px solid var(--aquamarine);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
       }
 
       .iframe-container {
-        border: 1px solid grey;
+        border: 2px solid var(--aquamarine);
         border-radius: 10px;
         overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
       }
 
       .iframe-container iframe {
@@ -289,7 +350,7 @@
       }
 
       iframe {
-        scrollbar-color: #888 #f0f0f0;
+        scrollbar-color: var(--cobalt-blue) var(--aquamarine);
         scrollbar-width: thin;
       }
 
@@ -298,33 +359,203 @@
       }
 
       iframe::-webkit-scrollbar-thumb {
-        background: #888;
+        background: var(--cobalt-blue);
         border-radius: 6px;
       }
 
       iframe::-webkit-scrollbar-track {
-        background: #f0f0f0;
+        background: var(--aquamarine);
       }
       #rotatable-image-container {
-      display: inline-block; /* So the container only wraps the image */
-      position: relative;    /* Needed for calculating the center */
+        display: inline-block; /* So the container only wraps the image */
+        position: relative;    /* Needed for calculating the center */
+        width: 800px;
+        height: 800px;
+        border-radius: 50%;
+        overflow: hidden;
+        border: 2px solid var(--aquamarine);
+        margin: 20px auto;
       }
 
       #wheel-image {
-      transform-origin: center center; /* Rotate around center */
-      cursor: grab;                    /* Show grab cursor on hover */
-      user-select: none;               /* Prevent text selection while dragging */
+        transform-origin: center center; /* Rotate around center */
+        cursor: grab;                    /* Show grab cursor on hover */
+        user-select: none;               /* Prevent text selection while dragging */
+        -webkit-user-drag: none; /* Chrome/Safari/Edge */
+        user-drag: none;         /* Possibly future standard */
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
       }
-      #wheel-image {
-      -webkit-user-drag: none; /* Chrome/Safari/Edge */
-      user-drag: none;         /* Possibly future standard */
+
+      .hidden {
+        display: none;
+      }
+
+      .fade-out-down {
+        animation: fadeOutDown 2s forwards;
+      }
+
+      @keyframes fadeOutDown {
+        0% {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        100% {
+          opacity: 0;
+          transform: translateY(50px);
+        }
+      }
+
+      #rna-label {
+        display: none;
+        font-weight: bold;
+        margin-top: 10px;
+        color: var(--chlorophyll-green);
+      }
+
+      #second-slider,
+      #third-card-slider,
+      #fourth-card-slider {
+        display: none;
+      }
+
+      #rna-container.bottom {
+        position: absolute;
+        bottom: 20px;
+        width: 80%;
+      }
+
+      /* List Styling */
+      ul {
+        /* Custom bullet point colour could be Cobalt Blue for accent */
+        list-style-type: '⚡ '; /* Custom bullet point - Using a bold emoji for fun/vibe */
+        padding-left: 20px;
+        margin-top: 10px;
+      }
+      li {
+        margin-bottom: 8px;
+        color: var(--text-on-light);
+      }
+
+      /* Label styling */
+      label {
+        color: var(--text-on-light);
+        font-weight: 500;
+        display: block;
+        margin-bottom: 10px;
+      }
+
+      /* Header wrapper */
+      .header-wrapper {
+        position: relative;
+        display: inline-block;
+        width: 100%;
+      }
+
+      /* Branding stays visible */
+      .header-branding {
+        cursor: pointer;
+      }
+
+      /* Dropdown menu hidden by default */
+      .header-dropdown {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        background: white;
+        border: 2px solid var(--aquamarine);
+        border-radius: 10px;
+        padding: 12px;
+        width: 220px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 9999;
+      }
+
+      /* Show dropdown when header is hovered */
+      .header-wrapper:hover .header-dropdown {
+        display: block;
+      }
+
+      .header-dropdown a {
+        display: block;
+        margin: 8px 0;
+        text-decoration: none;
+        color: var(--cobalt-blue);
+        font-weight: 600;
+      }
+
+      .header-dropdown a:hover {
+        color: var(--onyx);
+        text-decoration: underline;
+      }
+
+      /* Dropdown Container Styling */
+      .dropdown-container {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin: 20px 0;
+      }
+
+      .dropdown-container span {
+        display: inline-block;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--cobalt-blue);
+        margin-right: 8px;
+      }
+
+      .dropdown-container select {
+        font-family: 'Figtree', sans-serif;
+        font-size: 16px;
+        padding: 8px 8px;
+        border: 2px solid var(--aquamarine);
+        border-radius: 5px;
+        color: var(--text-on-light);
+        background-color: #fff;
+        cursor: pointer;
+        transition: border-color 0.3s;
+        width: 50%;
+        display: inline-block;
+      }
+
+      .dropdown-container select:hover {
+        border-color: var(--cobalt-blue);
+      }
+
+      .dropdown-container select:focus {
+        outline: none;
+        border-color: var(--cobalt-blue);
+        box-shadow: 0 0 5px rgba(76, 52, 229, 0.3);
+      }
+
+      .dropdown-container br {
+        display: none;
       }
 
     </style>
   </head>
   <body>
-    <div class="container">
-      <h2>Transcription</h2>
+
+    <div class="header-wrapper">
+      <div class="header-branding">
+        <h1>🧬 Gene to Protein</h1>
+        <img src="https://gtac.edu.au/wp-content/themes/gtac/assets/images/logo-2024.png" alt="GTAC Logo" class="gtac-logo">
+      </div>
+
+      <!-- Dropdown menu -->
+      <div class="header-dropdown">
+        <a href="#transcription">Transcription</a>
+        <a href="#translation">Translation</a>
+        <a href="#properties">Amino Acid Properties</a>
+        <a href="#structure">Protein Structure</a>
+      </div>
+    </div>
+    <p>Each of these processes depend on the one before it. As you complete each part of these activities, the next activity will unlock.</p>
+    <div class="container" id="first-card">
+      <h2 id="transcription">Transcription</h2>
       <label for="textbox"
         >Look at the DNA and write the corresponding mRNA sequence, then check
         your answer using the slider:</label
@@ -357,7 +588,7 @@
       </div>
     </div>
     <div class="container" id="second-card">
-      <h2>Translation</h2>
+      <h2 id="translation">Translation</h2>
       <label for="textbox2"
         >Using the mRNA codon wheel, determine and write the corresponding amino acid
         sequence using the single letter amino acid code. Check your answer using the slider:</label
@@ -391,7 +622,7 @@
       </p>
     </div>
     <div class="container" id="third-card">
-      <h2>Amino Acid Properties</h2>
+      <h2 id="properties">Amino Acid Properties</h2>
       <label for="textbox"
         >Using the table below, determine the characteristics that correspond to
         the amino acids. Check your answer using the slider:</label
@@ -469,7 +700,7 @@
       <h2>Amino Acid and Protein Structure</h2>
       <input type="range" id="fourth-card-slider" min="0" max="100" value="0" />
       <div class="iframe-container"><iframe
-          src="https://gtacaus.github.io/protein3D/amino.html"
+          src="amino.html"
           width="100%"
           height="2000px"
           style="border: none"
