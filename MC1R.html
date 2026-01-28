@@ -210,6 +210,26 @@
             font-size: 1em;
             line-height: 1.6;
         }
+        .header-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+        .header-branding {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+        .header-branding img {
+            height: 50px;
+            width: auto;
+        }
+        .header-title {
+            flex: 1;
+        }
         .hidden {
             display: none;
         }
@@ -403,7 +423,14 @@
 </head>
 <body>
     <div class="container">
-        <h1 id="mainHeading">Exploring the impact of mutation on the structure of <span id="proteinName"></span></h1>
+        <div class="header-wrapper">
+            <div class="header-title">
+                <h1 id="mainHeading">Exploring the impact of mutation on the structure of <span id="proteinName"></span></h1>
+            </div>
+            <div class="header-branding">
+                <img src="https://gtac.edu.au/wp-content/themes/gtac/assets/images/logo-2024.png" alt="GTAC Logo">
+            </div>
+        </div>
       <p>
         In this activity, you will use tools to determine the primary structure of the MC1R protein (the sequence of amino acids that link together to form a polypeptide chain) from its coding DNA sequence.  You will also use tools to observe the secondary and tertiary structure of this protein.
         </p>
@@ -460,7 +487,7 @@ Melanocytes are specialized cells that produce two types of melanin pigments, eu
             <div class="card">
                 <div class="card-content">
                     <h2>Secondary structure</h2>
-                    <p>In the cartoon representation, you can view the secondary structure of <span id="proteinName2"></span>. The folded protein structures of alpha helices, beta pleated sheets, and random coils are represented in the 3D Structure below. You can click and drag the protein to rotate it.</p>
+                    <p>In the cartoon representation, you can view the secondary structure of <span id="proteinName2"></span>. The folded protein structures of alpha helices and random coils are represented in the 3D Structure below. You can click and drag the protein to rotate it.</p>
                     <div class="viewer-container">
                         <div id="viewer1" class="viewer"></div>
                         <button class="refresh-button" onclick="reloadViewer('viewer1', 0)">Reset model</button>
@@ -1199,9 +1226,9 @@ async function initializeViewers() {
             const screenWidth = window.innerWidth;
             if (screenWidth <= 780) {
                 residuesPerLine = 10;
-            } else if (screenWidth <= 1200) {
+            } else if (screenWidth <= 1600) {
                 residuesPerLine = 20;
-            } else if (screenWidth <= 2000) {
+            } else if (screenWidth <= 7800) {
                 residuesPerLine = 30;   
             } else {
                 residuesPerLine = 30;
