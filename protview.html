@@ -48,8 +48,6 @@
             margin-bottom: 20px;
             text-align: left;
             font-size: 14px;
-            table-layout: fixed;
-            overflow-x: auto;
         }
         .sequence-table th, .sequence-table td {
             padding: 8px;
@@ -67,6 +65,8 @@
         .sequence-numbers {
             color: var(--cobalt-blue);
             font-weight: bold;
+            white-space: nowrap;
+            text-align: center;
         }
         .highlight {
             background-color: var(--chlorophyll-green);
@@ -247,181 +247,71 @@
 
         /* Flexbox container for the cards */
         .card-container {
-        .card-container {
             display: flex;
-            flex-direction: column;
-            gap: 20px;
-            align-items: stretch;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-start;
         }
 
-        /* Responsive styles - iPad Portrait (768px) */
-        @media (max-width: 1024px) {
-            .container {
-                padding: 15px;
-            }
-            .card {
-                margin: 15px 0;
-            }
-            .card-content {
-                padding: 20px;
-            }
+        /* Responsive styles */
+        @media (max-width: 768px) {
             .viewer {
-                height: 350px;
+                height: 300px;
+            }
+            .active-site-text {
+                font-size: 1em;
             }
             h1 {
-                font-size: 1.75em;
+                font-size: 2em;
             }
             h2 {
                 font-size: 1.3em;
             }
             p {
-                font-size: 0.95em;
+                font-size: 1em;
             }
             .big-blue-text {
-                font-size: 1.05em;
-            }
-            .sequence-table th, .sequence-table td {
-                padding: 6px;
-            }
-            .refresh-button, .deselect-button, .toggle-style-button {
-                padding: 10px 16px;
-                font-size: 13px;
-                margin: 8px 4px;
+                font-size: 1.2em;
             }
         }
 
-        /* iPad Landscape / Small tablets (768px - 1024px) */
-        @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+        @media (max-width: 480px) {
             .viewer {
-                height: 400px;
-            }
-        }
-
-        /* Mobile phones (480px - 767px) */
-        @media (max-width: 767px) {
-            .container {
-                padding: 12px;
-            }
-            .card {
-                margin: 12px 0;
-                border-radius: 6px;
-            }
-            .card-content {
-                padding: 16px;
-            }
-            .viewer {
-                height: 280px;
+                height: 250px;
             }
             .active-site-text {
                 font-size: 0.9em;
             }
             h1 {
                 font-size: 1.5em;
-                margin: 15px 0;
             }
             h2 {
                 font-size: 1.1em;
-                margin: 12px 0;
             }
             p {
                 font-size: 0.9em;
-                line-height: 1.5;
             }
             .big-blue-text {
-                font-size: 0.95em;
-            }
-            .sequence-table th, .sequence-table td {
-                padding: 5px;
-            }
-            .refresh-button, .deselect-button, .toggle-style-button {
-                padding: 9px 14px;
-                font-size: 12px;
-                margin: 6px 3px;
-            }
-            button {
-                padding: 10px 16px;
-                font-size: 14px;
+                font-size: 1em;
             }
             .button-container {
                 flex-direction: column;
-                align-items: stretch;
+                align-items: flex-start;
             }
             .button-container button {
-                width: 100%;
-            }
-            textarea {
-                min-height: 150px;
-                font-size: 13px;
-            }
-        }
-
-        /* Small phones (max-width 480px) */
-        @media (max-width: 479px) {
-            .container {
-                padding: 10px;
-            }
-            .card {
-                margin: 10px 0;
-            }
-            .card-content {
-                padding: 12px;
-            }
-            .viewer {
-                height: 240px;
-            }
-            .active-site-text {
-                font-size: 0.85em;
-            }
-            h1 {
-                font-size: 1.3em;
-                margin: 12px 0;
-            }
-            h2 {
-                font-size: 1em;
-                margin: 10px 0;
-            }
-            p {
-                font-size: 0.85em;
-                margin: 8px 0;
-            }
-            .big-blue-text {
-                font-size: 0.9em;
-            }
-            .sequence-table th, .sequence-table td {
-                padding: 4px;
-            }
-            .refresh-button, .deselect-button, .toggle-style-button {
-                padding: 8px 12px;
-                font-size: 11px;
-                margin: 5px 2px;
-            }
-            button {
-                padding: 8px 12px;
-                font-size: 13px;
-            }
-            textarea {
-                min-height: 120px;
-                font-size: 12px;
+                margin: 10px 0 0 0;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header-wrapper">
-            <div class="header-title">
-                <h1 id="mainHeading">Exploring the structure of <span id="proteinName"></span></h1>
-            </div>
-            <div class="header-branding">
-                <img src="https://gtac.edu.au/wp-content/themes/gtac/assets/images/logo-2024.png" alt="GTAC Logo">
-            </div>
-        </div>
+        <h1 id="mainHeading">Exploring the structure of <span id="proteinName"></span></h1>
         <div class="button-container">
             <input type="file" id="fileInput" accept=".xml" />
             <button onclick="loadDataXML()">Load PBP</button>
             <button onclick="loadDataXMLCLDN8()">Load CLDN8</button>
             <button onclick="loadDataXMLMC1R()">Load MC1R</button>
-            <button onclick="reloadPage()">Reload page for new data</button>
             <button onclick="redirectToXML()">Make XML</button>
         </div>
         <br><br>
@@ -924,7 +814,58 @@
             reader.readAsText(file);
         }
 
+        function clearAllData() {
+            selectedResidues.clear();
+            
+            // Clear text content for elements that exist
+            const textElements = ['proteinName', 'fileName', 'proteinName1', 'proteinName2', 'proteinName3', 'proteinName4', 'proteinName5',
+                'geneName1', 'geneName2', 'geneName3', 'geneName4', 'geneName5', 'activeSite', 'activeSiteText', 'proteinFunction', 'substrateOrDrug'];
+            textElements.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = '';
+            });
+            
+            // Clear HTML content for elements that exist
+            const htmlElements = ['sequence-container', 'sequenceTable', 'proteinSequence1', 'proteinSequence2', 'originalSequence', 'mutantSequence'];
+            htmlElements.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '';
+            });
+            
+            // Clear form values
+            const formElements = ['dnaSequence1', 'dnaSequence2', 'pdbFileInput', 'alphafoldImageInput'];
+            formElements.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = '';
+            });
+            
+            // Clear viewer containers
+            const viewerElements = ['viewer1', 'viewer2', 'viewer3', 'alphafoldViewer', 'mutantViewer'];
+            viewerElements.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = '';
+            });
+            
+            // Hide image if it exists
+            const alphafoldImage = document.getElementById('alphafoldImage');
+            if (alphafoldImage) {
+                alphafoldImage.style.display = 'none';
+                alphafoldImage.src = '';
+            }
+            
+            document.getElementById('content').classList.add('hidden');
+            originalText = '';
+            sequence = '';
+            mutantContent = null;
+            viewer1 = null;
+            viewer2 = null;
+            viewer3 = null;
+            alphafoldViewer = null;
+            mutantViewer = null;
+        }
+
         async function loadDataXML() {
+            clearAllData();
             const response = await fetch('data.xml');
             const xmlText = await response.text();
             const parser = new DOMParser();
@@ -936,25 +877,28 @@
             const activeSite = xmlDoc.getElementsByTagName('activeSite')[0].textContent;
             const activeSiteText = xmlDoc.getElementsByTagName('activeSiteText')[0].textContent;
             const proteinFunction = xmlDoc.getElementsByTagName('proteinFunction')[0].textContent;
-            const substrateOrDrug = xmlDoc.getElementsByTagName('substrateOrDrug')[0].textContent;
             pdbUri = xmlDoc.getElementsByTagName('PDBurl')[0].textContent;
 
-            document.getElementById('proteinName').textContent = proteinName;
-            document.getElementById('fileName').textContent = proteinName;
-            document.getElementById('proteinName1').textContent = proteinName;
-            document.getElementById('proteinName2').textContent = proteinName;
-            document.getElementById('proteinName3').textContent = proteinName;
-            document.getElementById('proteinName4').textContent = proteinName;
-            document.getElementById('proteinName5').textContent = proteinName;
-            document.getElementById('geneName1').textContent = geneName;
-            document.getElementById('geneName2').textContent = geneName;
-            document.getElementById('geneName3').textContent = geneName;
-            document.getElementById('geneName4').textContent = geneName;
-            document.getElementById('geneName5').textContent = geneName;
-            document.getElementById('activeSite').textContent = activeSite;
-            document.getElementById('activeSiteText').textContent = activeSiteText;
-            document.getElementById('proteinFunction').textContent = proteinFunction;
-            document.getElementById('substrateOrDrug').textContent = substrateOrDrug;
+            const setIfExists = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = value;
+            };
+
+            setIfExists('proteinName', proteinName);
+            setIfExists('fileName', proteinName);
+            setIfExists('proteinName1', proteinName);
+            setIfExists('proteinName2', proteinName);
+            setIfExists('proteinName3', proteinName);
+            setIfExists('proteinName4', proteinName);
+            setIfExists('proteinName5', proteinName);
+            setIfExists('geneName1', geneName);
+            setIfExists('geneName2', geneName);
+            setIfExists('geneName3', geneName);
+            setIfExists('geneName4', geneName);
+            setIfExists('geneName5', geneName);
+            setIfExists('activeSite', activeSite);
+            setIfExists('activeSiteText', activeSiteText);
+            setIfExists('proteinFunction', proteinFunction);
 
             originalText = geneSeq;
             document.getElementById('sequence-container').textContent = geneSeq;
@@ -963,6 +907,7 @@
             initializeViewers();
         }
         async function loadDataXMLCLDN8() {
+            clearAllData();
             const response = await fetch('CLDN8.xml');
             const xmlText = await response.text();
             const parser = new DOMParser();
@@ -974,25 +919,28 @@
             const activeSite = xmlDoc.getElementsByTagName('activeSite')[0].textContent;
             const activeSiteText = xmlDoc.getElementsByTagName('activeSiteText')[0].textContent;
             const proteinFunction = xmlDoc.getElementsByTagName('proteinFunction')[0].textContent;
-            const substrateOrDrug = xmlDoc.getElementsByTagName('substrateOrDrug')[0].textContent;
             pdbUri = xmlDoc.getElementsByTagName('PDBurl')[0].textContent;
 
-            document.getElementById('proteinName').textContent = proteinName;
-            document.getElementById('fileName').textContent = proteinName;
-            document.getElementById('proteinName1').textContent = proteinName;
-            document.getElementById('proteinName2').textContent = proteinName;
-            document.getElementById('proteinName3').textContent = proteinName;
-            document.getElementById('proteinName4').textContent = proteinName;
-            document.getElementById('proteinName5').textContent = proteinName;
-            document.getElementById('geneName1').textContent = geneName;
-            document.getElementById('geneName2').textContent = geneName;
-            document.getElementById('geneName3').textContent = geneName;
-            document.getElementById('geneName4').textContent = geneName;
-            document.getElementById('geneName5').textContent = geneName;
-            document.getElementById('activeSite').textContent = activeSite;
-            document.getElementById('activeSiteText').textContent = activeSiteText;
-            document.getElementById('proteinFunction').textContent = proteinFunction;
-            document.getElementById('substrateOrDrug').textContent = substrateOrDrug;
+            const setIfExists = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = value;
+            };
+
+            setIfExists('proteinName', proteinName);
+            setIfExists('fileName', proteinName);
+            setIfExists('proteinName1', proteinName);
+            setIfExists('proteinName2', proteinName);
+            setIfExists('proteinName3', proteinName);
+            setIfExists('proteinName4', proteinName);
+            setIfExists('proteinName5', proteinName);
+            setIfExists('geneName1', geneName);
+            setIfExists('geneName2', geneName);
+            setIfExists('geneName3', geneName);
+            setIfExists('geneName4', geneName);
+            setIfExists('geneName5', geneName);
+            setIfExists('activeSite', activeSite);
+            setIfExists('activeSiteText', activeSiteText);
+            setIfExists('proteinFunction', proteinFunction);
 
             originalText = geneSeq;
             document.getElementById('sequence-container').textContent = geneSeq;
@@ -1001,6 +949,7 @@
             initializeViewers();
         }
          async function loadDataXMLMC1R() {
+            clearAllData();
             const response = await fetch('MC1R.xml');
             const xmlText = await response.text();
             const parser = new DOMParser();
@@ -1012,25 +961,28 @@
             const activeSite = xmlDoc.getElementsByTagName('activeSite')[0].textContent;
             const activeSiteText = xmlDoc.getElementsByTagName('activeSiteText')[0].textContent;
             const proteinFunction = xmlDoc.getElementsByTagName('proteinFunction')[0].textContent;
-            const substrateOrDrug = xmlDoc.getElementsByTagName('substrateOrDrug')[0].textContent;
             pdbUri = xmlDoc.getElementsByTagName('PDBurl')[0].textContent;
 
-            document.getElementById('proteinName').textContent = proteinName;
-            document.getElementById('fileName').textContent = proteinName;
-            document.getElementById('proteinName1').textContent = proteinName;
-            document.getElementById('proteinName2').textContent = proteinName;
-            document.getElementById('proteinName3').textContent = proteinName;
-            document.getElementById('proteinName4').textContent = proteinName;
-            document.getElementById('proteinName5').textContent = proteinName;
-            document.getElementById('geneName1').textContent = geneName;
-            document.getElementById('geneName2').textContent = geneName;
-            document.getElementById('geneName3').textContent = geneName;
-            document.getElementById('geneName4').textContent = geneName;
-            document.getElementById('geneName5').textContent = geneName;
-            document.getElementById('activeSite').textContent = activeSite;
-            document.getElementById('activeSiteText').textContent = activeSiteText;
-            document.getElementById('proteinFunction').textContent = proteinFunction;
-            document.getElementById('substrateOrDrug').textContent = substrateOrDrug;
+            const setIfExists = (id, value) => {
+                const el = document.getElementById(id);
+                if (el) el.textContent = value;
+            };
+
+            setIfExists('proteinName', proteinName);
+            setIfExists('fileName', proteinName);
+            setIfExists('proteinName1', proteinName);
+            setIfExists('proteinName2', proteinName);
+            setIfExists('proteinName3', proteinName);
+            setIfExists('proteinName4', proteinName);
+            setIfExists('proteinName5', proteinName);
+            setIfExists('geneName1', geneName);
+            setIfExists('geneName2', geneName);
+            setIfExists('geneName3', geneName);
+            setIfExists('geneName4', geneName);
+            setIfExists('geneName5', geneName);
+            setIfExists('activeSite', activeSite);
+            setIfExists('activeSiteText', activeSiteText);
+            setIfExists('proteinFunction', proteinFunction);
 
             originalText = geneSeq;
             document.getElementById('sequence-container').textContent = geneSeq;
@@ -1185,19 +1137,24 @@
         // Adjust residues per line based on screen width
         function adjustResiduesPerLine() {
             const screenWidth = window.innerWidth;
-            if (screenWidth <= 480) {
+            if (screenWidth <= 780) {
+                residuesPerLine = 10;
+            } else if (screenWidth <= 1600) {
                 residuesPerLine = 20;
-            } else if (screenWidth <= 768) {
-                residuesPerLine = 30;
+            } else if (screenWidth <= 7800) {
+                residuesPerLine = 30;   
             } else {
-                residuesPerLine = 50;
+                residuesPerLine = 30;
             }
-            createSequenceTable(sequence);
+            if (sequence) {
+                createSequenceTable(sequence);
+            }
         }
 
-        // Call adjustResiduesPerLine on load and on resize
-        window.addEventListener('load', adjustResiduesPerLine);
-        window.addEventListener('resize', adjustResiduesPerLine);
+        // Call adjustResiduesPerLine on load only
+window.addEventListener('load', function() {
+  setTimeout(adjustResiduesPerLine, 10);
+});
 
         function handleFileInput(event) {
             const file = event.target.files[0];
