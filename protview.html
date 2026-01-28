@@ -6,59 +6,97 @@
     <title>Interactive 3D Protein Viewer</title>
     <script src="https://3dmol.csb.pitt.edu/build/3Dmol-min.js"></script>
     <script src="https://stuk.github.io/jszip/dist/jszip.min.js"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --eggshell: #F9F6E7;
+            --sodium-flame: #FF6D3A;
+            --cobalt-blue: #4C34E5;
+            --aquamarine: #6BE7BE;
+            --chlorophyll-green: #00BC74;
+            --onyx: #272A24;
+            --lavender: #C0ADFF;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         /* Add your CSS styles here */
         pre {
             white-space: pre-wrap;
             word-wrap: break-word;
         }
         body {
-            background-color: #fafafa;
-            font-family: 'Roboto', sans-serif;
+            background-color: var(--eggshell);
+            font-family: 'Figtree', sans-serif;
+            color: var(--onyx);
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
         }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
         .sequence-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
             text-align: left;
+            font-size: 14px;
+            table-layout: fixed;
+            overflow-x: auto;
         }
         .sequence-table th, .sequence-table td {
-            padding: 5px;
+            padding: 8px;
             cursor: pointer;
+            word-break: break-word;
         }
         .sequence-table th {
-            background-color: #f2f2f2;
+            background-color: var(--aquamarine);
+            color: var(--onyx);
+            font-weight: 700;
+            word-wrap: break-word;
+            white-space: normal;
+            line-height: 1.3;
         }
         .sequence-numbers {
-            color: #1e88e5;
+            color: var(--cobalt-blue);
             font-weight: bold;
         }
         .highlight {
-            background-color: #a5d6a7;
+            background-color: var(--chlorophyll-green);
+            color: white;
         }
         .viewer-container {
             position: relative;
             margin-bottom: 20px;
-            display: inline-block;
-            border: 1px solid #e0e0e0;
+            display: block;
+            border: 2px solid var(--aquamarine);
             border-radius: 8px;
             overflow: hidden;
             width: 100%;
+            background-color: white;
         }
         .refresh-button, .deselect-button, .toggle-style-button {
-            margin: 10px;
-            padding: 10px 20px;
-            background-color: #1e88e5;
+            margin: 10px 5px;
+            padding: 12px 20px;
+            background-color: var(--cobalt-blue);
             color: white;
             border: none;
             cursor: pointer;
             border-radius: 4px;
             display: inline-block;
+            font-family: 'Figtree', sans-serif;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
         }
         .refresh-button:hover, .deselect-button:hover, .toggle-style-button:hover {
-            background-color: #1565c0;
+            background-color: var(--sodium-flame);
         }
         .viewer {
             height: 400px;
@@ -67,36 +105,88 @@
             background-color: white;
         }
         .card {
-            margin: 20px;
+            margin: 20px 0;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             max-width: 100%;
             width: 100%;
+            background-color: white;
+            border: 1px solid var(--aquamarine);
         }
         .card-content {
-            padding: 20px;
+            padding: 25px;
             word-wrap: break-word;
-            white-space: pre-wrap;
         }
         h1 {
-            color: #424242;
-            font-size: 2.5em;
+            color: var(--cobalt-blue);
+            font-size: 2em;
+            font-weight: 700;
+            margin: 20px 0;
         }
         h2 {
-            color: #424242;
+            color: var(--cobalt-blue);
             font-size: 1.5em;
+            font-weight: 700;
+            margin: 15px 0;
         }
         p {
-            color: #757575;
-            font-size: 1.2em;
+            color: var(--onyx);
+            font-size: 1em;
+            line-height: 1.6;
+            margin: 10px 0;
         }
         .big-blue-text {
-            font-size: 1.5em;
-            color: #1e88e5;
+            font-size: 1.1em;
+            color: var(--cobalt-blue);
+            font-weight: 700;
+            margin: 15px 0;
         }
         textarea {
             width: 100%;
-            font-family: monospace;
+            min-height: 200px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            padding: 12px;
+            border: 2px solid var(--aquamarine);
+            border-radius: 4px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 12px 20px;
+            font-size: 16px;
+            background-color: var(--cobalt-blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-family: 'Figtree', sans-serif;
+        }
+        button:hover {
+            background-color: var(--sodium-flame);
+        }
+        .header-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            gap: 20px;
+        }
+        .header-branding {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+        .header-branding img {
+            height: 50px;
+            width: auto;
+        }
+        .header-title {
+            flex: 1;
+        }
+        .hidden {
+            display: none;
         }
         button {
             margin-top: 10px;
@@ -157,66 +247,175 @@
 
         /* Flexbox container for the cards */
         .card-container {
+        .card-container {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: flex-start;
+            flex-direction: column;
+            gap: 20px;
+            align-items: stretch;
         }
 
-        /* Responsive styles */
-        @media (max-width: 768px) {
-            .viewer {
-                height: 300px;
+        /* Responsive styles - iPad Portrait (768px) */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 15px;
             }
-            .active-site-text {
-                font-size: 1em;
+            .card {
+                margin: 15px 0;
+            }
+            .card-content {
+                padding: 20px;
+            }
+            .viewer {
+                height: 350px;
             }
             h1 {
-                font-size: 2em;
+                font-size: 1.75em;
             }
             h2 {
                 font-size: 1.3em;
             }
             p {
-                font-size: 1em;
+                font-size: 0.95em;
             }
             .big-blue-text {
-                font-size: 1.2em;
+                font-size: 1.05em;
+            }
+            .sequence-table th, .sequence-table td {
+                padding: 6px;
+            }
+            .refresh-button, .deselect-button, .toggle-style-button {
+                padding: 10px 16px;
+                font-size: 13px;
+                margin: 8px 4px;
             }
         }
 
-        @media (max-width: 480px) {
+        /* iPad Landscape / Small tablets (768px - 1024px) */
+        @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
             .viewer {
-                height: 250px;
+                height: 400px;
+            }
+        }
+
+        /* Mobile phones (480px - 767px) */
+        @media (max-width: 767px) {
+            .container {
+                padding: 12px;
+            }
+            .card {
+                margin: 12px 0;
+                border-radius: 6px;
+            }
+            .card-content {
+                padding: 16px;
+            }
+            .viewer {
+                height: 280px;
             }
             .active-site-text {
                 font-size: 0.9em;
             }
             h1 {
                 font-size: 1.5em;
+                margin: 15px 0;
             }
             h2 {
                 font-size: 1.1em;
+                margin: 12px 0;
             }
             p {
                 font-size: 0.9em;
+                line-height: 1.5;
             }
             .big-blue-text {
-                font-size: 1em;
+                font-size: 0.95em;
+            }
+            .sequence-table th, .sequence-table td {
+                padding: 5px;
+            }
+            .refresh-button, .deselect-button, .toggle-style-button {
+                padding: 9px 14px;
+                font-size: 12px;
+                margin: 6px 3px;
+            }
+            button {
+                padding: 10px 16px;
+                font-size: 14px;
             }
             .button-container {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: stretch;
             }
             .button-container button {
-                margin: 10px 0 0 0;
+                width: 100%;
+            }
+            textarea {
+                min-height: 150px;
+                font-size: 13px;
+            }
+        }
+
+        /* Small phones (max-width 480px) */
+        @media (max-width: 479px) {
+            .container {
+                padding: 10px;
+            }
+            .card {
+                margin: 10px 0;
+            }
+            .card-content {
+                padding: 12px;
+            }
+            .viewer {
+                height: 240px;
+            }
+            .active-site-text {
+                font-size: 0.85em;
+            }
+            h1 {
+                font-size: 1.3em;
+                margin: 12px 0;
+            }
+            h2 {
+                font-size: 1em;
+                margin: 10px 0;
+            }
+            p {
+                font-size: 0.85em;
+                margin: 8px 0;
+            }
+            .big-blue-text {
+                font-size: 0.9em;
+            }
+            .sequence-table th, .sequence-table td {
+                padding: 4px;
+            }
+            .refresh-button, .deselect-button, .toggle-style-button {
+                padding: 8px 12px;
+                font-size: 11px;
+                margin: 5px 2px;
+            }
+            button {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            textarea {
+                min-height: 120px;
+                font-size: 12px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 id="mainHeading">Exploring the structure of <span id="proteinName"></span></h1>
+        <div class="header-wrapper">
+            <div class="header-title">
+                <h1 id="mainHeading">Exploring the structure of <span id="proteinName"></span></h1>
+            </div>
+            <div class="header-branding">
+                <img src="https://gtac.edu.au/wp-content/themes/gtac/assets/images/logo-2024.png" alt="GTAC Logo">
+            </div>
+        </div>
         <div class="button-container">
             <input type="file" id="fileInput" accept=".xml" />
             <button onclick="loadDataXML()">Load PBP</button>
