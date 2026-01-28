@@ -12,5 +12,5 @@ In the sequence table at the top of this page, to highlight a significant sequen
 This sequence includes charged and Polar Residues - lysine (K), arginine (R), and aspartic acid (D) are often involved in binding and transport.  It also includes transmembrane and extracellular regions which are critical for interactions with ions and other tight junction components.</activeSiteText>
     <proteinFunction>Claudins are integral membrane proteins and components of tight junction strands. Tight junction strands serve as a physical barrier to prevent solutes and water from passing freely through the paracellular space between epithelial or endothelial cell sheets, and also play critical roles in maintaining cell polarity and signal transductions.</proteinFunction>
     <substrateOrDrug>tight junctions between cells</substrateOrDrug>
-    <PDBurl>https://alphafold.ebi.ac.uk/files/AF-P56748-F1-model_v4.pdb</PDBurl>
+    <PDBurl>AF-P56748-F1-model_v6.pdb</PDBurl>
 </proteinInfo>
