@@ -8,5 +8,5 @@
     <activeSiteText>In the sequence table at the top of this page, click on each amino acid starting with the 70th and ending with the 84th. This will highlight amino acids in the active site of the penicillin binding protein. In non-resistant bacteria, this is where penicillin binds. It is also an important part of the protein in that it facilitates its role in cell wall production.</activeSiteText>
     <proteinFunction>Penicillin-Binding Proteins (PBPs) are enzymes involved in the synthesis of bacterial cell walls. Beta-lactam antibiotics (like penicillin) bind to the active site of these PBPs, inhibiting their function and preventing cell wall synthesis.</proteinFunction>
     <substrateOrDrug>antibiotics</substrateOrDrug>
-    <PDBurl>https://alphafold.ebi.ac.uk/files/AF-P60185-F1-model_v4.pdb</PDBurl>
+    <PDBurl>AF-P60185-F1-model_v6.pdb</PDBurl>
 </proteinInfo>
