@@ -8,57 +8,90 @@
     <script src="https://stuk.github.io/jszip/dist/jszip.min.js"></script>
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --eggshell: #F9F6E7;
+            --sodium-flame: #FF6D3A;
+            --cobalt-blue: #4C34E5;
+            --aquamarine: #6BE7BE;
+            --chlorophyll-green: #00BC74;
+            --onyx: #272A24;
+            --lavender: #C0ADFF;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         /* Add your CSS styles here */
         pre {
             white-space: pre-wrap;
             word-wrap: break-word;
         }
         body {
-            background-color: #fafafa;
-            font-family: 'Roboto', sans-serif;
+            background-color: var(--eggshell);
+            font-family: 'Figtree', sans-serif;
+            color: var(--onyx);
+            margin: 0;
+            padding: 0;
+            font-size: 16px;
         }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
         .sequence-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
             text-align: left;
+            font-size: 14px;
         }
         .sequence-table th, .sequence-table td {
-            padding: 5px;
+            padding: 8px;
             cursor: pointer;
         }
         .sequence-table th {
-            background-color: #f2f2f2;
+            background-color: var(--aquamarine);
+            color: var(--onyx);
+            font-weight: 700;
         }
         .sequence-numbers {
-            color: #1e88e5;
+            color: var(--cobalt-blue);
             font-weight: bold;
         }
         .highlight {
-            background-color: #a5d6a7;
+            background-color: var(--chlorophyll-green);
+            color: white;
         }
         .viewer-container {
             position: relative;
             margin-bottom: 20px;
-            display: inline-block;
-            border: 1px solid #e0e0e0;
+            display: block;
+            border: 2px solid var(--aquamarine);
             border-radius: 8px;
             overflow: hidden;
             width: 100%;
+            background-color: white;
         }
         .refresh-button, .deselect-button, .toggle-style-button {
-            margin: 10px;
-            padding: 10px 20px;
-            background-color: #1e88e5;
+            margin: 10px 5px;
+            padding: 12px 20px;
+            background-color: var(--cobalt-blue);
             color: white;
             border: none;
             cursor: pointer;
             border-radius: 4px;
             display: inline-block;
+            font-family: 'Figtree', sans-serif;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
         }
         .refresh-button:hover, .deselect-button:hover, .toggle-style-button:hover {
-            background-color: #1565c0;
+            background-color: var(--sodium-flame);
         }
         .viewer {
             height: 400px;
@@ -67,62 +100,91 @@
             background-color: white;
         }
         .card {
-            margin: 20px;
+            margin: 20px 0;
             border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             max-width: 100%;
             width: 100%;
+            background-color: white;
+            border: 1px solid var(--aquamarine);
         }
         .card-content {
-            padding: 20px;
+            padding: 25px;
             word-wrap: break-word;
-            white-space: pre-wrap;
         }
         h1 {
-            color: #424242;
-            font-size: 2.5em;
+            color: var(--cobalt-blue);
+            font-size: 2em;
+            font-weight: 700;
+            margin: 20px 0;
         }
         h2 {
-            color: #424242;
+            color: var(--cobalt-blue);
             font-size: 1.5em;
+            font-weight: 700;
+            margin: 15px 0;
         }
         p {
-            color: #757575;
-            font-size: 1.2em;
+            color: var(--onyx);
+            font-size: 1em;
+            line-height: 1.6;
+            margin: 10px 0;
         }
         .big-blue-text {
-            font-size: 1.5em;
-            color: #1e88e5;
+            font-size: 1.1em;
+            color: var(--cobalt-blue);
+            font-weight: 700;
+            margin: 15px 0;
         }
         textarea {
             width: 100%;
             min-height: 200px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            padding: 12px;
+            border: 2px solid var(--aquamarine);
+            border-radius: 4px;
             font-family: monospace;
         }
         button {
             margin-top: 10px;
-            padding: 10px;
+            padding: 12px 20px;
             font-size: 16px;
+            background-color: var(--cobalt-blue);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-family: 'Figtree', sans-serif;
+        }
+        button:hover {
+            background-color: var(--sodium-flame);
         }
         #proteinSequence {
             white-space: pre-wrap;
             word-wrap: break-word;
-            font-family: monospace;
+            font-family: 'Courier New', monospace;
             width: 100%;
             height: 200px;
-            border: 1px solid #ccc;
-            padding: 10px;
+            border: 2px solid var(--aquamarine);
+            padding: 12px;
             box-sizing: border-box;
             overflow-y: auto;
+            border-radius: 4px;
+            background-color: #fafafa;
         }
         .highlight-blue {
-            background-color: #e0f7fa;
+            background-color: var(--lavender);
+            color: var(--onyx);
         }
         .highlight-red {
-            background-color: #d54056;
+            background-color: var(--sodium-flame);
+            color: white;
         }
         .highlight-purple {
-            background-color: #e1bee7;
+            background-color: var(--cobalt-blue);
+            color: white;
         }
         .spacefill-key span {
             display: inline-block;
@@ -132,7 +194,8 @@
         .spacefill-key li {
             display: flex;
             margin-right: 10px;
-            font-size: 1.5em;
+            font-size: 1.2em;
+            align-items: center;
         }
         .spacefill-key li span.hydrophilic {
             background-color: white;
@@ -141,84 +204,202 @@
             display: inline-block;
             height: 12px;
             width: 12px;
+            margin-right: 8px;
         }
         .active-site-text {
-            font-size: 1.2em;
+            font-size: 1em;
+            line-height: 1.6;
         }
         .hidden {
             display: none;
         }
         .button-container {
             display: flex;
+            flex-wrap: wrap;
             align-items: center;
+            gap: 10px;
         }
         .button-container button {
-            margin-left: 20px;
+            margin-left: 0;
         }
         .image-container img {
-  width: 65%; /* Set the image to 80% of the card's width */
-  height: auto; /* Maintain the aspect ratio */
-  border-radius: 4px; /* Optional: Add slight rounding to the image corners */
-}
+            width: 65%;
+            height: auto;
+            border-radius: 4px;
+        }
 
         /* Flexbox container for the cards */
         .card-container {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: flex-start;
+            flex-direction: column;
+            gap: 20px;
+            align-items: stretch;
         }
 
-        /* Responsive styles */
-        @media (max-width: 768px) {
-            .viewer {
-                height: 300px;
+        /* Responsive styles - iPad Portrait (768px) */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 15px;
             }
-            .active-site-text {
-                font-size: 1em;
+            .card {
+                margin: 15px 0;
+            }
+            .card-content {
+                padding: 20px;
+            }
+            .viewer {
+                height: 350px;
             }
             h1 {
-                font-size: 2em;
+                font-size: 1.75em;
             }
             h2 {
                 font-size: 1.3em;
             }
             p {
-                font-size: 1em;
+                font-size: 0.95em;
             }
             .big-blue-text {
-                font-size: 1.2em;
+                font-size: 1.05em;
+            }
+            .sequence-table th, .sequence-table td {
+                padding: 6px;
+            }
+            .refresh-button, .deselect-button, .toggle-style-button {
+                padding: 10px 16px;
+                font-size: 13px;
+                margin: 8px 4px;
             }
         }
 
-        @media (max-width: 480px) {
+        /* iPad Landscape / Small tablets (768px - 1024px) */
+        @media (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
             .viewer {
-                height: 250px;
+                height: 400px;
+            }
+        }
+
+        /* Mobile phones (480px - 767px) */
+        @media (max-width: 767px) {
+            .container {
+                padding: 12px;
+            }
+            .card {
+                margin: 12px 0;
+                border-radius: 6px;
+            }
+            .card-content {
+                padding: 16px;
+            }
+            .viewer {
+                height: 280px;
             }
             .active-site-text {
                 font-size: 0.9em;
             }
             h1 {
                 font-size: 1.5em;
+                margin: 15px 0;
             }
             h2 {
                 font-size: 1.1em;
+                margin: 12px 0;
             }
             p {
                 font-size: 0.9em;
+                line-height: 1.5;
             }
             .big-blue-text {
-                font-size: 1em;
+                font-size: 0.95em;
+            }
+            .sequence-table th, .sequence-table td {
+                padding: 5px;
+            }
+            .refresh-button, .deselect-button, .toggle-style-button {
+                padding: 9px 14px;
+                font-size: 12px;
+                margin: 6px 3px;
+            }
+            button {
+                padding: 10px 16px;
+                font-size: 14px;
             }
             .button-container {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: stretch;
             }
             .button-container button {
-                margin: 10px 0 0 0;
+                width: 100%;
+            }
+            .spacefill-key li {
+                font-size: 1em;
+            }
+            textarea {
+                min-height: 150px;
+                font-size: 13px;
+            }
+            #proteinSequence {
+                height: 150px;
+            }
+        }
+
+        /* Small phones (max-width 480px) */
+        @media (max-width: 479px) {
+            .container {
+                padding: 10px;
+            }
+            .card {
+                margin: 10px 0;
+            }
+            .card-content {
+                padding: 12px;
+            }
+            .viewer {
+                height: 240px;
+            }
+            .active-site-text {
+                font-size: 0.85em;
+            }
+            h1 {
+                font-size: 1.3em;
+                margin: 12px 0;
+            }
+            h2 {
+                font-size: 1em;
+                margin: 10px 0;
+            }
+            p {
+                font-size: 0.85em;
+                margin: 8px 0;
+            }
+            .big-blue-text {
+                font-size: 0.9em;
+            }
+            .sequence-table th, .sequence-table td {
+                padding: 4px;
+            }
+            .refresh-button, .deselect-button, .toggle-style-button {
+                padding: 8px 12px;
+                font-size: 11px;
+                margin: 5px 2px;
+            }
+            button {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            .spacefill-key li {
+                font-size: 0.9em;
+            }
+            textarea {
+                min-height: 120px;
+                font-size: 12px;
+            }
+            #proteinSequence {
+                height: 120px;
             }
         }
     </style>
+
 </head>
 <body>
     <div class="container">
@@ -456,7 +637,7 @@ Compare the three nucleotides in the stop and position of STOPs in the original 
         let pdbUri = "";
         let sequence = "";
         let currentStyle = 'spectrum';
-        let residuesPerLine = 50;
+        let residuesPerLine = 20;
 
         let viewer1, viewer2, viewer3, alphafoldViewer, mutantViewer;
         let selectedResidues = new Set();
@@ -1016,18 +1197,14 @@ async function initializeViewers() {
         // Adjust residues per line based on screen width
         function adjustResiduesPerLine() {
             const screenWidth = window.innerWidth;
-            if (screenWidth <= 800) {
+            if (screenWidth <= 780) {
                 residuesPerLine = 10;
-               } else if (screenWidth <= 1000) {
+            } else if (screenWidth <= 1200) {
                 residuesPerLine = 20;
-            } else if (screenWidth <= 1280) {
-                residuesPerLine = 30;
-            } else if (screenWidth <= 1480) {
-                residuesPerLine = 40;   
-            } else if (screenWidth <= 1680) {
-                residuesPerLine = 40;           
+            } else if (screenWidth <= 2000) {
+                residuesPerLine = 30;   
             } else {
-                residuesPerLine = 50;
+                residuesPerLine = 30;
             }
             createSequenceTable(sequence);
         }
@@ -1037,7 +1214,7 @@ window.addEventListener('load', function() {
   setTimeout(adjustResiduesPerLine, 10);
 });
 
-        //window.addEventListener('resize', adjustResiduesPerLine);
+        window.addEventListener('resize', adjustResiduesPerLine);
 
         function handleFileInput(event) {
             const file = event.target.files[0];
