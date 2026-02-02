@@ -53,6 +53,7 @@
         .sequence-table th, .sequence-table td {
             padding: 8px;
             cursor: pointer;
+            user-select: none;
         }
         .sequence-table th {
             background-color: var(--aquamarine);
@@ -665,6 +666,8 @@ Compare the three nucleotides in the stop and position of STOPs in the original 
         let sequence = "";
         let currentStyle = 'spectrum';
         let residuesPerLine = 20;
+        let isDragging = false;
+        let dragMode = 'add';
 
         let viewer1, viewer2, viewer3, alphafoldViewer, mutantViewer;
         let selectedResidues = new Set();
@@ -762,7 +765,24 @@ Compare the three nucleotides in the stop and position of STOPs in the original 
                     const sequenceCell = document.createElement('td');
                     sequenceCell.textContent = sequence[i + j];
                     sequenceCell.dataset.residueIndex = i + j + 1;
-                    sequenceCell.addEventListener('click', () => toggleResidueHighlight(sequenceCell));
+                    sequenceCell.addEventListener('mousedown', (e) => {
+                        e.preventDefault(); // prevent text selection
+                    isDragging = true;
+
+                    const residueIndex = parseInt(sequenceCell.dataset.residueIndex);
+
+                    // Decide whether we're adding or removing based on first cell
+                    dragMode = selectedResidues.has(residueIndex) ? 'remove' : 'add';
+
+                    applyDragSelection(sequenceCell);
+                });
+
+                sequenceCell.addEventListener('mouseover', () => {
+                    if (isDragging) {
+                        applyDragSelection(sequenceCell);
+                    }
+                });
+
                     sequenceRow.appendChild(sequenceCell);
                 }
 
@@ -1291,9 +1311,17 @@ async function initializeViewers() {
         }
 
         // Call adjustResiduesPerLine on load and on resize
-window.addEventListener('load', function() {
-  setTimeout(adjustResiduesPerLine, 10);
-});
+        window.addEventListener('load', function() {
+          setTimeout(adjustResiduesPerLine, 10);
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                updateResidueHighlighting();
+            }
+        });
+
 
         window.addEventListener('resize', adjustResiduesPerLine);
 
@@ -1355,6 +1383,23 @@ window.addEventListener('load', function() {
             reader.readAsText(file);
         }
 
+        function applyDragSelection(cell) {
+            const residueIndex = parseInt(cell.dataset.residueIndex);
+
+            if (dragMode === 'add') {
+                if (!selectedResidues.has(residueIndex)) {
+                    selectedResidues.add(residueIndex);
+                    cell.classList.add('highlight');
+                }
+            } else {
+                if (selectedResidues.has(residueIndex)) {
+                    selectedResidues.delete(residueIndex);
+                    cell.classList.remove('highlight');
+                }
+            }
+        }
+
+        
         function loadModelIntoViewer(content, format) {
             // Load the model into mutantViewer and store the content for later reloading
             const viewer = $3Dmol.createViewer('mutantViewer', { backgroundColor: '0xffffff' });
