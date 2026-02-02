@@ -951,9 +951,36 @@ async function initializeViewers() {
         function copyMutantText() {
             const proteinSequenceDiv = document.getElementById('proteinSequence2');
             const highlightedText = proteinSequenceDiv.querySelector('.highlight').innerText;
-            navigator.clipboard.writeText(highlightedText).then(() => {
-                alert('Highlighted text copied to clipboard');
-            });
+
+            // Create a temporary textarea element
+            const textArea = document.createElement("textarea");
+            textArea.value = highlightedText;
+    
+            // Position it off-screen
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            textArea.style.top = "0";
+            document.body.appendChild(textArea);
+
+            // Select and focus the text
+            textArea.focus();
+            textArea.select();
+            textArea.setSelectionRange(0, 99999); // Compatibility for mobile
+
+            try {
+                // Execute the copy command
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    alert('Highlighted text copied to clipboard');
+                } else {
+                    console.warn('Copy command was unsuccessful');
+                }
+            } catch (err) {
+                console.error('Hard failure on copy:', err);
+            }
+
+            // Clean up: remove the textarea from the DOM
+            document.body.removeChild(textArea);
         }
 
         function loadXMLFile() {
