@@ -916,9 +916,36 @@ async function initializeViewers() {
         function copyText() {
             const sequenceContainer = document.getElementById('sequence-container');
             const sequenceText = sequenceContainer.textContent.split('\n').slice(1).join('').trim();
-            navigator.clipboard.writeText(sequenceText).then(() => {
-                alert('Text copied to clipboard');
-            });
+
+            // 1. Create a hidden textarea
+            const textArea = document.createElement("textarea");
+            textArea.value = sequenceText;
+    
+            // Ensure it's not visible but still in the DOM
+            textArea.style.position = "fixed";
+            textArea.style.left = "-9999px";
+            textArea.style.top = "0";
+            document.body.appendChild(textArea);
+
+            // 2. Select the text
+            textArea.focus();
+            textArea.select();
+            textArea.setSelectionRange(0, 99999); // For mobile devices
+
+            try {
+                // 3. Execute the copy command
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    alert('Text copied to clipboard');
+                } else {
+                    console.error('Unable to copy');
+                }
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+
+            // 4. Clean up
+            document.body.removeChild(textArea);
         }
 
         function copyMutantText() {
