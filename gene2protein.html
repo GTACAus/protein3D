@@ -108,12 +108,18 @@
         margin: 20px 0;
         font-size: 30px;
         color: var(--text-on-light);
+        word-break: break-all;
+        overflow-wrap: anywhere;
+        white-space: normal;
       }
 
       .amino-acid-sequence {
         margin: 15px 0;
         font-size: 35px;
         color: var(--text-on-light);
+        word-break: break-all;
+        overflow-wrap: anywhere;
+        white-space: normal;
       }
 
       .base {
@@ -534,6 +540,24 @@
       .dropdown-container br {
         display: none;
       }
+      @media (max-width: 600px) {
+        .dna-sequence,
+        .template-sequence {
+          font-size: 20px;
+        }
+
+        .rna-sequence {
+          font-size: 18px;
+        }
+
+        .amino-acid-sequence {
+          font-size: 18px;
+          }
+
+        .base {
+          font-size: 20px;
+          }
+        }
 
     </style>
   </head>
